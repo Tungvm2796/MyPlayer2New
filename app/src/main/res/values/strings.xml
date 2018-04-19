@@ -1,0 +1,40 @@
+<resources>
+
+    <string name="app_name">MyPlayer</string>
+
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="frag1">List Song</string>
+
+    <string name="frag2">Album</string>
+
+    <string name="frag3">Artist</string>
+
+    <string name="frag4">Play List</string>
+
+    <string name="frag5">Genres</string>
+
+    <string name="pause">Pause</string>
+
+    <string name="addToPlayList">Add To Playlist</string>
+
+    <string name="details">Details</string>
+
+    <string name="removeFromPlaylist">Remove from Playlist</string>
+
+    <string name="allSong">All Song</string>
+
+    <string name="albums">Albums</string>
+
+    <string name="artist">Artist</string>
+
+    <string name="playlist">Playlist</string>
+
+    <string name="online">Online Songs</string>
+
+    <string name="equaliser">Equaliser</string>
+
+    <string name="description">Description</string>
+
+</resources>
