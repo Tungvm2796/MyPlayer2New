@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
@@ -32,6 +34,7 @@ import java.util.Random;
 
 import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Class.Constants;
+import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
@@ -52,6 +55,7 @@ public class MyService extends Service implements
     MediaSession mediaSession;
     android.media.session.MediaController mController;
 
+    Function function = new Function();
 
     //song list of all
     private ArrayList<Song> allsongs;
@@ -766,6 +770,7 @@ public class MyService extends Service implements
     private void buildNotificationPlay( Notification.Action action ) {
         Notification.MediaStyle style = new Notification.MediaStyle();
 
+
         Intent notIntent = new Intent(this, MainActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -776,9 +781,10 @@ public class MyService extends Service implements
 
         Notification.Builder builder = new Notification.Builder( this )
                 .setContentIntent(pendInt)
-                .setSmallIcon(R.drawable.ic_play_circle_outline_white_24dp)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
+                .setSmallIcon(R.drawable.ic_play_circle_outline_white_24dp)
+                .setLargeIcon(loadLargeIcon(getCurSong().getData()))
                 .setAutoCancel(true)
                 .setOngoing(false)
                 .setDeleteIntent(pendingIntent)
@@ -808,9 +814,10 @@ public class MyService extends Service implements
 
         Notification.Builder builder = new Notification.Builder( this )
                 .setContentIntent(pendInt)
-                .setSmallIcon(R.drawable.ic_play_circle_outline_white_24dp)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
+                .setSmallIcon(R.drawable.ic_play_circle_outline_white_24dp)
+                .setLargeIcon(loadLargeIcon(getCurSong().getData()))
                 .setAutoCancel(true)
                 .setOngoing(false)
                 .setDeleteIntent(pendingIntent)
@@ -912,5 +919,18 @@ public class MyService extends Service implements
     public void onDestroy() {
         super.onDestroy();
         mediaSession.release();
+    }
+
+    private Bitmap loadLargeIcon(String path){
+        Bitmap largeIcon;
+
+        try {
+            byte[] bitmapByte = function.GetBitMapByte(path);
+            largeIcon = BitmapFactory.decodeByteArray(bitmapByte, 0, bitmapByte.length);
+        }catch (Exception e){
+            largeIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.noteicon);
+        }
+
+        return largeIcon;
     }
 }

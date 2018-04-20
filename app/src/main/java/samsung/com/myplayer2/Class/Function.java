@@ -39,7 +39,7 @@ public class Function {
         });
     }
 
-    private void SortByAlbumName(ArrayList<Album> ArrayAlbum) {
+    private static void SortByAlbumName(ArrayList<Album> ArrayAlbum) {
         Collections.sort(ArrayAlbum, new Comparator<Album>() {
             public int compare(Album a, Album b) {
                 return a.getAlbumName().toLowerCase().compareTo(b.getAlbumName().toLowerCase());
@@ -47,7 +47,7 @@ public class Function {
         });
     }
 
-    private void SortByArtistName(ArrayList<Artist> ArrayArtist) {
+    private static void SortByArtistName(ArrayList<Artist> ArrayArtist) {
         Collections.sort(ArrayArtist, new Comparator<Artist>() {
             public int compare(Artist a, Artist b) {
                 return a.getName().toLowerCase().compareTo(b.getName().toLowerCase());
@@ -106,7 +106,7 @@ public class Function {
         }
     }
 
-    public void getSongList(Context mContext, ArrayList<Song> ArraySong) {
+    public static void getSongList(Context mContext, ArrayList<Song> ArraySong) {
         //retrieve song info
         MediaMetadataRetriever mr = new MediaMetadataRetriever();
         Cursor musicCursor;
@@ -153,31 +153,33 @@ public class Function {
         musicCursor.close();
     }
 
-    public void getAlbumsLists(Context mContext, ArrayList<Album> albumList) {
+    public static void getAlbumsLists(Context mContext, ArrayList<Album> albumList) {
         String where = null;
 
         final Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
-        final String _id = MediaStore.Audio.Albums._ID;
-        final String album_name = MediaStore.Audio.Albums.ALBUM;
-        final String artist = MediaStore.Audio.Albums.ARTIST;
-        final String albumart = MediaStore.Audio.Albums.ALBUM_ART;
-        final String tracks = MediaStore.Audio.Albums.NUMBER_OF_SONGS;
 
-        final String[] columns = {_id, album_name, artist, albumart, tracks};
+//        final String _id = MediaStore.Audio.Albums._ID;
+//        final String album_name = MediaStore.Audio.Albums.ALBUM;
+//        final String artist = MediaStore.Audio.Albums.ARTIST;
+//        final String albumart = MediaStore.Audio.Albums.ALBUM_ART;
+//        final String tracks = MediaStore.Audio.Albums.NUMBER_OF_SONGS;
+
+
+        final String[] columns = {"_id", "album", "artist", "album_art", "numsongs"};
         Cursor cursor = mContext.getContentResolver().query(uri, columns, where, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
 
             do {
 
-                long id = cursor.getLong(cursor.getColumnIndex(_id));
-                String name = cursor.getString(cursor.getColumnIndex(album_name));
-                String artist2 = cursor.getString(cursor.getColumnIndex(artist));
-                String artPath = cursor.getString(cursor.getColumnIndex(albumart));
+                long id = cursor.getLong(0);
+                String name = cursor.getString(1);
+                String artist = cursor.getString(2);
+                String artPath = cursor.getString(3);
                 Bitmap art = BitmapFactory.decodeFile(artPath);
-                int nr = Integer.parseInt(cursor.getString(cursor.getColumnIndex(tracks)));
+                int nr = Integer.parseInt(cursor.getString(4));
 
-                albumList.add(new Album(id, name, artist2, nr, art));
+                albumList.add(new Album(id, name, artist, nr, art));
 
             } while (cursor.moveToNext());
 
@@ -186,21 +188,22 @@ public class Function {
         SortByAlbumName(albumList);
     }
 
-    public void getArtist(Context mContext, ArrayList<Artist> artists) {
+    public static void getArtist(Context mContext, ArrayList<Artist> artists) {
         String where = null;
 
         final Uri uri = MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI;
-        final String artist = MediaStore.Audio.Artists.ARTIST;
 
-        final String[] columns = {artist};
+        //final String artist = MediaStore.Audio.Artists.ARTIST;
+
+        final String[] columns = {"artist"};
         Cursor cursor = mContext.getContentResolver().query(uri, columns, where, null, null);
 
         if (cursor != null && cursor.moveToFirst()) {
 
             do {
 
-                String artist2 = cursor.getString(cursor.getColumnIndex(artist));
-                artists.add(new Artist(artist2));
+                String artist = cursor.getString(0);
+                artists.add(new Artist(artist));
 
             } while (cursor.moveToNext());
 
@@ -209,15 +212,20 @@ public class Function {
         SortByArtistName(artists);
     }
 
-    public void getGenres(Context mContext, ArrayList<String> genres) {
+    public static void getGenres(Context mContext, ArrayList<String> genres) {
         Cursor genresCursor;
+
         Uri genresUri = MediaStore.Audio.Genres.EXTERNAL_CONTENT_URI;
-        genresCursor = mContext.getContentResolver().query(genresUri, null, null, null, null);
-        int genre_column_index = genresCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
+
+        String[] Column = {"name"};
+
+
+        genresCursor = mContext.getContentResolver().query(genresUri, Column, null, null, null);
+//        int genre_column_index = genresCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
 
         if (genresCursor.moveToFirst()) {
             do {
-                String genresName = genresCursor.getString(genre_column_index);
+                String genresName = genresCursor.getString(0);
                 genres.add(genresName);
             } while (genresCursor.moveToNext());
         }

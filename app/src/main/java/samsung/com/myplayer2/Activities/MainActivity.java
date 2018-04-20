@@ -1,6 +1,5 @@
 package samsung.com.myplayer2.Activities;
 
-import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
@@ -12,7 +11,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.audiofx.AudioEffect;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -166,11 +164,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        initPermission();
 
         navigationMap.put(Constants.NAVIGATE_LIBRARY, navigateLibrary);
         navigationMap.put(Constants.NAVIGATE_PLAYLIST, navigatePlaylist);
@@ -550,22 +547,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
 
     }
 
-    public void initPermission() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            //if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-            //}
-            //if (checkSelfPermission(Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WAKE_LOCK}, 1);
-            //}
-            //if (checkSelfPermission(Manifest.permission.MEDIA_CONTENT_CONTROL) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.MEDIA_CONTENT_CONTROL}, 1);
-            //}
-            //if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.INTERNET}, 1);
-            //}
-        }
-    }
+
 
     private void setSuggestion() {
         for (Song song : MainSongList) {
