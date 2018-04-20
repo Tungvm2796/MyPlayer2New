@@ -14,7 +14,7 @@ import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Class.Playlist;
+import samsung.com.myplayer2.Model.Playlist;
 import samsung.com.myplayer2.R;
 
 /**

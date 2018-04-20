@@ -23,7 +23,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import java.util.ArrayList;
 
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Class.Song;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.R;
 
@@ -34,7 +34,7 @@ import samsung.com.myplayer2.R;
 public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> {
 
 
-    private ArrayList<samsung.com.myplayer2.Class.Song> songs;
+    private ArrayList<Song> songs;
     Context mContext;
     ArrayList<String> Namelist;
     ListView lv;
@@ -74,7 +74,7 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
     @Override
     public void onBindViewHolder(final MyRecyclerSongHolder holder, int position) {
         //get song using position
-        final samsung.com.myplayer2.Class.Song currSong = songs.get(position);
+        final Song currSong = songs.get(position);
         final int pos = position;
 
         //get title and artist strings, embedded pictures

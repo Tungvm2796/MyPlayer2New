@@ -13,4 +13,7 @@ public class Constants {
         public static String NEXT_ACTION = "samsung.com.myplayer2.action.next";
         public static String EXIT_ACTION = "samsung.com.myplayer2.action.exit";
     }
+
+    public static final String NAVIGATE_LIBRARY = "navigate_library";
+    public static final String NAVIGATE_PLAYLIST = "navigate_playlist";
 }

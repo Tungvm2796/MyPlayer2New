@@ -14,15 +14,18 @@ import android.content.SharedPreferences;
 import android.media.audiofx.AudioEffect;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,10 +40,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
-import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.bumptech.glide.Glide;
 import com.musixmatch.lyrics.MissingPluginException;
 import com.musixmatch.lyrics.musiXmatchLyricsConnector;
@@ -49,17 +50,21 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import samsung.com.myplayer2.Adapter.CustomPagerAdapter;
 import samsung.com.myplayer2.Adapter.RecyclerAlbumAdapter;
 import samsung.com.myplayer2.Adapter.RecyclerArtistAdapter;
 import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
-import samsung.com.myplayer2.Class.Album;
-import samsung.com.myplayer2.Class.Artist;
+import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.KMPSearch;
-import samsung.com.myplayer2.Class.Song;
-import samsung.com.myplayer2.Class.Suggestion;
+import samsung.com.myplayer2.Fragments.MainFragment;
+import samsung.com.myplayer2.Model.Album;
+import samsung.com.myplayer2.Model.Artist;
+import samsung.com.myplayer2.Model.Song;
+import samsung.com.myplayer2.Model.Suggestion;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
 
@@ -129,8 +134,35 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
     Toolbar toolbar;
 
     private DrawerLayout drawerLayout;
+    NavigationView navigationView;
 
     private musiXmatchLyricsConnector mLyricsPlugin = null;
+
+    private String action;
+    private Runnable runnable;
+    private Map<String, Runnable> navigationMap = new HashMap<String, Runnable>();
+    private Handler navDrawerRunnable = new Handler();
+
+    private Runnable navigateLibrary = new Runnable() {
+        public void run() {
+            navigationView.getMenu().findItem(R.id.nav_library).setChecked(true);
+            Fragment fragment = new MainFragment();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.replace(R.id.fragment_container, fragment).commitAllowingStateLoss();
+
+        }
+    };
+
+    private Runnable navigatePlaylist = new Runnable() {
+        public void run() {
+            navigationView.getMenu().findItem(R.id.nav_playlist).setChecked(true);
+            //Fragment fragment = new PlaylistFragment();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.hide(getSupportFragmentManager().findFragmentById(R.id.fragment_container));
+            //transaction.replace(R.id.fragment_container, fragment).commit();
+
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -140,17 +172,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
 
         initPermission();
 
-        Button mybtn = findViewById(R.id.xemlist);
+        navigationMap.put(Constants.NAVIGATE_LIBRARY, navigateLibrary);
+        navigationMap.put(Constants.NAVIGATE_PLAYLIST, navigatePlaylist);
 
         context = this;
         function = new Function();
 
-        mybtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(context, Integer.toString(myService.getListNumber()), Toast.LENGTH_SHORT).show();
-            }
-        });
 
         IntentFilter toActivity = new IntentFilter("ToActivity");
         toActivity.addAction("PlayPause");
@@ -163,19 +190,19 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
 
         initView();
 
-        tabcontainer = findViewById(R.id.tabcontainer);
-        coloredBackgroundView = findViewById(R.id.colored_background_view);
+        //tabcontainer = findViewById(R.id.tabcontainer);
+        //coloredBackgroundView = findViewById(R.id.colored_background_view);
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        //toolbar = findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
+        //ActionBar actionBar = getSupportActionBar();
+        //actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         MainSongList = new ArrayList<>();
@@ -235,107 +262,64 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
             }
         });
 
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//
+//            }
+//
+//            @Override
+//            public void onPageSelected(int position) {
+//                if (musicBound) {
+//                    switch (position) {
+//                        case 0:
+//                            myService.setListNumber(1);
+//                            myService.setListNumberFrag(1);
+//                            //songAdapter.setOnPlaylist(0);
+//                            break;
+//                        case 1:
+//                            myService.setListNumber(2);
+//                            myService.setListNumberFrag(2);
+//                            //songAdapter.setOnPlaylist(0);
+//                            break;
+//                        case 2:
+//                            myService.setListNumber(3);
+//                            myService.setListNumberFrag(3);
+//                            //songAdapter.setOnPlaylist(0);
+//                            break;
+//                        case 3:
+//                            myService.setListNumber(4);
+//                            myService.setListNumberFrag(4);
+//                            //songAdapter.setOnPlaylist(1);
+//                            break;
+//                        case 4:
+//                            myService.setListNumber(5);
+//                            myService.setListNumberFrag(5);
+//                            //songAdapter.setOnPlaylist(0);
+//                            break;
+//                    }
+//                }
+//                tabcontainer.clearAnimation();
+//                tabcontainer
+//                        .animate()
+//                        .translationY(0)
+//                        .start();
+//                coloredBackgroundView.setTranslationY(0);
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//
+//            }
+//        });
 
-            }
 
-            @Override
-            public void onPageSelected(int position) {
-                if (musicBound) {
-                    switch (position) {
-                        case 0:
-                            myService.setListNumber(1);
-                            myService.setListNumberFrag(1);
-                            //songAdapter.setOnPlaylist(0);
-                            break;
-                        case 1:
-                            myService.setListNumber(2);
-                            myService.setListNumberFrag(2);
-                            //songAdapter.setOnPlaylist(0);
-                            break;
-                        case 2:
-                            myService.setListNumber(3);
-                            myService.setListNumberFrag(3);
-                            //songAdapter.setOnPlaylist(0);
-                            break;
-                        case 3:
-                            myService.setListNumber(4);
-                            myService.setListNumberFrag(4);
-                            //songAdapter.setOnPlaylist(1);
-                            break;
-                        case 4:
-                            myService.setListNumber(5);
-                            myService.setListNumberFrag(5);
-                            //songAdapter.setOnPlaylist(0);
-                            break;
-                    }
-                }
-                tabcontainer.clearAnimation();
-                tabcontainer
-                        .animate()
-                        .translationY(0)
-                        .start();
-                coloredBackgroundView.setTranslationY(0);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-
-        searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, String newQuery) {
-                if (!oldQuery.equals("") && newQuery.equals("")) {
-                    searchView.clearSuggestions();
-                } else {
-                    searchView.showProgress();
-                    searchView.swapSuggestions(getSuggestion(newQuery));
-                    searchView.hideProgress();
-                }
-            }
-        });
-
-        searchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
-            @Override
-            public void onFocus() {
-                searchView.showProgress();
-                searchView.swapSuggestions(getSuggestion(searchView.getQuery()));
-                searchView.hideProgress();
-            }
-
-            @Override
-            public void onFocusCleared() {
-
-            }
-        });
-
-        searchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
-            @Override
-            public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
-
-                Suggestion sug = (Suggestion) searchSuggestion;
-
-                SetDataForResultView(sug.getBody());
-
-                searchView.clearFocus();
-            }
-
-            @Override
-            public void onSearchAction(String currentQuery) {
-
-                SetDataForResultView(currentQuery);
-            }
-        });
 
         btnPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (myService.isPng()) {
-                    myService.pausePlayer();
+                    //myService.pausePlayer();
                     btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
                     Intent pauseIntent = new Intent("ToService");
                     pauseIntent.setAction("SvPlayPause");
@@ -343,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
                     sendBroadcast(pauseIntent);
 
                 } else {
-                    myService.go();
+                    //myService.go();
                     btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
                     Intent playIntent = new Intent("ToService");
                     playIntent.setAction("SvPlayPause");
@@ -401,25 +385,25 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
         Button btn2 = findViewById(R.id.btnmainlay2);
         Button btn3 = findViewById(R.id.btnmainlay3);
 
-        btn2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainlay1.setVisibility(View.INVISIBLE);
-                mainlay2.setVisibility(View.INVISIBLE);
-                mainlay3.setVisibility(View.VISIBLE);
-                myService.setListNumber(7);  ///// Sua lai cho nay, dung ra nos la button quay lai
-            }
-        });
-
-        btn3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainlay1.setVisibility(View.INVISIBLE);
-                mainlay2.setVisibility(View.VISIBLE);
-                mainlay3.setVisibility(View.INVISIBLE);
-                myService.setListNumber(6);
-            }
-        });
+//        btn2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                mainlay1.setVisibility(View.INVISIBLE);
+//                mainlay2.setVisibility(View.INVISIBLE);
+//                mainlay3.setVisibility(View.VISIBLE);
+//                myService.setListNumber(7);  ///// Sua lai cho nay, dung ra nos la button quay lai
+//            }
+//        });
+//
+//        btn3.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                mainlay1.setVisibility(View.INVISIBLE);
+//                mainlay2.setVisibility(View.VISIBLE);
+//                mainlay3.setVisibility(View.INVISIBLE);
+//                myService.setListNumber(6);
+//            }
+//        });
 
         mLyricsPlugin = new musiXmatchLyricsConnector(this);
         mLyricsPlugin.setLoadingMessage("Your custom title", "Your custom message");
@@ -437,6 +421,91 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
                 }
             }
         });
+
+        navDrawerRunnable.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setupDrawerContent(navigationView);
+            }
+        }, 700);
+
+        addBackstackListener();
+        loadEverything();
+
+        //END onCreate() ---------------------------------------------------------------
+    }
+
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(final MenuItem menuItem) {
+                        updatePosition(menuItem);
+                        return true;
+
+                    }
+                });
+    }
+
+
+    private void updatePosition(final MenuItem menuItem) {
+        runnable = null;
+
+        switch (menuItem.getItemId()) {
+            case R.id.nav_library:
+                runnable = navigateLibrary;
+
+                break;
+
+            case R.id.nav_playlist:
+                runnable = navigatePlaylist;
+
+                break;
+
+            case R.id.nav_equalizer:
+                Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+                if ((intent.resolveActivity(getPackageManager()) != null)) {
+                    startActivityForResult(intent, RESULT_OK);
+                } else {
+                    // No equalizer found
+                }
+                break;
+        }
+
+        if (runnable != null) {
+            menuItem.setChecked(true);
+            drawerLayout.closeDrawers();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    runnable.run();
+                }
+            }, 350);
+        }
+    }
+
+    private void addBackstackListener() {
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+            @Override
+            public void onBackStackChanged() {
+                getSupportFragmentManager().findFragmentById(R.id.fragment_container).onResume();
+            }
+        });
+    }
+
+    private void loadEverything() {
+        Runnable navigation = navigationMap.get(action);
+        if (navigation != null) {
+            navigation.run();
+        } else {
+            navigateLibrary.run();
+        }
+    }
+
+    private boolean isNavigatingMain() {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        return (currentFragment instanceof MainFragment);
     }
 
     private void initView() {
@@ -450,17 +519,17 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
 
         seekBar = findViewById(R.id.seekbar_song);
 
-        smartTabLayout = findViewById(R.id.viewpagertab);
+        //smartTabLayout = findViewById(R.id.viewpagertab);
 
-        customPagerAdapter = new CustomPagerAdapter(this, getSupportFragmentManager());
+        //customPagerAdapter = new CustomPagerAdapter(this, getSupportFragmentManager());
 
-        viewPager = findViewById(R.id.viewpager1);
+        //viewPager = findViewById(R.id.viewpager);
 
-        viewPager.setAdapter(customPagerAdapter);
+        //viewPager.setAdapter(customPagerAdapter);
 
-        viewPager.setOffscreenPageLimit(customPagerAdapter.getCount() - 1);
+        //viewPager.setOffscreenPageLimit(customPagerAdapter.getCount() - 1);
 
-        smartTabLayout.setViewPager(viewPager);
+        //smartTabLayout.setViewPager(viewPager);
 
         //FragmentManager fragmentManager = getSupportFragmentManager();
 
@@ -472,12 +541,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
         shuffle = findViewById(R.id.btn_shuffle);
         repeat = findViewById(R.id.btn_repeat);
 
-        mainlay1 = findViewById(R.id.mainlay1);
-        mainlay2 = findViewById(R.id.mainlay2);
-        mainlay3 = findViewById(R.id.mainlay3);
+        //mainlay1 = findViewById(R.id.mainlay1);
+        //mainlay2 = findViewById(R.id.mainlay2);
+        //mainlay3 = findViewById(R.id.mainlay3);
 
-        mainlay2.setVisibility(View.INVISIBLE);
-        mainlay3.setVisibility(View.INVISIBLE);
+        //mainlay2.setVisibility(View.INVISIBLE);
+        //mainlay3.setVisibility(View.INVISIBLE);
 
     }
 
@@ -613,7 +682,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
         public void onReceive(Context context, Intent intent) {
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
             String action = intent.getAction();
-            if(action != null) {
+            if (action != null) {
                 switch (action) {
 
                     case "PlayPause":
@@ -665,26 +734,28 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
                 (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED ||
                         slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        }
-        //If SlingUp Panel is collaped and the inner result is show, close the inner result layout and back to the result
-        else if (slidingLayout != null && (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) &&
-                (mainlay3.getVisibility() == View.VISIBLE)) {
-            CloseLay3();
-            OpenLay2();
-            crossFadeAnimation(mainlay2, mainlay3, 270);
-            myService.setListNumber(6);
-        }
-        //If SlidingUp Panel is collapsed and the result is show, close the result layout and back to the main layout, set Listnumber to Fragments
-        else if (slidingLayout != null && (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) &&
-                (mainlay2.getVisibility() == View.VISIBLE)) {
-            CloseLay2();
-            OpenLay1();
-            myService.setListNumber(myService.getListNumberFrag()); //Turn back to list content not searchview, so set the listNumber to the fragNumber before
-        } else if ((myService.getListNumber() == 2) &&
-                (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED)
-                && index == 2) {
-            Toast.makeText(context, "close Album", Toast.LENGTH_SHORT).show();
-            index = 0;
+//        }
+//        //If SlingUp Panel is collaped and the inner result is show, close the inner result layout and back to the result
+//        else if (slidingLayout != null && (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) &&
+//                (mainlay3.getVisibility() == View.VISIBLE)) {
+//            CloseLay3();
+//            OpenLay2();
+//            crossFadeAnimation(mainlay2, mainlay3, 270);
+//            myService.setListNumber(6);
+//        }
+//        //If SlidingUp Panel is collapsed and the result is show, close the result layout and back to the main layout, set Listnumber to Fragments
+//        else if (slidingLayout != null && (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) &&
+//                (mainlay2.getVisibility() == View.VISIBLE)) {
+//            CloseLay2();
+//            OpenLay1();
+//            myService.setListNumber(myService.getListNumberFrag()); //Turn back to list content not searchview, so set the listNumber to the fragNumber before
+//        } else if ((myService.getListNumber() == 2) &&
+//                (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED)
+//                && index == 2) {
+//            Toast.makeText(context, "close Album", Toast.LENGTH_SHORT).show();
+//            index = 0;
+        } else if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -843,9 +914,12 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                drawerLayout.openDrawer(GravityCompat.START);
+            case android.R.id.home: {
+                if (isNavigatingMain()) {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                } else super.onBackPressed();
                 return true;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

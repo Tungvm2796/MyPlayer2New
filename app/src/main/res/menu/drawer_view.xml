@@ -4,6 +4,10 @@
         android:id="@+id/player"
         android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_library"
+            android:icon="@drawable/ic_audiotrack"
+            android:title="Library" />
+        <item
             android:id="@+id/nav_song"
             android:icon="@drawable/ic_audiotrack"
             android:title="@string/allSong" />

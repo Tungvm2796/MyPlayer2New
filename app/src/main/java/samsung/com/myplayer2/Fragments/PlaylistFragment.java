@@ -35,9 +35,8 @@ import samsung.com.myplayer2.Adapter.RecyclerPlaylistAdapter;
 import samsung.com.myplayer2.Adapter.SongInPlaylistAdapter;
 import samsung.com.myplayer2.Class.EditItemTouchHelperCallback;
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Class.Playlist;
-import samsung.com.myplayer2.Class.Song;
-import samsung.com.myplayer2.Class.ToolbarHidingOnScrollListener;
+import samsung.com.myplayer2.Model.Playlist;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
@@ -106,17 +105,17 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
         //function.getSongList(getActivity(), AllSong);
         AllSong = ((MainActivity) getActivity()).getAllSong();
 
-        View tabcontainer = getActivity().findViewById(R.id.tabcontainer);
-        toolbar = getActivity().findViewById(R.id.toolbar);
-        View lasttab = getActivity().findViewById(R.id.viewpagertab);
-        View coloredBackgroundView = getActivity().findViewById(R.id.colored_background_view);
+//        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
+//        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);
+//        View lasttab = new MainFragment().getView().findViewById(R.id.viewpagertab);
+//        View coloredBackgroundView = new MainFragment().getView().findViewById(R.id.colored_background_view);
 
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         playListView.setLayoutManager(mManager);
         PlaylistAdapter = new RecyclerPlaylistAdapter(getActivity(), playlists);
         PlaylistAdapter.setClickListener(this);
         playListView.setAdapter(PlaylistAdapter);
-        playListView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
+        //playListView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
 
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity(), R.style.AlertDialogTheme);
         alertDialog.setTitle("Add new Playlist");

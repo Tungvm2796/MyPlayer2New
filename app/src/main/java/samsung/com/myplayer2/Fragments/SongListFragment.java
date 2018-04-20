@@ -19,8 +19,7 @@ import java.util.ArrayList;
 
 import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Class.Song;
-import samsung.com.myplayer2.Class.ToolbarHidingOnScrollListener;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
 
@@ -59,24 +58,24 @@ public class SongListFragment extends Fragment {
 
         context = v.getContext();
 
+        SongList = new ArrayList<>();
+
         if(savedInstanceState == null){
             new GetSong().execute();
         }
 
-        SongList = new ArrayList<>();
-
         //SongList = ((MainActivity) getActivity()).getAllSong();
 
-        View tabcontainer = getActivity().findViewById(R.id.tabcontainer);
-        toolbar = getActivity().findViewById(R.id.toolbar);
-        View lasttab = getActivity().findViewById(R.id.viewpagertab);
-        View coloredBackgroundView = getActivity().findViewById(R.id.colored_background_view);
+//        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
+//        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);
+//        View lasttab = new MainFragment().getView().findViewById(R.id.viewpagertab);
+//        View coloredBackgroundView = new MainFragment().getView().findViewById(R.id.colored_background_view);
 
         RecyclerView.LayoutManager mManager = new LinearLayoutManager(getContext());
         songView.setLayoutManager(mManager);
         //new GetSong().execute();
 
-        songView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
+        //songView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
 
         return v;
     }
@@ -129,14 +128,14 @@ public class SongListFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            function.getSongList(getActivity(), SongList);
+            function.getSongList(getContext(), SongList);
+            songAdt = new RecyclerSongAdapter(getContext(), SongList);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            songAdt = new RecyclerSongAdapter(getContext(), SongList);
             songView.setAdapter(songAdt);
         }
     }

@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Class.Artist;
+import samsung.com.myplayer2.Model.Artist;
 import samsung.com.myplayer2.R;
 
 /**

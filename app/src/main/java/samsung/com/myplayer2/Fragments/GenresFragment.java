@@ -24,8 +24,7 @@ import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Adapter.RecyclerGenresAdapter;
 import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Class.Song;
-import samsung.com.myplayer2.Class.ToolbarHidingOnScrollListener;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
 
@@ -82,17 +81,17 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
         songOfGenres.setLayoutManager(manager);
         songOfGenres.setAdapter(null);
 
-        View tabcontainer = getActivity().findViewById(R.id.tabcontainer);
-        toolbar = getActivity().findViewById(R.id.toolbar);
-        View lasttab = getActivity().findViewById(R.id.viewpagertab);
-        View coloredBackgroundView = getActivity().findViewById(R.id.colored_background_view);
+//        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
+//        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);
+//        View lasttab = new MainFragment().getView().findViewById(R.id.viewpagertab);
+//        View coloredBackgroundView = new MainFragment().getView().findViewById(R.id.colored_background_view);
 
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         genresView.setLayoutManager(mManager);
 
         new GetGenres().execute();
 
-        genresView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
+        //genresView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
 
         return v;
     }

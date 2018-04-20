@@ -10,12 +10,16 @@ import android.graphics.Matrix;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import samsung.com.myplayer2.Model.Album;
+import samsung.com.myplayer2.Model.Artist;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
 /**
@@ -27,10 +31,10 @@ public class Function {
     public Function() {
     }
 
-    private void SortBySongName(ArrayList<Song> ArraySong) {
+    private static void SortBySongName(ArrayList<Song> ArraySong) {
         Collections.sort(ArraySong, new Comparator<Song>() {
             public int compare(Song a, Song b) {
-                return a.getTitle().compareTo(b.getTitle());
+                return a.getTitle().toLowerCase().compareTo(b.getTitle().toLowerCase());
             }
         });
     }
@@ -38,7 +42,7 @@ public class Function {
     private void SortByAlbumName(ArrayList<Album> ArrayAlbum) {
         Collections.sort(ArrayAlbum, new Comparator<Album>() {
             public int compare(Album a, Album b) {
-                return a.getAlbumName().compareTo(b.getAlbumName());
+                return a.getAlbumName().toLowerCase().compareTo(b.getAlbumName().toLowerCase());
             }
         });
     }
@@ -46,7 +50,7 @@ public class Function {
     private void SortByArtistName(ArrayList<Artist> ArrayArtist) {
         Collections.sort(ArrayArtist, new Comparator<Artist>() {
             public int compare(Artist a, Artist b) {
-                return a.getName().compareTo(b.getName());
+                return a.getName().toLowerCase().compareTo(b.getName().toLowerCase());
             }
         });
     }
@@ -109,26 +113,30 @@ public class Function {
 
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String select = MediaStore.Audio.Media.DURATION + ">=30000";
-        musicCursor = musicResolver.query(musicUri, null, select, null, null);
+
+        String[] ColumnIndex = {"_id", "title", "artist", "_data", "album_id"};
+
+        String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
+
+        musicCursor = musicResolver.query(musicUri, ColumnIndex, selectOption, null, null);
 
         //get collumn
-        int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
-        int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
-        int artisColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
-        int dataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
-        int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+//        int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+//        int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+//        int artisColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+//        int dataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+//        int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
 
         if (musicCursor.moveToFirst()) {
             //add song to list
             do {
-                long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtis = musicCursor.getString(artisColumn);
-                String thisData = musicCursor.getString(dataColumn);
+                long thisId = musicCursor.getLong(0);
+                String thisTitle = musicCursor.getString(1);
+                String thisArtis = musicCursor.getString(2);
+                String thisData = musicCursor.getString(3);
                 //Bitmap songimg = GetBitmap(thisData);
                 //Bitmap lastimg = getResizedBitmap(songimg, 55, 60);
-                long albumId = musicCursor.getLong(albumIdColumn);
+                long albumId = musicCursor.getLong(4);
 
                 Uri trackUri = ContentUris.withAppendedId(musicUri, thisId);
 
@@ -219,5 +227,43 @@ public class Function {
 
     public String getURLForResource(int resourceId) {
         return Uri.parse("android.resource://" + R.class.getPackage().getName() + "/" + resourceId).toString();
+    }
+
+
+
+
+    public ArrayList<Song> getAllSongs(Context context) {
+        return getSongsForCursor(makeSongCursor(context, null, null, null));
+    }
+
+    public ArrayList<Song> getSongsForCursor(Cursor cursor) {
+        ArrayList arrayList = new ArrayList();
+        if ((cursor != null) && (cursor.moveToFirst()))
+            do {
+                long id = cursor.getLong(0);
+                String title = cursor.getString(1);
+                String artist = cursor.getString(2);
+                String data = cursor.getString(3);
+                long albumId = cursor.getInt(4);
+
+                arrayList.add(new Song(id, title, artist, data, albumId, null));
+            }
+            while (cursor.moveToNext());
+        if (cursor != null)
+            cursor.close();
+
+        SortBySongName(arrayList);
+
+        return arrayList;
+    }
+
+    private Cursor makeSongCursor(Context context, String selection, String[] paramArrayOfString, String sortOrder) {
+        String selectionStatement = "is_music = 1 AND title != ''";
+
+        if (!TextUtils.isEmpty(selection)) {
+            selectionStatement = selectionStatement + " AND " + selection;
+        }
+        return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "title", "artist", "_data", "album_id"}, selectionStatement, paramArrayOfString, sortOrder);
+
     }
 }

@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Class.Playlist;
+import samsung.com.myplayer2.Model.Playlist;
 
 /**
  * Created by 450G4 on 3/17/2018.

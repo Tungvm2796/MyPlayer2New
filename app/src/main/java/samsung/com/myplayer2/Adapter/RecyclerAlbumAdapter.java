@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Class.Album;
+import samsung.com.myplayer2.Model.Album;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.R;
 

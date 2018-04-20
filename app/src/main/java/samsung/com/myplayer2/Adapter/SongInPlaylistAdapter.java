@@ -23,7 +23,7 @@ import java.util.Collections;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.ItemTouchHelperAdapter;
 import samsung.com.myplayer2.Class.ItemTouchHelperViewHolder;
-import samsung.com.myplayer2.Class.Song;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.R;
 
@@ -79,7 +79,7 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
     @Override
     public void onBindViewHolder(final SongInPlaylistAdapter.MyRecyclerSongHolder holder, final int position) {
         //get song using position
-        final samsung.com.myplayer2.Class.Song currSong = songs.get(position);
+        final Song currSong = songs.get(position);
 
         //get title and artist strings, embedded pictures
         holder.songView.setText(currSong.getTitle());

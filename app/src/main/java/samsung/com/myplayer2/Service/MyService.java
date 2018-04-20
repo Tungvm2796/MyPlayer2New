@@ -1,6 +1,7 @@
 package samsung.com.myplayer2.Service;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -12,7 +13,6 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
-import android.media.session.MediaSessionManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
@@ -22,7 +22,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
-import android.widget.MediaController;
 import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.Toast;
@@ -33,7 +32,7 @@ import java.util.Random;
 
 import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Class.Constants;
-import samsung.com.myplayer2.Class.Song;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
 /*
@@ -50,9 +49,8 @@ public class MyService extends Service implements
     //media player
     public static MediaPlayer player;
 
-    MediaSessionManager mediaSessionManager;
     MediaSession mediaSession;
-    MediaController mediaController;
+    android.media.session.MediaController mController;
 
 
     //song list of all
@@ -114,6 +112,7 @@ public class MyService extends Service implements
         //create player
         player = new MediaPlayer();
 
+
         context = this;
 
         IntentFilter svintent = new IntentFilter("ToService");
@@ -128,75 +127,73 @@ public class MyService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        String action = intent.getAction();
+        //String action = intent.getAction();
 
-        if (action != null) {
-
-            switch (action) {
-
-                case Constants.ACTION.PAUSE_ACTION:
-                    pausePlayer();
-                    showNoti(2);
-
-                    Intent intent1 = new Intent("ToActivity");
-                    intent1.setAction("PlayPause");
-                    intent1.putExtra("key", "pause");
-                    sendBroadcast(intent1);
-
-                    progressHandler.removeCallbacks(run);
-
-                    break;
-
-                case Constants.ACTION.PLAY_ACTION:
-
-                    go();
-                    showNoti(1);
-
-                    Intent intent2 = new Intent("ToActivity");
-                    intent2.setAction("PlayPause");
-                    intent2.putExtra("key", "play");
-                    sendBroadcast(intent2);
-
-                    updateProgress();
-
-                    break;
-
-                case Constants.ACTION.NEXT_ACTION:
-                    showNoti(1);
-                    playNext();
-                    break;
-
-                case Constants.ACTION.PREV_ACTION:
-                    showNoti(1);
-                    playPrev();
-                    break;
-
-                case Constants.ACTION.EXIT_ACTION:
-                    if (!player.isPlaying()) {
-                        if (bothRun = true) {
-                            stopForeground(true);
-                            checkBothRun();
-                        } else if (bothRun = false) {
-                            stopForeground(true);
-                            unregisterReceiver(myServBroadcast);
-                            stopSelf();
-                        }
-                    }
-                    break;
-            }
+        if(mediaSession == null){
+            initSession();
         }
 
-        initUI();
+//        if (action != null) {
+//
+//            switch (action) {
+//
+//                case Constants.ACTION.PAUSE_ACTION:
+//                    pausePlayer();
+//                    showNoti(2);
+//
+//                    Intent intent1 = new Intent("ToActivity");
+//                    intent1.setAction("PlayPause");
+//                    intent1.putExtra("key", "pause");
+//                    sendBroadcast(intent1);
+//
+//                    progressHandler.removeCallbacks(run);
+//
+//                    break;
+//
+//                case Constants.ACTION.PLAY_ACTION:
+//
+//                    go();
+//                    showNoti(1);
+//
+//                    Intent intent2 = new Intent("ToActivity");
+//                    intent2.setAction("PlayPause");
+//                    intent2.putExtra("key", "play");
+//                    sendBroadcast(intent2);
+//
+//                    updateProgress();
+//
+//                    break;
+//
+//                case Constants.ACTION.NEXT_ACTION:
+//                    showNoti(1);
+//                    playNext();
+//                    break;
+//
+//                case Constants.ACTION.PREV_ACTION:
+//                    showNoti(1);
+//                    playPrev();
+//                    break;
+//
+//                case Constants.ACTION.EXIT_ACTION:
+//                    if (!player.isPlaying()) {
+//                        if (bothRun = true) {
+//                            stopForeground(true);
+//                            checkBothRun();
+//                        } else if (bothRun = false) {
+//                            stopForeground(true);
+//                            unregisterReceiver(myServBroadcast);
+//                            stopSelf();
+//                        }
+//                    }
+//                    break;
+//            }
+//        }
+
+        handleIntent(intent);
 
         return START_NOT_STICKY;
     }
 
-    public void initUI() {
-        //seekPro = new WeakReference<>(MainActivity.seekBar);
-        //txtCurTime = new WeakReference<>(MainActivity.txtTimeSong);
-        //txtTotal = new WeakReference<>(MainActivity.txtTotal);
-        //btnPayPause = new WeakReference<>(MainActivity.btnPlayPause);
-    }
 
     public void initMusicPlayer() {
 
@@ -303,7 +300,7 @@ public class MyService extends Service implements
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mediaPlayer.start();
                 updateProgress();
-                showNoti(1);
+                buildNotificationPlay( generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE ) );
             }
         });
     }
@@ -507,8 +504,13 @@ public class MyService extends Service implements
     public void onTaskRemoved(Intent rootIntent) {
         if (!player.isPlaying()) {
             stopForeground(true);
+
+            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(NOTIFY_ID);
+
             unregisterReceiver(myServBroadcast);
             stopSelf();
+            Log.i("Thong bao", "Da dung lai Service ");
         } else {
             checkBothRun();
         }
@@ -525,11 +527,15 @@ public class MyService extends Service implements
             if (intent.getAction().toString().equals("SvPlayPause")) {
                 if (intent.getStringExtra("key").equals("pause")) {
                     Toast.makeText(getApplicationContext(), "Service received: Pause", Toast.LENGTH_SHORT).show();
-                    showNoti(2);
+
+                    mController.getTransportControls().pause();
+
                     progressHandler.removeCallbacks(run);
                 } else if (intent.getStringExtra("key").equals("play")) {
                     Toast.makeText(getApplicationContext(), "Service received: Play", Toast.LENGTH_SHORT).show();
-                    showNoti(1);
+
+                    mController.getTransportControls().play();
+
                     updateProgress();
                 }
             } else if (intent.getAction().toString().equals("SvPlayOne")) {
@@ -537,7 +543,9 @@ public class MyService extends Service implements
                 Integer posn = intent.getIntExtra("pos", 0);
                 if (SizeList() <= posn)
                     songs = allsongs;
+
                 setSong(posn);
+
                 playSong(ListNumber);
 
                 Intent intent4 = new Intent("ToActivity");
@@ -723,5 +731,186 @@ public class MyService extends Service implements
 
     public Song getCurSong() {
         return songs.get(songPosn);
+    }
+
+    private void handleIntent( Intent intent ) {
+        if( intent == null || intent.getAction() == null )
+            return;
+
+        String action = intent.getAction();
+
+        if( action.equalsIgnoreCase( ACTION_PLAY ) ) {
+            mController.getTransportControls().play();
+        } else if( action.equalsIgnoreCase( ACTION_PAUSE ) ) {
+            mController.getTransportControls().pause();
+        } else if( action.equalsIgnoreCase( ACTION_FAST_FORWARD ) ) {
+            mController.getTransportControls().fastForward();
+        } else if( action.equalsIgnoreCase( ACTION_REWIND ) ) {
+            mController.getTransportControls().rewind();
+        } else if( action.equalsIgnoreCase( ACTION_PREVIOUS ) ) {
+            mController.getTransportControls().skipToPrevious();
+        } else if( action.equalsIgnoreCase( ACTION_NEXT ) ) {
+            mController.getTransportControls().skipToNext();
+        } else if( action.equalsIgnoreCase( ACTION_STOP ) ) {
+            mController.getTransportControls().stop();
+        }
+    }
+
+    private Notification.Action generateAction( int icon, String title, String intentAction ) {
+        Intent intent = new Intent( getApplicationContext(), MyService.class );
+        intent.setAction( intentAction );
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+        return new Notification.Action.Builder( icon, title, pendingIntent ).build();
+    }
+
+    private void buildNotificationPlay( Notification.Action action ) {
+        Notification.MediaStyle style = new Notification.MediaStyle();
+
+        Intent notIntent = new Intent(this, MainActivity.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intent = new Intent( getApplicationContext(), MyService.class );
+        intent.setAction( ACTION_STOP );
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+
+        Notification.Builder builder = new Notification.Builder( this )
+                .setContentIntent(pendInt)
+                .setSmallIcon(R.drawable.ic_play_circle_outline_white_24dp)
+                .setContentTitle(songTitle)
+                .setContentText(songArtist)
+                .setAutoCancel(true)
+                .setOngoing(false)
+                .setDeleteIntent(pendingIntent)
+                .setStyle(style)
+                .setVisibility(Notification.VISIBILITY_PUBLIC);
+
+        builder.addAction( generateAction(R.drawable.ic_skip_previous_black_24dpsmall, "Previous", ACTION_PREVIOUS ) );
+        builder.addAction( action );
+        builder.addAction( generateAction(R.drawable.ic_skip_next_black_24dpsmall, "Next", ACTION_NEXT ) );
+        style.setShowActionsInCompactView(0,1,2,3,4);
+
+        Notification notice = builder.build();
+
+        startForeground(NOTIFY_ID, notice);
+    }
+
+    private void buildNotificationPause( Notification.Action action ) {
+        Notification.MediaStyle style = new Notification.MediaStyle();
+
+        Intent notIntent = new Intent(this, MainActivity.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent intent = new Intent( getApplicationContext(), MyService.class );
+        intent.setAction( ACTION_STOP );
+        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
+
+        Notification.Builder builder = new Notification.Builder( this )
+                .setContentIntent(pendInt)
+                .setSmallIcon(R.drawable.ic_play_circle_outline_white_24dp)
+                .setContentTitle(songTitle)
+                .setContentText(songArtist)
+                .setAutoCancel(true)
+                .setOngoing(false)
+                .setDeleteIntent(pendingIntent)
+                .setStyle(style)
+                .setVisibility(Notification.VISIBILITY_PUBLIC);
+
+        builder.addAction( generateAction(R.drawable.ic_skip_previous_black_24dpsmall, "Previous", ACTION_PREVIOUS ) );
+        builder.addAction( action );
+        builder.addAction( generateAction(R.drawable.ic_skip_next_black_24dpsmall, "Next", ACTION_NEXT ) );
+        style.setShowActionsInCompactView(0,1,2,3,4);
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+
+        Notification notice = builder.build();
+
+        stopForeground(true);
+
+        notificationManager.notify( NOTIFY_ID, notice);
+    }
+
+    public static final String ACTION_PLAY = "action_play";
+    public static final String ACTION_PAUSE = "action_pause";
+    public static final String ACTION_REWIND = "action_rewind";
+    public static final String ACTION_FAST_FORWARD = "action_fast_foward";
+    public static final String ACTION_NEXT = "action_next";
+    public static final String ACTION_PREVIOUS = "action_previous";
+    public static final String ACTION_STOP = "action_stop";
+
+    private void initSession() {
+        mediaSession = new MediaSession(this, "MySession");
+        mController = new android.media.session.MediaController(this, mediaSession.getSessionToken());
+
+        mediaSession.setCallback(new MediaSession.Callback() {
+            @Override
+            public void onPlay() {
+                super.onPlay();
+
+                go();
+                Intent intent2 = new Intent("ToActivity");
+                intent2.setAction("PlayPause");
+                intent2.putExtra("key", "play");
+                sendBroadcast(intent2);
+
+                updateProgress();
+
+                Log.e( "MediaPlayerService", "onPlay");
+                buildNotificationPlay( generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE ) );
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+
+                pausePlayer();
+                Intent intent1 = new Intent("ToActivity");
+                intent1.setAction("PlayPause");
+                intent1.putExtra("key", "pause");
+                sendBroadcast(intent1);
+
+                progressHandler.removeCallbacks(run);
+
+                Log.e( "MediaPlayerService", "onPause");
+                buildNotificationPause(generateAction(R.drawable.ic_play_arrow_black_24dp, "Play", ACTION_PLAY));
+            }
+
+            @Override
+            public void onSkipToNext() {
+                super.onSkipToNext();
+                playNext();
+                Log.e( "MediaPlayerService", "onSkipToNext");
+                //Change media here
+                buildNotificationPlay( generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE ) );
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                super.onSkipToPrevious();
+                playPrev();
+                Log.e( "MediaPlayerService", "onSkipToPrevious");
+                //Change media here
+                buildNotificationPlay( generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE ) );
+            }
+
+            @Override
+            public void onStop() {
+                super.onStop();
+                Log.e( "MediaPlayerService", "onStop");
+                //Stop media player here
+                    NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                    notificationManager.cancel(NOTIFY_ID);
+                    Intent intent = new Intent(getApplicationContext(), MyService.class);
+                    stopService(intent);
+            }
+
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mediaSession.release();
     }
 }

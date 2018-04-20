@@ -1,4 +1,4 @@
-package samsung.com.myplayer2.Class;
+package samsung.com.myplayer2.Model;
 
 /**
  * Created by 450G4 on 3/26/2018.

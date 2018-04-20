@@ -1,4 +1,4 @@
-package samsung.com.myplayer2.Class;
+package samsung.com.myplayer2.Model;
 
 import android.os.Parcel;
 
