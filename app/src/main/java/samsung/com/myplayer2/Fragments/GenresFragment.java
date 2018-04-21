@@ -1,13 +1,8 @@
 package samsung.com.myplayer2.Fragments;
 
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,13 +15,10 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Adapter.RecyclerGenresAdapter;
-import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
-import samsung.com.myplayer2.Service.MyService;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,10 +29,6 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
     public GenresFragment() {
         // Required empty public constructor
     }
-
-    MyService myService;
-    private boolean musicBound = false;
-    private Intent playIntent;
 
     RecyclerGenresAdapter recyclerGenresAdapter;
     RecyclerView genresView;
@@ -69,7 +57,7 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
         songList = new ArrayList<>();
 
         AllSong = new ArrayList<>();
-        AllSong = ((MainActivity) getActivity()).getAllSong();
+        //AllSong = ((MainActivity) getActivity()).getAllSong();
 
         genList = new ArrayList<>();
         //function.getGenres(getContext(), genList);
@@ -96,62 +84,12 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
         return v;
     }
 
-    private ServiceConnection musicConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            MyService.MusicBinder binder = (MyService.MusicBinder) service;
-            //get service
-            myService = binder.getService();
-            //pass list
-            //myService.setList(AllSong);
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            musicBound = false;
-        }
-    };
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        playIntent = new Intent(getActivity(), MyService.class);
-        getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (musicBound) {
-            getActivity().unbindService(musicConnection);
-            musicBound = false;
-        }
-    }
-
-
     @Override
     public void onGenresClick(View view, int position) {
-        songList.clear();
-        songOfGenres.setAdapter(null);
 
-        lin1.setVisibility(View.INVISIBLE);
-        lin2.setVisibility(View.VISIBLE);
-
-        for (int i = 0; i < AllSong.size(); i++) {
-            if (AllSong.get(i).getGenres() != null) {
-                if (AllSong.get(i).getGenres().equals(genList.get(position)))
-                    songList.add(AllSong.get(i));
-            }
-        }
-
-        RecyclerSongAdapter newSongAdt = new RecyclerSongAdapter(getContext(), songList);
-        songOfGenres.setAdapter(newSongAdt);
-        myService.setSongListFrag5(songList);
     }
 
-    class GetGenres extends AsyncTask<Void, Void, Void>{
+    private class GetGenres extends AsyncTask<Void, Void, Void>{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

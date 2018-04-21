@@ -60,9 +60,7 @@ public class SongListFragment extends Fragment {
 
         SongList = new ArrayList<>();
 
-        if(savedInstanceState == null){
-            new GetSong().execute();
-        }
+        new GetSong().execute();
 
         //SongList = ((MainActivity) getActivity()).getAllSong();
 
@@ -86,9 +84,9 @@ public class SongListFragment extends Fragment {
             MyService.MusicBinder binder = (MyService.MusicBinder) service;
             //get service
             myService = binder.getService();
+
             //pass list
             myService.setAllSongs(SongList);
-            myService.setSongListFrag1(SongList);
 
             musicBound = true;
         }
@@ -119,7 +117,7 @@ public class SongListFragment extends Fragment {
         }
     }
 
-    class GetSong extends AsyncTask<Void, Void, Void>{
+    private class GetSong extends AsyncTask<Void, Void, Void>{
 
         @Override
         protected void onPreExecute() {
@@ -129,13 +127,13 @@ public class SongListFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             function.getSongList(getContext(), SongList);
-            songAdt = new RecyclerSongAdapter(getContext(), SongList);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            songAdt = new RecyclerSongAdapter(getContext(), SongList);
             songView.setAdapter(songAdt);
         }
     }

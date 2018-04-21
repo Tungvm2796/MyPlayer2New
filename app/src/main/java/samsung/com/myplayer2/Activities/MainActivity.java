@@ -1,8 +1,6 @@
 package samsung.com.myplayer2.Activities;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,31 +9,24 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.media.audiofx.AudioEffect;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -43,7 +34,6 @@ import com.arlib.floatingsearchview.FloatingSearchView;
 import com.bumptech.glide.Glide;
 import com.musixmatch.lyrics.MissingPluginException;
 import com.musixmatch.lyrics.musiXmatchLyricsConnector;
-import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.text.SimpleDateFormat;
@@ -51,34 +41,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import samsung.com.myplayer2.Adapter.CustomPagerAdapter;
-import samsung.com.myplayer2.Adapter.RecyclerAlbumAdapter;
-import samsung.com.myplayer2.Adapter.RecyclerArtistAdapter;
-import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Class.KMPSearch;
 import samsung.com.myplayer2.Fragments.MainFragment;
-import samsung.com.myplayer2.Model.Album;
-import samsung.com.myplayer2.Model.Artist;
 import samsung.com.myplayer2.Model.Song;
-import samsung.com.myplayer2.Model.Suggestion;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
 
-public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdapter.AlbumClickListener, RecyclerArtistAdapter.ArtistClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity {
 
-    private ArrayList<Song> MainSongList;
-    private ArrayList<Song> SongListOfResult;
-    private ArrayList<Song> SongListOfInnerResult;
-
-    private ArrayList<Album> AllAlbum;
-    private ArrayList<Album> AlbumOfResult;
-
-    private ArrayList<Artist> AllArtist;
-    private ArrayList<Artist> ArtistOfResult;
-
-    private ArrayList<Suggestion> mSuggestion = new ArrayList<>();
+    //private ArrayList<Suggestion> mSuggestion = new ArrayList<>();
 
     Function function;
 
@@ -87,49 +59,23 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
     SlidingUpPanelLayout slidingLayout;
     FloatingSearchView searchView;
 
-    ViewPager viewPager;
-    CustomPagerAdapter customPagerAdapter;
-
-    //TabLayout tabLayout;
-    SmartTabLayout smartTabLayout;
-    //PagerTabStrip pagerTabStrip;
     MyService myService;
     private boolean musicBound = false;
     private Intent playintent;
+
+    TextView txtTitle;
+    TextView txtArtist;
     public ImageButton btnPlayPause;
     ImageButton next;
     ImageButton prev;
     ImageButton shuffle;
     ImageButton repeat;
-    TextView txtArtist;
-    TextView txtTitle;
     public TextView txtTimeSong;
     public TextView txtTotal;
     public SeekBar seekBar;
     ImageView imgDisc;
+
     String SongPath;
-
-    RecyclerSongAdapter songAdapter;
-
-    RecyclerSongAdapter songAdapterOfResult;
-    RecyclerSongAdapter songAdapterOfInnerResult;
-    RecyclerAlbumAdapter albumAdapterOfResult;
-    RecyclerArtistAdapter artistAdapterOfResult;
-
-    RecyclerView resultAlbum;
-    RecyclerView resultArtist;
-    RecyclerView resultSong;
-    RecyclerView resultInnerSong;
-
-    LinearLayout mainlay1;
-    LinearLayout mainlay2;
-    LinearLayout mainlay3;
-
-    int index;
-
-    View tabcontainer;
-    View coloredBackgroundView;
-    Toolbar toolbar;
 
     private DrawerLayout drawerLayout;
     NavigationView navigationView;
@@ -165,7 +111,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        action = getIntent().getAction();
+
         super.onCreate(savedInstanceState);
+
+        initPermission();
 
         setContentView(R.layout.activity_main);
 
@@ -182,57 +132,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
         toActivity.addAction("timeSong");
         toActivity.addAction("timeTotal");
         toActivity.addAction("seekbar");
-        toActivity.addAction("FragIndex");
         registerReceiver(myMainBroadcast, toActivity);
 
         initView();
-
-        //tabcontainer = findViewById(R.id.tabcontainer);
-        //coloredBackgroundView = findViewById(R.id.colored_background_view);
-
-        //toolbar = findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-        //ActionBar actionBar = getSupportActionBar();
-        //actionBar.setDisplayHomeAsUpEnabled(true);
-        //actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
-
-        drawerLayout = findViewById(R.id.drawer_layout);
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-
-        navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        MainSongList = new ArrayList<>();
-        SongListOfResult = new ArrayList<>();
-        SongListOfInnerResult = new ArrayList<>();
-
-        AllAlbum = new ArrayList<>();
-        AlbumOfResult = new ArrayList<>();
-
-        AllArtist = new ArrayList<>();
-        ArtistOfResult = new ArrayList<>();
-
-        //function.getSongList(context, MainSongList);
-        //function.getAlbumsLists(context, AllAlbum);
-        //function.getArtist(context, AllArtist);
-
-        resultAlbum = findViewById(R.id.album_result);
-        resultArtist = findViewById(R.id.artist_result);
-        resultSong = findViewById(R.id.song_result);
-        resultInnerSong = findViewById(R.id.song_inner_result);
-
-        songAdapter = new RecyclerSongAdapter();
-
-        setSuggestion();
-
-        searchView = findViewById(R.id.floating_search_view);
-
-        //set layout slide listener
-        slidingLayout = findViewById(R.id.sliding_layout);
-        slidingLayout.getChildAt(1).setOnClickListener(null);
-        //slidingLayout.setDragView(findViewById(R.id.dragview));
-
-        imgDisc = findViewById(R.id.imageViewDisc);
 
         slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
@@ -258,58 +160,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
                 slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
         });
-
-//        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-//            @Override
-//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//
-//            }
-//
-//            @Override
-//            public void onPageSelected(int position) {
-//                if (musicBound) {
-//                    switch (position) {
-//                        case 0:
-//                            myService.setListNumber(1);
-//                            myService.setListNumberFrag(1);
-//                            //songAdapter.setOnPlaylist(0);
-//                            break;
-//                        case 1:
-//                            myService.setListNumber(2);
-//                            myService.setListNumberFrag(2);
-//                            //songAdapter.setOnPlaylist(0);
-//                            break;
-//                        case 2:
-//                            myService.setListNumber(3);
-//                            myService.setListNumberFrag(3);
-//                            //songAdapter.setOnPlaylist(0);
-//                            break;
-//                        case 3:
-//                            myService.setListNumber(4);
-//                            myService.setListNumberFrag(4);
-//                            //songAdapter.setOnPlaylist(1);
-//                            break;
-//                        case 4:
-//                            myService.setListNumber(5);
-//                            myService.setListNumberFrag(5);
-//                            //songAdapter.setOnPlaylist(0);
-//                            break;
-//                    }
-//                }
-//                tabcontainer.clearAnimation();
-//                tabcontainer
-//                        .animate()
-//                        .translationY(0)
-//                        .start();
-//                coloredBackgroundView.setTranslationY(0);
-//            }
-//
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//
-//            }
-//        });
-
 
 
         btnPlayPause.setOnClickListener(new View.OnClickListener() {
@@ -379,29 +229,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
             }
         });
 
-        Button btn2 = findViewById(R.id.btnmainlay2);
-        Button btn3 = findViewById(R.id.btnmainlay3);
-
-//        btn2.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                mainlay1.setVisibility(View.INVISIBLE);
-//                mainlay2.setVisibility(View.INVISIBLE);
-//                mainlay3.setVisibility(View.VISIBLE);
-//                myService.setListNumber(7);  ///// Sua lai cho nay, dung ra nos la button quay lai
-//            }
-//        });
-//
-//        btn3.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                mainlay1.setVisibility(View.INVISIBLE);
-//                mainlay2.setVisibility(View.VISIBLE);
-//                mainlay3.setVisibility(View.INVISIBLE);
-//                myService.setListNumber(6);
-//            }
-//        });
-
         mLyricsPlugin = new musiXmatchLyricsConnector(this);
         mLyricsPlugin.setLoadingMessage("Your custom title", "Your custom message");
 
@@ -432,77 +259,21 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
         //END onCreate() ---------------------------------------------------------------
     }
 
-    private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(final MenuItem menuItem) {
-                        updatePosition(menuItem);
-                        return true;
-
-                    }
-                });
-    }
-
-
-    private void updatePosition(final MenuItem menuItem) {
-        runnable = null;
-
-        switch (menuItem.getItemId()) {
-            case R.id.nav_library:
-                runnable = navigateLibrary;
-
-                break;
-
-            case R.id.nav_playlist:
-                runnable = navigatePlaylist;
-
-                break;
-
-            case R.id.nav_equalizer:
-                Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-                if ((intent.resolveActivity(getPackageManager()) != null)) {
-                    startActivityForResult(intent, RESULT_OK);
-                } else {
-                    // No equalizer found
-                }
-                break;
+    private void initPermission() {
+        if (Build.VERSION.SDK_INT >= 23) {
+            //if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            //}
+            //if (checkSelfPermission(Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WAKE_LOCK}, 1);
+            //}
+            //if (checkSelfPermission(Manifest.permission.MEDIA_CONTENT_CONTROL) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.MEDIA_CONTENT_CONTROL}, 1);
+            //}
+            //if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.INTERNET}, 1);
+            //}
         }
-
-        if (runnable != null) {
-            menuItem.setChecked(true);
-            drawerLayout.closeDrawers();
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    runnable.run();
-                }
-            }, 350);
-        }
-    }
-
-    private void addBackstackListener() {
-        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-                getSupportFragmentManager().findFragmentById(R.id.fragment_container).onResume();
-            }
-        });
-    }
-
-    private void loadEverything() {
-        Runnable navigation = navigationMap.get(action);
-        if (navigation != null) {
-            navigation.run();
-        } else {
-            navigateLibrary.run();
-        }
-    }
-
-    private boolean isNavigatingMain() {
-        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        return (currentFragment instanceof MainFragment);
     }
 
     private void initView() {
@@ -516,61 +287,49 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
 
         seekBar = findViewById(R.id.seekbar_song);
 
-        //smartTabLayout = findViewById(R.id.viewpagertab);
-
-        //customPagerAdapter = new CustomPagerAdapter(this, getSupportFragmentManager());
-
-        //viewPager = findViewById(R.id.viewpager);
-
-        //viewPager.setAdapter(customPagerAdapter);
-
-        //viewPager.setOffscreenPageLimit(customPagerAdapter.getCount() - 1);
-
-        //smartTabLayout.setViewPager(viewPager);
-
-        //FragmentManager fragmentManager = getSupportFragmentManager();
-
-        //FragmentAdapter fragmentAdapter = new FragmentAdapter(fragmentManager, MainActivity.this);
-
         btnPlayPause = findViewById(R.id.btn_play_pause);
         next = findViewById(R.id.btn_next);
         prev = findViewById(R.id.btn_prev);
         shuffle = findViewById(R.id.btn_shuffle);
         repeat = findViewById(R.id.btn_repeat);
 
-        //mainlay1 = findViewById(R.id.mainlay1);
-        //mainlay2 = findViewById(R.id.mainlay2);
-        //mainlay3 = findViewById(R.id.mainlay3);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
 
-        //mainlay2.setVisibility(View.INVISIBLE);
-        //mainlay3.setVisibility(View.INVISIBLE);
+        navigationView = findViewById(R.id.nav_view);
 
+        searchView = findViewById(R.id.floating_search_view);
+
+        //set layout slide listener
+        slidingLayout = findViewById(R.id.sliding_layout);
+        slidingLayout.getChildAt(1).setOnClickListener(null);
+        //slidingLayout.setDragView(findViewById(R.id.dragview));
+
+        imgDisc = findViewById(R.id.imageViewDisc);
     }
 
+//    private void setSuggestion() {
+//        for (Song song : MainSongList) {
+//            mSuggestion.add(new Suggestion(song.getTitle()));
+//            mSuggestion.add(new Suggestion(song.getArtist()));
+//        }
+//        for (Album album : AllAlbum) {
+//            mSuggestion.add(new Suggestion(album.getAlbumName()));
+//        }
+//        for (Artist artist : AllArtist) {
+//            mSuggestion.add(new Suggestion(artist.getName()));
+//        }
+//    }
 
-
-    private void setSuggestion() {
-        for (Song song : MainSongList) {
-            mSuggestion.add(new Suggestion(song.getTitle()));
-            mSuggestion.add(new Suggestion(song.getArtist()));
-        }
-        for (Album album : AllAlbum) {
-            mSuggestion.add(new Suggestion(album.getAlbumName()));
-        }
-        for (Artist artist : AllArtist) {
-            mSuggestion.add(new Suggestion(artist.getName()));
-        }
-    }
-
-    private ArrayList<Suggestion> getSuggestion(String query) {
-        ArrayList<Suggestion> suggestions = new ArrayList<>();
-        for (Suggestion suggestion : mSuggestion) {
-            if (suggestion.getBody().toLowerCase().contains(query.toLowerCase())) {
-                suggestions.add(suggestion);
-            }
-        }
-        return suggestions;
-    }
+//    private ArrayList<Suggestion> getSuggestion(String query) {
+//        ArrayList<Suggestion> suggestions = new ArrayList<>();
+//        for (Suggestion suggestion : mSuggestion) {
+//            if (suggestion.getBody().toLowerCase().contains(query.toLowerCase())) {
+//                suggestions.add(suggestion);
+//            }
+//        }
+//        return suggestions;
+//    }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override
@@ -578,7 +337,20 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
             MyService.MusicBinder binder = (MyService.MusicBinder) service;
             //get service
             myService = binder.getService();
+
             //pass list
+            //Check if list playing song is null, pass a song list with length = 0, to prevent Null List;
+            int sizeList;
+            try {
+                sizeList = myService.SizeList();
+            } catch (Exception e) {
+                sizeList = 0;
+            }
+
+            if (sizeList == 0) {
+                ArrayList<Song> ZeroList = new ArrayList<>();
+                myService.setList(ZeroList);
+            }
 
             musicBound = true;
         }
@@ -653,8 +425,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
         super.onStop();
         /*SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = settings.edit();
-        editor.putString("curSongName", myService.getSongTitle());
         editor.putString("curArtist", myService.getSongArtist());
+        editor.putString("curSongName", myService.getSongTitle());
         editor.putString("curSongImg", SongPath);
         editor.apply();*/
     }
@@ -685,10 +457,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
                         Glide.with(context).load(function.GetBitMapByte(SongPath)).into(imgDisc);
                         break;
 
-                    case "FragIndex":
-                        index = intent.getIntExtra("key", 0);
-                        break;
-
                     case "timeTotal":
                         int timeTotal = intent.getIntExtra("key", 0);
                         seekBar.setMax(timeTotal);
@@ -716,181 +484,11 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
                 (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED ||
                         slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-//        }
-//        //If SlingUp Panel is collaped and the inner result is show, close the inner result layout and back to the result
-//        else if (slidingLayout != null && (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) &&
-//                (mainlay3.getVisibility() == View.VISIBLE)) {
-//            CloseLay3();
-//            OpenLay2();
-//            crossFadeAnimation(mainlay2, mainlay3, 270);
-//            myService.setListNumber(6);
-//        }
-//        //If SlidingUp Panel is collapsed and the result is show, close the result layout and back to the main layout, set Listnumber to Fragments
-//        else if (slidingLayout != null && (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED) &&
-//                (mainlay2.getVisibility() == View.VISIBLE)) {
-//            CloseLay2();
-//            OpenLay1();
-//            myService.setListNumber(myService.getListNumberFrag()); //Turn back to list content not searchview, so set the listNumber to the fragNumber before
-//        } else if ((myService.getListNumber() == 2) &&
-//                (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED)
-//                && index == 2) {
-//            Toast.makeText(context, "close Album", Toast.LENGTH_SHORT).show();
-//            index = 0;
         } else if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
-    }
-
-    private void SetDataForResultView(String keyword) {
-
-        CloseLay1();
-        CloseLay2();
-        CloseLay3();
-
-        OpenLay2();
-
-        myService.setListNumber(6);
-        SongListOfResult.clear();
-        SongListOfInnerResult.clear();
-        AlbumOfResult.clear();
-        ArtistOfResult.clear();
-
-        //Get Result Albums
-        for (int i = 0; i < AllAlbum.size(); i++) {
-            KMPSearch kmpSearch1 = new KMPSearch();
-            kmpSearch1.Search(keyword.toLowerCase(), AllAlbum.get(i).getAlbumName().toLowerCase());
-            if (kmpSearch1.GetSize() != 0 && kmpSearch1.GetFirstIndex() == 0) {
-                AlbumOfResult.add(AllAlbum.get(i));
-            } else {
-                kmpSearch1.Search(" " + keyword.toLowerCase(), AllAlbum.get(i).getAlbumName().toLowerCase());
-                if (kmpSearch1.GetSize() != 0 && kmpSearch1.GetFirstIndex() != 0)
-                    AlbumOfResult.add(AllAlbum.get(i));
-            }
-        }
-
-        //Get Result Artists
-        for (int i = 0; i < AllArtist.size(); i++) {
-            KMPSearch kmpSearch2 = new KMPSearch();
-            kmpSearch2.Search(keyword.toLowerCase(), AllArtist.get(i).getName().toLowerCase());
-            if (kmpSearch2.GetSize() != 0 && kmpSearch2.GetFirstIndex() == 0) {
-                ArtistOfResult.add(AllArtist.get(i));
-            } else {
-                kmpSearch2.Search(" " + keyword.toLowerCase(), AllArtist.get(i).getName().toLowerCase());
-                if (kmpSearch2.GetSize() != 0 && kmpSearch2.GetFirstIndex() != 0)
-                    ArtistOfResult.add(AllArtist.get(i));
-            }
-        }
-
-        //Get Result Songs
-        for (int i = 0; i < MainSongList.size(); i++) {
-            KMPSearch kmpSearch3 = new KMPSearch();
-            kmpSearch3.Search(keyword.toLowerCase(), MainSongList.get(i).getTitle().toLowerCase());
-            if (kmpSearch3.GetSize() != 0 && kmpSearch3.GetFirstIndex() == 0) {
-                SongListOfResult.add(MainSongList.get(i));
-            } else {
-                kmpSearch3.Search(" " + keyword.toLowerCase(), MainSongList.get(i).getTitle().toLowerCase());
-                if (kmpSearch3.GetSize() != 0 && kmpSearch3.GetFirstIndex() != 0)
-                    SongListOfResult.add(MainSongList.get(i));
-            }
-        }
-
-        //Set Adapter for Result Albums
-        albumAdapterOfResult = new RecyclerAlbumAdapter(context, AlbumOfResult);
-        albumAdapterOfResult.setAlbumClickListener(this);
-
-        //Set Adapter for Result Artists
-        artistAdapterOfResult = new RecyclerArtistAdapter(context, ArtistOfResult);
-        artistAdapterOfResult.setArtistClickListener(this);
-
-        //Set Layout for RecyclerView list result Albums
-        RecyclerView.LayoutManager mManager1 = new GridLayoutManager(context, 2) {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
-
-        resultAlbum.setLayoutManager(mManager1);
-        resultAlbum.setAdapter(albumAdapterOfResult);
-
-        //Now Set layout for result, all is disable to scroll vertical
-
-        //Set Layout for RecyclerView list result Artists
-        RecyclerView.LayoutManager mManager2 = new GridLayoutManager(context, 2) {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
-
-        resultArtist.setLayoutManager(mManager2);
-        resultArtist.setAdapter(artistAdapterOfResult);
-
-        //Set Layout for RecyclerView list result Songs
-        RecyclerView.LayoutManager manager1 = new LinearLayoutManager(context) {
-            @Override
-            public boolean canScrollVertically() {
-                return false;
-            }
-        };
-        songAdapterOfResult = new RecyclerSongAdapter(context, SongListOfResult);
-        resultSong.setLayoutManager(manager1);
-        resultSong.setAdapter(songAdapterOfResult);
-
-        //Set list song to List show in Result
-        myService.setSongListResult(SongListOfResult);
-    }
-
-    @Override
-    public void onAlbumClick(View view, int position) {
-
-        OpenLay3();
-        crossFadeAnimation(mainlay3, mainlay2, 270);
-
-        myService.setListNumber(7);
-        SongListOfInnerResult.clear();
-        resultInnerSong.setAdapter(null);
-
-        for (int i = 0; i < MainSongList.size(); i++) {
-            if (MainSongList.get(i).getAlbumid() == AlbumOfResult.get(position).getId())
-                SongListOfInnerResult.add(MainSongList.get(i));
-        }
-
-        songAdapterOfInnerResult = new RecyclerSongAdapter(context, SongListOfInnerResult);
-        RecyclerView.LayoutManager manager2 = new LinearLayoutManager(context);
-        resultInnerSong.setLayoutManager(manager2);
-        resultInnerSong.setAdapter(songAdapterOfInnerResult);
-
-        myService.setSongListInnerResult(SongListOfInnerResult);
-    }
-
-    @Override
-    public void onArtistClick(View view, int position) {
-
-        OpenLay3();
-        crossFadeAnimation(mainlay3, mainlay2, 270);
-
-        myService.setListNumber(7);
-        SongListOfInnerResult.clear();
-        resultInnerSong.setAdapter(null);
-
-        for (int i = 0; i < MainSongList.size(); i++) {
-            if (MainSongList.get(i).getArtist().equals(ArtistOfResult.get(position).getName()))
-                SongListOfInnerResult.add(MainSongList.get(i));
-        }
-
-        songAdapterOfInnerResult = new RecyclerSongAdapter(context, SongListOfInnerResult);
-        RecyclerView.LayoutManager manager3 = new LinearLayoutManager(context);
-        resultInnerSong.setLayoutManager(manager3);
-        resultInnerSong.setAdapter(songAdapterOfInnerResult);
-
-        myService.setSongListInnerResult(SongListOfInnerResult);
-    }
-
-    public ArrayList<Song> getAllSong() {
-        return MainSongList;
     }
 
     @Override
@@ -906,25 +504,30 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Handle navigation view item clicks here.
-        switch (item.getItemId()) {
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(final MenuItem menuItem) {
+                        updatePosition(menuItem);
+                        return true;
 
-            case R.id.nav_song:
-                viewPager.setCurrentItem(0, true);
-                break;
+                    }
+                });
+    }
 
-            case R.id.nav_album:
-                viewPager.setCurrentItem(1, true);
-                break;
+    private void updatePosition(final MenuItem menuItem) {
+        runnable = null;
 
-            case R.id.nav_artist:
-                viewPager.setCurrentItem(2, true);
+        switch (menuItem.getItemId()) {
+            case R.id.nav_library:
+                runnable = navigateLibrary;
+
                 break;
 
             case R.id.nav_playlist:
-                viewPager.setCurrentItem(3, true);
+                runnable = navigatePlaylist;
+
                 break;
 
             case R.id.nav_equalizer:
@@ -935,103 +538,42 @@ public class MainActivity extends AppCompatActivity implements RecyclerAlbumAdap
                     // No equalizer found
                 }
                 break;
-
-            case R.id.nav_online:
-
         }
-        //close navigation drawer
-        item.setChecked(true);
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
+
+        if (runnable != null) {
+            menuItem.setChecked(true);
+            drawerLayout.closeDrawers();
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    runnable.run();
+                }
+            }, 350);
+        }
     }
 
-    public void OpenLay1() {
-        mainlay1.animate().translationX(0);
-        tabcontainer.animate().translationX(0).setDuration(720);
-        toolbar.animate().translationX(0).setDuration(900);
-        mainlay1.setVisibility(View.VISIBLE);
-    }
-
-    public void CloseLay1() {
-        mainlay1.clearAnimation();
-        toolbar.clearAnimation();
-        tabcontainer.clearAnimation();
-
-        mainlay1.animate().translationX(-mainlay1.getWidth()).setDuration(360);
-        toolbar.animate().translationX(toolbar.getWidth());
-        tabcontainer.animate().translationX(tabcontainer.getWidth());
-
-        //mainlay1.setVisibility(View.INVISIBLE);
-    }
-
-    public void OpenLay2() {
-        mainlay2.animate().translationX(0);
-        mainlay2.setVisibility(View.VISIBLE);
-    }
-
-    public void CloseLay2() {
-        mainlay2.animate().translationX(-mainlay2.getWidth());
-        mainlay2.setVisibility(View.INVISIBLE);
-    }
-
-    public void OpenLay3() {
-        mainlay3.animate().translationX(0);
-        mainlay3.setVisibility(View.VISIBLE);
-    }
-
-    public void CloseLay3() {
-        mainlay3.animate().translationX(-mainlay3.getWidth());
-        mainlay3.setVisibility(View.INVISIBLE);
-    }
-
-    private void crossFadeAnimation(final View fadeInTarget, final View fadeOutTarget, long duration) {
-        AnimatorSet mAnimationSet = new AnimatorSet();
-        ObjectAnimator fadeOut = ObjectAnimator.ofFloat(fadeOutTarget, View.ALPHA, 1f, 0f);
-        fadeOut.addListener(new Animator.AnimatorListener() {
+    private void addBackstackListener() {
+        getSupportFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
+            public void onBackStackChanged() {
+                getSupportFragmentManager().findFragmentById(R.id.fragment_container).onResume();
             }
         });
-        fadeOut.setInterpolator(new LinearInterpolator());
-
-        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(fadeInTarget, View.ALPHA, 0f, 1f);
-        fadeIn.addListener(new Animator.AnimatorListener() {
-            @Override
-            public void onAnimationStart(Animator animation) {
-                fadeInTarget.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animation) {
-            }
-        });
-        fadeIn.setInterpolator(new LinearInterpolator());
-        mAnimationSet.setDuration(duration);
-        mAnimationSet.playTogether(fadeOut, fadeIn);
-        mAnimationSet.start();
     }
+
+    private void loadEverything() {
+        Runnable navigation = navigationMap.get(action);
+        if (navigation != null) {
+            navigation.run();
+        } else {
+            navigateLibrary.run();
+        }
+    }
+
+    private boolean isNavigatingMain() {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        return (currentFragment instanceof MainFragment);
+    }
+
 }

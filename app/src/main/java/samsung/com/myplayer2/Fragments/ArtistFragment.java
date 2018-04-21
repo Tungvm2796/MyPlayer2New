@@ -1,13 +1,9 @@
 package samsung.com.myplayer2.Fragments;
 
 
-import android.content.ComponentName;
 import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,14 +17,10 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Adapter.RecyclerArtistAdapter;
-import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
-import samsung.com.myplayer2.Model.Artist;
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Model.Song;
+import samsung.com.myplayer2.Model.Artist;
 import samsung.com.myplayer2.R;
-import samsung.com.myplayer2.Service.MyService;
 
 
 /**
@@ -42,14 +34,10 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
         // Required empty public constructor
     }
 
-    MyService myService;
-    private boolean musicBound = false;
-    private Intent playIntent;
     Button clickme;
     Button clickmeback;
     private ArrayList<Artist> artists;
-    private ArrayList<Song> songListTake;
-    private ArrayList<Song> songListOfArtist;
+
     RecyclerView artistView;
     RecyclerView songOfArtist;
     Context context;
@@ -94,11 +82,9 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
             }
         });
 
-        songListOfArtist = new ArrayList<>();
 
-        songListTake = new ArrayList<>();
         //function.getSongList(getActivity(), songListTake);
-        songListTake = ((MainActivity)getActivity()).getAllSong();
+        //songListTake = ((MainActivity)getActivity()).getAllSong();
 
         artists = new ArrayList<>();
         //function.getArtist(getActivity(), artists);
@@ -122,57 +108,11 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
         return v;
     }
 
-    private ServiceConnection musicConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            MyService.MusicBinder binder = (MyService.MusicBinder) service;
-            //get service
-            myService = binder.getService();
-            //pass list
-            //myService.setList(songListTake);
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            musicBound = false;
-        }
-    };
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        playIntent = new Intent(getActivity(), MyService.class);
-        getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (musicBound) {
-            getActivity().unbindService(musicConnection);
-            musicBound = false;
-        }
-    }
-
     @Override
     public void onArtistClick(View view, int position) {
-        lin1.setVisibility(View.INVISIBLE);
-        lin2.setVisibility(View.VISIBLE);
-        songListOfArtist.clear();
-
-        for (int i = 0; i < songListTake.size(); i++)
-            if (songListTake.get(i).getArtist().equals(artists.get(position).getName()))
-                songListOfArtist.add(songListTake.get(i));
-
-        songOfArtist.setAdapter(null);
-        RecyclerSongAdapter songAdt = new RecyclerSongAdapter(getContext(), songListOfArtist);
-        songOfArtist.setAdapter(songAdt);
-        myService.setSongListFrag3(songListOfArtist);
     }
 
-    class GetArtist extends AsyncTask<Void, Void, Void>{
+    private class GetArtist extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {

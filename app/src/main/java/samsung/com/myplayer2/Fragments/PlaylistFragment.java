@@ -2,14 +2,11 @@ package samsung.com.myplayer2.Fragments;
 
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
@@ -30,14 +27,13 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Adapter.RecyclerPlaylistAdapter;
 import samsung.com.myplayer2.Adapter.SongInPlaylistAdapter;
 import samsung.com.myplayer2.Class.EditItemTouchHelperCallback;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.Model.Playlist;
 import samsung.com.myplayer2.Model.Song;
-import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
 
@@ -52,8 +48,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
     }
 
     MyService myService;
-    private boolean musicBound = false;
-    private Intent playIntent;
+
     RecyclerView playListView;
     RecyclerView songInPlaylist;
     Button btnViewSong;
@@ -103,7 +98,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
         songOfPlaylist = new ArrayList<>();
         AllSong = new ArrayList<>();
         //function.getSongList(getActivity(), AllSong);
-        AllSong = ((MainActivity) getActivity()).getAllSong();
+        //AllSong = ((MainActivity) getActivity()).getAllSong();
 
 //        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
 //        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);
@@ -180,39 +175,6 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
         return v;
     }
 
-    private ServiceConnection musicConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            MyService.MusicBinder binder = (MyService.MusicBinder) service;
-            //get service
-            myService = binder.getService();
-            //pass list
-            //myService.setList(songListTake);
-            musicBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            musicBound = false;
-        }
-    };
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        playIntent = new Intent(getActivity(), MyService.class);
-        getActivity().bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        if (musicBound) {
-            getActivity().unbindService(musicConnection);
-            musicBound = false;
-        }
-    }
 
     @Override
     public void onPlaylistClick(View view, int position) {
@@ -308,7 +270,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
                     AlertDialog art = aat.create();
                     art.show();
                 } else if (intent.getAction().equals("Changed")) {
-                    myService.setSongListFrag4(songAdapterPlaylist.getSongs());
+                    //myService.setSongListFrag4(songAdapterPlaylist.getSongs());
                 } else if (intent.getAction().equals("Unregister")) {
                     getActivity().unregisterReceiver(PlaylistBroadcast);
                 }
@@ -344,7 +306,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
         RecyclerView.LayoutManager mManager = new LinearLayoutManager(getContext());
         songInPlaylist.setLayoutManager(mManager);
         songInPlaylist.setAdapter(songAdapterPlaylist);
-        myService.setSongListFrag4(songOfPlaylist);
+        //myService.setSongListFrag4(songOfPlaylist);
     }
 
 }

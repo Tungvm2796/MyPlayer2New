@@ -132,28 +132,28 @@ public class MainFragment extends Fragment {
                 if (musicBound) {
                     switch (position) {
                         case 0:
-                            myService.setListNumber(1);
-                            myService.setListNumberFrag(1);
+                            //myService.setListNumber(1);
+                            //myService.setListNumberFrag(1);
                             //songAdapter.setOnPlaylist(0);
                             break;
                         case 1:
-                            myService.setListNumber(2);
-                            myService.setListNumberFrag(2);
+                            //myService.setListNumber(2);
+                            //myService.setListNumberFrag(2);
                             //songAdapter.setOnPlaylist(0);
                             break;
                         case 2:
-                            myService.setListNumber(3);
-                            myService.setListNumberFrag(3);
+                            //myService.setListNumber(3);
+                            //myService.setListNumberFrag(3);
                             //songAdapter.setOnPlaylist(0);
                             break;
                         case 3:
-                            myService.setListNumber(4);
-                            myService.setListNumberFrag(4);
+                            //myService.setListNumber(4);
+                            //myService.setListNumberFrag(4);
                             //songAdapter.setOnPlaylist(1);
                             break;
                         case 4:
-                            myService.setListNumber(5);
-                            myService.setListNumberFrag(5);
+                            //myService.setListNumber(5);
+                            //myService.setListNumberFrag(5);
                             //songAdapter.setOnPlaylist(0);
                             break;
                     }

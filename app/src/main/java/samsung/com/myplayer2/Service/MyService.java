@@ -28,7 +28,6 @@ import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -49,7 +48,15 @@ public class MyService extends Service implements
         MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener,
         MediaPlayer.OnCompletionListener, SeekBar.OnSeekBarChangeListener {
 
-    //media player
+    public static final String ACTION_PLAY = "action_play";
+    public static final String ACTION_PAUSE = "action_pause";
+    public static final String ACTION_REWIND = "action_rewind";
+    public static final String ACTION_FAST_FORWARD = "action_fast_foward";
+    public static final String ACTION_NEXT = "action_next";
+    public static final String ACTION_PREVIOUS = "action_previous";
+    public static final String ACTION_STOP = "action_stop";
+
+    //media player1
     public static MediaPlayer player;
 
     MediaSession mediaSession;
@@ -59,24 +66,21 @@ public class MyService extends Service implements
 
     //song list of all
     private ArrayList<Song> allsongs;
-    //List from Fragment 1
-    private ArrayList<Song> SongListFrag1;
-    //List from Fragment 2
-    private ArrayList<Song> SongListFrag2;
-    //List from Fragment 3
-    private ArrayList<Song> SongListFrag3;
-    //List from Fragment 4
-    private ArrayList<Song> SongListFrag4;
-    //List from Fragment 5
-    private ArrayList<Song> SongListFrag5;
-    //List from Search result Songs
-    private ArrayList<Song> SongListResult;
-    //List from Search result Songs of Album and Artist
-    private ArrayList<Song> SongListInnerResult;
+    //List from Album
+    private ArrayList<Song> SongListOfAlbum;
+    //List from Artist
+    private ArrayList<Song> SongListOfArtist;
+    //List from Playlist
+    private ArrayList<Song> SongListOfPlaylist;
+    //List from Genres
+    private ArrayList<Song> SongListOfGenres;
+    //List from Search
+    private ArrayList<Song> SongListOfSearch;
     //song list to play
     private ArrayList<Song> songs;
+
     //Number of song list
-    private int ListNumber = 1;
+    private String ListType = Constants.SONG_TYPE;
     //Number of song list in Fragments
     private int ListNumberFrag = 1;
     //current position
@@ -98,10 +102,6 @@ public class MyService extends Service implements
 
     public Context context;
 
-    //public static WeakReference<SeekBar> seekPro;
-    //public static WeakReference<TextView> txtTotal;
-    //public static WeakReference<TextView> txtCurTime;
-    //public static WeakReference<ImageButton> btnPayPause;
     SharedPreferences shared;
     SharedPreferences.Editor editor;
 
@@ -122,6 +122,7 @@ public class MyService extends Service implements
         IntentFilter svintent = new IntentFilter("ToService");
         svintent.addAction("SvPlayPause");
         svintent.addAction("SvPlayOne");
+        svintent.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         registerReceiver(myServBroadcast, svintent);
 
         //initialize
@@ -133,7 +134,7 @@ public class MyService extends Service implements
 
         //String action = intent.getAction();
 
-        if(mediaSession == null){
+        if (mediaSession == null) {
             initSession();
         }
 
@@ -231,33 +232,28 @@ public class MyService extends Service implements
     }
 
     //play a song
-    public void playSong(int listIndex) {
+    public void playSong(String type) {
         //play
         player.reset();
         //get song
-        switch (listIndex) {
-            case 0:
+        switch (type) {
+            case Constants.SONG_TYPE:
+                setList(allsongs);
                 break;
-            case 1:
-                setList(getSongListFrag1());
+            case Constants.ALBUM_TYPE:
+                setList(getSongListOfAlbum());
                 break;
-            case 2:
-                setList(getSongListFrag2());
+            case Constants.ARTIST_TYPE:
+                setList(getSongListOfArtist());
                 break;
-            case 3:
-                setList(getSongListFrag3());
+            case Constants.PLAYLIST_TYPE:
+                setList(getSongListOfPlaylist());
                 break;
-            case 4:
-                setList(getSongListFrag4());
+            case Constants.GENRES_TYPE:
+                setList(getSongListOfGenres());
                 break;
-            case 5:
-                setList(getSongListFrag5());
-                break;
-            case 6:
-                setList(getSongListResult());
-                break;
-            case 7:
-                setList(getSongListInnerResult());
+            case Constants.SEARCH_TYPE:
+                setList(getSongListOfSearch());
                 break;
         }
         Song playSong = songs.get(songPosn);
@@ -278,11 +274,13 @@ public class MyService extends Service implements
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
 
-        try {
-            player.prepare();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            player.prepare();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        player.prepareAsync();
 
         Intent setup = new Intent("ToActivity");
         setup.setAction("StartPlay");
@@ -304,7 +302,7 @@ public class MyService extends Service implements
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mediaPlayer.start();
                 updateProgress();
-                buildNotificationPlay( generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE ) );
+                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
             }
         });
     }
@@ -326,7 +324,7 @@ public class MyService extends Service implements
         //start playback
         mp.start();
         updateProgress();
-        showNoti(1);
+        //showNoti(1);
     }
 
 
@@ -419,18 +417,6 @@ public class MyService extends Service implements
         player.start();
     }
 
-    /*public int CountNoti() {
-        NotificationManager notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-        StatusBarNotification[] notifications = notificationManager.getActiveNotifications();
-        int count = 0;
-        for (StatusBarNotification notification : notifications) {
-            if (notification.getId() == 27) {
-                count++;
-            }
-        }
-        return count;
-    }*/
-
     public String getSongTitle() {
         return songTitle;
     }
@@ -451,7 +437,7 @@ public class MyService extends Service implements
         } else {
             songPosn--;
             if (songPosn < 0) songPosn = songs.size() - 1;
-            playSong(0);
+            playSong(ListType);
         }
         updateProgress();
     }
@@ -473,7 +459,7 @@ public class MyService extends Service implements
         } else if (repeat) {
 
         }
-        playSong(0);
+        playSong(ListType);
         updateProgress();
     }
 
@@ -512,7 +498,7 @@ public class MyService extends Service implements
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.cancel(NOTIFY_ID);
 
-            unregisterReceiver(myServBroadcast);
+            //unregisterReceiver(myServBroadcast);
             stopSelf();
             Log.i("Thong bao", "Da dung lai Service ");
         } else {
@@ -535,6 +521,7 @@ public class MyService extends Service implements
                     mController.getTransportControls().pause();
 
                     progressHandler.removeCallbacks(run);
+
                 } else if (intent.getStringExtra("key").equals("play")) {
                     Toast.makeText(getApplicationContext(), "Service received: Play", Toast.LENGTH_SHORT).show();
 
@@ -543,19 +530,32 @@ public class MyService extends Service implements
                     updateProgress();
                 }
             } else if (intent.getAction().toString().equals("SvPlayOne")) {
+
                 Toast.makeText(getApplicationContext(), "Service received: Play One", Toast.LENGTH_SHORT).show();
+
                 Integer posn = intent.getIntExtra("pos", 0);
+                String getType = intent.getStringExtra(Constants.TYPE_NAME);
+
+                setListType(getType);
+
                 if (SizeList() <= posn)
                     songs = allsongs;
 
                 setSong(posn);
 
-                playSong(ListNumber);
+                playSong(ListType);
 
                 Intent intent4 = new Intent("ToActivity");
                 intent4.setAction("PlayPause");
                 intent4.putExtra("key", "pause");
                 sendBroadcast(intent4);
+
+            } else if (intent.getAction().compareTo(AudioManager.ACTION_AUDIO_BECOMING_NOISY) == 0) {
+
+                mController.getTransportControls().pause();
+
+                progressHandler.removeCallbacks(run);
+
             }
         }
     };
@@ -661,113 +661,85 @@ public class MyService extends Service implements
         songs = theSongs;
     }
 
-    public void setSongListFrag1(ArrayList<Song> songListFrag1) {
-        SongListFrag1 = songListFrag1;
+    public ArrayList<Song> getSongListOfAlbum() {
+        return SongListOfAlbum;
     }
 
-    public void setSongListFrag2(ArrayList<Song> songListFrag2) {
-        SongListFrag2 = songListFrag2;
+    public ArrayList<Song> getSongListOfArtist() {
+        return SongListOfArtist;
     }
 
-    public void setSongListFrag3(ArrayList<Song> songListFrag3) {
-        SongListFrag3 = songListFrag3;
+    public ArrayList<Song> getSongListOfPlaylist() {
+        return SongListOfPlaylist;
     }
 
-    public void setSongListFrag4(ArrayList<Song> songListFrag4) {
-        SongListFrag4 = songListFrag4;
+    public ArrayList<Song> getSongListOfGenres() {
+        return SongListOfGenres;
     }
 
-    public void setSongListFrag5(ArrayList<Song> songListFrag5) {
-        SongListFrag5 = songListFrag5;
+    public ArrayList<Song> getSongListOfSearch() {
+        return SongListOfSearch;
     }
 
-    public ArrayList<Song> getSongListFrag1() {
-        return SongListFrag1;
+    public void setSongListOfAlbum(ArrayList<Song> songListOfAlbum) {
+        SongListOfAlbum = songListOfAlbum;
     }
 
-    public ArrayList<Song> getSongListFrag2() {
-        return SongListFrag2;
+    public void setSongListOfArtist(ArrayList<Song> songListOfArtist) {
+        SongListOfArtist = songListOfArtist;
     }
 
-    public ArrayList<Song> getSongListFrag3() {
-        return SongListFrag3;
+    public void setSongListOfPlaylist(ArrayList<Song> songListOfPlaylist) {
+        SongListOfPlaylist = songListOfPlaylist;
     }
 
-    public ArrayList<Song> getSongListFrag4() {
-        return SongListFrag4;
+    public void setSongListOfGenres(ArrayList<Song> songListOfGenres) {
+        SongListOfGenres = songListOfGenres;
     }
 
-    public ArrayList<Song> getSongListFrag5() {
-        return SongListFrag5;
+    public void setSongListOfSearch(ArrayList<Song> songListOfSearch) {
+        SongListOfSearch = songListOfSearch;
     }
 
-    public ArrayList<Song> getSongListResult() {
-        return SongListResult;
-    }
-
-    public ArrayList<Song> getSongListInnerResult() {
-        return SongListInnerResult;
-    }
-
-    public void setListNumber(int num) {
-        ListNumber = num;
-    }
-
-    public int getListNumber() {
-        return ListNumber;
-    }
-
-    public int getListNumberFrag() {
-        return ListNumberFrag;
-    }
-
-    public void setListNumberFrag(int listNumberFrag) {
-        ListNumberFrag = listNumberFrag;
-    }
-
-    public void setSongListResult(ArrayList<Song> songListResult) {
-        SongListResult = songListResult;
-    }
-
-    public void setSongListInnerResult(ArrayList<Song> songListInnerResult) {
-        SongListInnerResult = songListInnerResult;
+    public void setListType(String type) {
+        ListType = type;
     }
 
     public Song getCurSong() {
         return songs.get(songPosn);
     }
 
-    private void handleIntent( Intent intent ) {
-        if( intent == null || intent.getAction() == null )
+    private void handleIntent(Intent intent) {
+        if (intent == null || intent.getAction() == null)
             return;
 
         String action = intent.getAction();
 
-        if( action.equalsIgnoreCase( ACTION_PLAY ) ) {
+        if (action.equalsIgnoreCase(ACTION_PLAY)) {
             mController.getTransportControls().play();
-        } else if( action.equalsIgnoreCase( ACTION_PAUSE ) ) {
+        } else if (action.equalsIgnoreCase(ACTION_PAUSE)) {
             mController.getTransportControls().pause();
-        } else if( action.equalsIgnoreCase( ACTION_FAST_FORWARD ) ) {
+        } else if (action.equalsIgnoreCase(ACTION_FAST_FORWARD)) {
             mController.getTransportControls().fastForward();
-        } else if( action.equalsIgnoreCase( ACTION_REWIND ) ) {
+        } else if (action.equalsIgnoreCase(ACTION_REWIND)) {
             mController.getTransportControls().rewind();
-        } else if( action.equalsIgnoreCase( ACTION_PREVIOUS ) ) {
+        } else if (action.equalsIgnoreCase(ACTION_PREVIOUS)) {
             mController.getTransportControls().skipToPrevious();
-        } else if( action.equalsIgnoreCase( ACTION_NEXT ) ) {
+        } else if (action.equalsIgnoreCase(ACTION_NEXT)) {
             mController.getTransportControls().skipToNext();
-        } else if( action.equalsIgnoreCase( ACTION_STOP ) ) {
+        } else if (action.equalsIgnoreCase(ACTION_STOP)) {
             mController.getTransportControls().stop();
         }
     }
 
-    private Notification.Action generateAction( int icon, String title, String intentAction ) {
-        Intent intent = new Intent( getApplicationContext(), MyService.class );
-        intent.setAction( intentAction );
+    private Notification.Action generateAction(int icon, String title, String intentAction) {
+        Intent intent = new Intent(getApplicationContext(), MyService.class);
+        intent.setAction(intentAction);
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
-        return new Notification.Action.Builder( icon, title, pendingIntent ).build();
+        return new Notification.Action.Builder(icon, title, pendingIntent).build();
     }
 
-    private void buildNotificationPlay( Notification.Action action ) {
+    private void buildNotificationPlay(Notification.Action action) {
         Notification.MediaStyle style = new Notification.MediaStyle();
 
 
@@ -775,11 +747,11 @@ public class MyService extends Service implements
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent intent = new Intent( getApplicationContext(), MyService.class );
-        intent.setAction( ACTION_STOP );
+        Intent intent = new Intent(getApplicationContext(), MyService.class);
+        intent.setAction(ACTION_STOP);
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
 
-        Notification.Builder builder = new Notification.Builder( this )
+        Notification.Builder builder = new Notification.Builder(this)
                 .setContentIntent(pendInt)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
@@ -791,28 +763,28 @@ public class MyService extends Service implements
                 .setStyle(style)
                 .setVisibility(Notification.VISIBILITY_PUBLIC);
 
-        builder.addAction( generateAction(R.drawable.ic_skip_previous_black_24dpsmall, "Previous", ACTION_PREVIOUS ) );
-        builder.addAction( action );
-        builder.addAction( generateAction(R.drawable.ic_skip_next_black_24dpsmall, "Next", ACTION_NEXT ) );
-        style.setShowActionsInCompactView(0,1,2,3,4);
+        builder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dpsmall, "Previous", ACTION_PREVIOUS));
+        builder.addAction(action);
+        builder.addAction(generateAction(R.drawable.ic_skip_next_black_24dpsmall, "Next", ACTION_NEXT));
+        style.setShowActionsInCompactView(0, 1, 2, 3, 4);
 
         Notification notice = builder.build();
 
         startForeground(NOTIFY_ID, notice);
     }
 
-    private void buildNotificationPause( Notification.Action action ) {
+    private void buildNotificationPause(Notification.Action action) {
         Notification.MediaStyle style = new Notification.MediaStyle();
 
         Intent notIntent = new Intent(this, MainActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent intent = new Intent( getApplicationContext(), MyService.class );
-        intent.setAction( ACTION_STOP );
+        Intent intent = new Intent(getApplicationContext(), MyService.class);
+        intent.setAction(ACTION_STOP);
         PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
 
-        Notification.Builder builder = new Notification.Builder( this )
+        Notification.Builder builder = new Notification.Builder(this)
                 .setContentIntent(pendInt)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
@@ -824,27 +796,19 @@ public class MyService extends Service implements
                 .setStyle(style)
                 .setVisibility(Notification.VISIBILITY_PUBLIC);
 
-        builder.addAction( generateAction(R.drawable.ic_skip_previous_black_24dpsmall, "Previous", ACTION_PREVIOUS ) );
-        builder.addAction( action );
-        builder.addAction( generateAction(R.drawable.ic_skip_next_black_24dpsmall, "Next", ACTION_NEXT ) );
-        style.setShowActionsInCompactView(0,1,2,3,4);
+        builder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dpsmall, "Previous", ACTION_PREVIOUS));
+        builder.addAction(action);
+        builder.addAction(generateAction(R.drawable.ic_skip_next_black_24dpsmall, "Next", ACTION_NEXT));
+        style.setShowActionsInCompactView(0, 1, 2, 3, 4);
 
-        NotificationManager notificationManager = (NotificationManager) getSystemService( Context.NOTIFICATION_SERVICE );
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         Notification notice = builder.build();
 
         stopForeground(true);
 
-        notificationManager.notify( NOTIFY_ID, notice);
+        notificationManager.notify(NOTIFY_ID, notice);
     }
-
-    public static final String ACTION_PLAY = "action_play";
-    public static final String ACTION_PAUSE = "action_pause";
-    public static final String ACTION_REWIND = "action_rewind";
-    public static final String ACTION_FAST_FORWARD = "action_fast_foward";
-    public static final String ACTION_NEXT = "action_next";
-    public static final String ACTION_PREVIOUS = "action_previous";
-    public static final String ACTION_STOP = "action_stop";
 
     private void initSession() {
         mediaSession = new MediaSession(this, "MySession");
@@ -863,8 +827,8 @@ public class MyService extends Service implements
 
                 updateProgress();
 
-                Log.e( "MediaPlayerService", "onPlay");
-                buildNotificationPlay( generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE ) );
+                Log.e("MediaPlayerService", "onPlay");
+                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
             }
 
             @Override
@@ -879,7 +843,7 @@ public class MyService extends Service implements
 
                 progressHandler.removeCallbacks(run);
 
-                Log.e( "MediaPlayerService", "onPause");
+                Log.e("MediaPlayerService", "onPause");
                 buildNotificationPause(generateAction(R.drawable.ic_play_arrow_black_24dp, "Play", ACTION_PLAY));
             }
 
@@ -887,29 +851,29 @@ public class MyService extends Service implements
             public void onSkipToNext() {
                 super.onSkipToNext();
                 playNext();
-                Log.e( "MediaPlayerService", "onSkipToNext");
+                Log.e("MediaPlayerService", "onSkipToNext");
                 //Change media here
-                buildNotificationPlay( generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE ) );
+                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
             }
 
             @Override
             public void onSkipToPrevious() {
                 super.onSkipToPrevious();
                 playPrev();
-                Log.e( "MediaPlayerService", "onSkipToPrevious");
+                Log.e("MediaPlayerService", "onSkipToPrevious");
                 //Change media here
-                buildNotificationPlay( generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE ) );
+                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
             }
 
             @Override
             public void onStop() {
                 super.onStop();
-                Log.e( "MediaPlayerService", "onStop");
+                Log.e("MediaPlayerService", "onStop");
                 //Stop media player here
-                    NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-                    notificationManager.cancel(NOTIFY_ID);
-                    Intent intent = new Intent(getApplicationContext(), MyService.class);
-                    stopService(intent);
+                NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                notificationManager.cancel(NOTIFY_ID);
+                Intent intent = new Intent(getApplicationContext(), MyService.class);
+                stopService(intent);
             }
 
         });
@@ -919,15 +883,16 @@ public class MyService extends Service implements
     public void onDestroy() {
         super.onDestroy();
         mediaSession.release();
+        unregisterReceiver(myServBroadcast);
     }
 
-    private Bitmap loadLargeIcon(String path){
+    private Bitmap loadLargeIcon(String path) {
         Bitmap largeIcon;
 
         try {
             byte[] bitmapByte = function.GetBitMapByte(path);
             largeIcon = BitmapFactory.decodeByteArray(bitmapByte, 0, bitmapByte.length);
-        }catch (Exception e){
+        } catch (Exception e) {
             largeIcon = BitmapFactory.decodeResource(this.getResources(), R.drawable.noteicon);
         }
 

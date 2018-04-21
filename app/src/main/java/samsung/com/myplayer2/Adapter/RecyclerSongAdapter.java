@@ -22,6 +22,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 
+import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
@@ -94,6 +95,7 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                 Intent play = new Intent("ToService");
                 play.setAction("SvPlayOne");
                 play.putExtra("pos", pos);
+                play.putExtra(Constants.TYPE_NAME, Constants.SONG_TYPE);
                 c.sendBroadcast(play);
             }
         });

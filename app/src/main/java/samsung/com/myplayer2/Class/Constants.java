@@ -16,4 +16,13 @@ public class Constants {
 
     public static final String NAVIGATE_LIBRARY = "navigate_library";
     public static final String NAVIGATE_PLAYLIST = "navigate_playlist";
+
+    public static final String TYPE_NAME = "type_name";
+    public static final String SONG_TYPE = "song_type";
+    public static final String ALBUM_TYPE = "album_type";
+    public static final String ARTIST_TYPE = "artist_type";
+    public static final String PLAYLIST_TYPE = "playlist_type";
+    public static final String GENRES_TYPE = "genres_type";
+    public static final String SEARCH_TYPE = "search_type";
+
 }

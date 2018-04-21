@@ -109,7 +109,6 @@ public class Function {
     public static void getSongList(Context mContext, ArrayList<Song> ArraySong) {
         //retrieve song info
         MediaMetadataRetriever mr = new MediaMetadataRetriever();
-        Cursor musicCursor;
 
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -118,7 +117,7 @@ public class Function {
 
         String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
 
-        musicCursor = musicResolver.query(musicUri, ColumnIndex, selectOption, null, null);
+        Cursor musicCursor = musicResolver.query(musicUri, ColumnIndex, selectOption, null, null);
 
         //get collumn
 //        int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
@@ -127,7 +126,7 @@ public class Function {
 //        int dataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
 //        int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
 
-        if (musicCursor.moveToFirst()) {
+        if (musicCursor != null && musicCursor.moveToFirst()) {
             //add song to list
             do {
                 long thisId = musicCursor.getLong(0);
@@ -148,9 +147,11 @@ public class Function {
 
             }
             while (musicCursor.moveToNext());
+
+            //Close Cursor when done
+            musicCursor.close();
         }
         SortBySongName(ArraySong);
-        musicCursor.close();
     }
 
     public static void getAlbumsLists(Context mContext, ArrayList<Album> albumList) {
@@ -238,13 +239,11 @@ public class Function {
     }
 
 
-
-
     public ArrayList<Song> getAllSongs(Context context) {
         return getSongsForCursor(makeSongCursor(context, null, null, null));
     }
 
-    public ArrayList<Song> getSongsForCursor(Cursor cursor) {
+    private static ArrayList<Song> getSongsForCursor(Cursor cursor) {
         ArrayList arrayList = new ArrayList();
         if ((cursor != null) && (cursor.moveToFirst()))
             do {
@@ -260,18 +259,16 @@ public class Function {
         if (cursor != null)
             cursor.close();
 
-        SortBySongName(arrayList);
-
         return arrayList;
     }
 
-    private Cursor makeSongCursor(Context context, String selection, String[] paramArrayOfString, String sortOrder) {
+    private static Cursor makeSongCursor(Context context, String selection, String[] paramArrayOfString, String sortOrder) {
         String selectionStatement = "is_music = 1 AND title != ''";
 
         if (!TextUtils.isEmpty(selection)) {
             selectionStatement = selectionStatement + " AND " + selection;
         }
-        return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "title", "artist", "_data", "album_id"}, selectionStatement, paramArrayOfString, sortOrder);
+        return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, paramArrayOfString, selectionStatement, null, sortOrder);
 
     }
 }
