@@ -24,16 +24,11 @@ import java.util.ArrayList;
 
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
-/**
- * Created by 450G4 on 3/10/2018.
- */
-
-public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> {
-
+public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.MyRecyclerSongHolder> {
 
     private ArrayList<Song> songs;
     Context mContext;
@@ -41,12 +36,12 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
     ListView lv;
     Function function = new Function();
 
-    public RecyclerSongAdapter(Context context, ArrayList<Song> data) {
+    public SongInAlbumAdapter(Context context, ArrayList<Song> data) {
         this.mContext = context;
         this.songs = data;
     }
 
-    public RecyclerSongAdapter() {
+    public SongInAlbumAdapter() {
     }
 
     public class MyRecyclerSongHolder extends RecyclerView.ViewHolder {
@@ -94,7 +89,7 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                 Intent play = new Intent("ToService");
                 play.setAction("SvPlayOne");
                 play.putExtra("pos", pos);
-                play.putExtra(Constants.TYPE_NAME, Constants.SONG_TYPE);
+                play.putExtra(Constants.TYPE_NAME, Constants.ALBUM_TYPE);
                 c.sendBroadcast(play);
             }
         });

@@ -28,6 +28,7 @@ import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -80,7 +81,7 @@ public class MyService extends Service implements
     private ArrayList<Song> songs;
 
     //Number of song list
-    private String ListType = Constants.SONG_TYPE;
+    private String ListType = "";
     //Number of song list in Fragments
     private int ListNumberFrag = 1;
     //current position
@@ -274,13 +275,13 @@ public class MyService extends Service implements
             Log.e("MUSIC SERVICE", "Error setting data source", e);
         }
 
-//        try {
-//            player.prepare();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            player.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
-        player.prepareAsync();
+        //player.prepareAsync();
 
         Intent setup = new Intent("ToActivity");
         setup.setAction("StartPlay");

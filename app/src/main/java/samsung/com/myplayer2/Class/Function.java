@@ -234,6 +234,151 @@ public class Function {
         genresCursor.close();
     }
 
+    public static void getSongListOfAlbum(Context mContext, long AlbumID, ArrayList<Song> ArraySong) {
+        //retrieve song info
+        MediaMetadataRetriever mr = new MediaMetadataRetriever();
+
+        ContentResolver musicResolver = mContext.getContentResolver();
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String[] ColumnIndex = {"_id", "title", "artist", "_data", "album_id"};
+
+        String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != '' AND album_id = '" + Long.toString(AlbumID) + "'";
+
+        Cursor musicCursor = musicResolver.query(musicUri, ColumnIndex, selectOption, null, null);
+
+        //get collumn
+//        int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+//        int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+//        int artisColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+//        int dataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+//        int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+
+        if (musicCursor != null && musicCursor.moveToFirst()) {
+            //add song to list
+            do {
+                long thisId = musicCursor.getLong(0);
+                String thisTitle = musicCursor.getString(1);
+                String thisArtis = musicCursor.getString(2);
+                String thisData = musicCursor.getString(3);
+                //Bitmap songimg = GetBitmap(thisData);
+                //Bitmap lastimg = getResizedBitmap(songimg, 55, 60);
+                long albumId = musicCursor.getLong(4);
+
+                Uri trackUri = ContentUris.withAppendedId(musicUri, thisId);
+
+                mr.setDataSource(mContext, trackUri);
+
+                String genres = mr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
+
+                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisData, albumId, genres));
+
+            }
+            while (musicCursor.moveToNext());
+
+            //Close Cursor when done
+            musicCursor.close();
+        }
+        SortBySongName(ArraySong);
+    }
+
+    public static void getSongListOfArtist(Context mContext, String artist_name, ArrayList<Song> ArraySong) {
+        //retrieve song info
+        MediaMetadataRetriever mr = new MediaMetadataRetriever();
+
+        ContentResolver musicResolver = mContext.getContentResolver();
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String[] ColumnIndex = {"_id", "title", "artist", "_data", "album_id"};
+
+        String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != '' AND album_id = '" + artist_name + "'";
+
+        Cursor musicCursor = musicResolver.query(musicUri, ColumnIndex, selectOption, null, null);
+
+        //get collumn
+//        int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+//        int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+//        int artisColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+//        int dataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+//        int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+
+        if (musicCursor != null && musicCursor.moveToFirst()) {
+            //add song to list
+            do {
+                long thisId = musicCursor.getLong(0);
+                String thisTitle = musicCursor.getString(1);
+                String thisArtis = musicCursor.getString(2);
+                String thisData = musicCursor.getString(3);
+                //Bitmap songimg = GetBitmap(thisData);
+                //Bitmap lastimg = getResizedBitmap(songimg, 55, 60);
+                long albumId = musicCursor.getLong(4);
+
+                Uri trackUri = ContentUris.withAppendedId(musicUri, thisId);
+
+                mr.setDataSource(mContext, trackUri);
+
+                String genres = mr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
+
+                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisData, albumId, genres));
+
+            }
+            while (musicCursor.moveToNext());
+
+            //Close Cursor when done
+            musicCursor.close();
+        }
+        SortBySongName(ArraySong);
+    }
+
+    public static void getSongListOfGenres(Context mContext, String genres_name, ArrayList<Song> ArraySong) {
+        //retrieve song info
+        MediaMetadataRetriever mr = new MediaMetadataRetriever();
+
+        ContentResolver musicResolver = mContext.getContentResolver();
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+        String[] ColumnIndex = {"_id", "title", "artist", "_data", "album_id"};
+
+        String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
+
+        Cursor musicCursor = musicResolver.query(musicUri, ColumnIndex, selectOption, null, null);
+
+        //get collumn
+//        int titleColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+//        int idColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media._ID);
+//        int artisColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ARTIST);
+//        int dataColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.DATA);
+//        int albumIdColumn = musicCursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID);
+
+        if (musicCursor != null && musicCursor.moveToFirst()) {
+            //add song to list
+            do {
+                long thisId = musicCursor.getLong(0);
+                String thisTitle = musicCursor.getString(1);
+                String thisArtis = musicCursor.getString(2);
+                String thisData = musicCursor.getString(3);
+                //Bitmap songimg = GetBitmap(thisData);
+                //Bitmap lastimg = getResizedBitmap(songimg, 55, 60);
+                long albumId = musicCursor.getLong(4);
+
+                Uri trackUri = ContentUris.withAppendedId(musicUri, thisId);
+
+                mr.setDataSource(mContext, trackUri);
+
+                String genres = mr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
+
+                if (genres.equals(genres_name))
+                    ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisData, albumId, genres));
+
+            }
+            while (musicCursor.moveToNext());
+
+            //Close Cursor when done
+            musicCursor.close();
+        }
+        SortBySongName(ArraySong);
+    }
+
     public String getURLForResource(int resourceId) {
         return Uri.parse("android.resource://" + R.class.getPackage().getName() + "/" + resourceId).toString();
     }
