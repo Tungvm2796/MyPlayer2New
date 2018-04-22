@@ -46,7 +46,7 @@ public class AlbumSongFragment extends Fragment {
     ArrayList<Song> SongListOfAlbum;
     Function function = new Function();
 
-    public static AlbumSongFragment getFragmen(long albumId){
+    public static AlbumSongFragment getFragment(long albumId){
         AlbumSongFragment fragment = new AlbumSongFragment();
 
         Bundle args = new Bundle();

@@ -13,7 +13,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -32,7 +31,6 @@ import android.widget.TextView;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.bumptech.glide.Glide;
-import com.musixmatch.lyrics.MissingPluginException;
 import com.musixmatch.lyrics.musiXmatchLyricsConnector;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -43,6 +41,7 @@ import java.util.Map;
 
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Fragments.LyricsFragment;
 import samsung.com.myplayer2.Fragments.MainFragment;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -62,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
     MyService myService;
     private boolean musicBound = false;
     private Intent playintent;
+
+    Button btnHide;
 
     TextView txtTitle;
     TextView txtArtist;
@@ -108,6 +109,22 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    private Runnable navigateLyrics = new Runnable() {
+        public void run() {
+            Fragment fragment = new LyricsFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+
+            Bundle args = new Bundle();
+            args.putString(Constants.SONG_PATH, myService.GetSongPath());
+            args.putString(Constants.SONG_TITLE, myService.getSongTitle());
+            args.putString(Constants.ARTIST, myService.getSongArtist());
+            fragment.setArguments(args);
+
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -121,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
         navigationMap.put(Constants.NAVIGATE_LIBRARY, navigateLibrary);
         navigationMap.put(Constants.NAVIGATE_PLAYLIST, navigatePlaylist);
+        navigationMap.put(Constants.NAVIGATE_LYRICS, navigateLyrics);
 
         context = this;
         function = new Function();
@@ -232,17 +250,26 @@ public class MainActivity extends AppCompatActivity {
         mLyricsPlugin = new musiXmatchLyricsConnector(this);
         mLyricsPlugin.setLoadingMessage("Your custom title", "Your custom message");
 
-        Button btnhide = findViewById(R.id.btn_hide);
-        btnhide.setOnClickListener(new View.OnClickListener() {
+//        Button btnhide = findViewById(R.id.btn_hide);
+//        btnhide.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                    mLyricsPlugin.startLyricsActivity(myService.getSongArtist(), myService.getSongTitle());
+//                } catch (MissingPluginException e) {
+//                    mLyricsPlugin.downloadLyricsPlugin();
+//                } catch (RemoteException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+
+        btnHide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                try {
-                    mLyricsPlugin.startLyricsActivity(myService.getSongArtist(), myService.getSongTitle());
-                } catch (MissingPluginException e) {
-                    mLyricsPlugin.downloadLyricsPlugin();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+                //NavigationHelper.goToLyrics(MainActivity.this);
+                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                navigateLyrics.run();
             }
         });
 
@@ -254,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
         }, 700);
 
         addBackstackListener();
+
         loadEverything();
 
         //END onCreate() ---------------------------------------------------------------
@@ -306,6 +334,8 @@ public class MainActivity extends AppCompatActivity {
         //slidingLayout.setDragView(findViewById(R.id.dragview));
 
         imgDisc = findViewById(R.id.imageViewDisc);
+
+        btnHide = findViewById(R.id.btn_hide);
     }
 
 //    private void setSuggestion() {

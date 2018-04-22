@@ -416,4 +416,8 @@ public class Function {
         return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, paramArrayOfString, selectionStatement, null, sortOrder);
 
     }
+
+    public static Uri getAlbumArtUri(long albumId) {
+        return ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
+    }
 }

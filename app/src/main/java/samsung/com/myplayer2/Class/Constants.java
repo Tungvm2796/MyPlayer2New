@@ -25,8 +25,12 @@ public class Constants {
     public static final String GENRES_TYPE = "genres_type";
     public static final String SEARCH_TYPE = "search_type";
 
+    public static final String SONG_TITLE = "song_title";
     public static final String ALBUM_ID = "album_id";
     public static final String ARTIST = "artist_name";
     public static final String GENRES = "genres_name";
+    public static final String SONG_PATH = "song_path";
+
+    public static final String NAVIGATE_LYRICS = "navigate_lyrics";
 
 }

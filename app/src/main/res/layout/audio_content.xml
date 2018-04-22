@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     xmlns:tools="http://schemas.android.com/tools"
 
 
+    android:id="@+id/audio_content"
+
     android:layout_width="match_parent"
 
     android:layout_height="match_parent"
 
     android:animateLayoutChanges="true"
-
     android:orientation="vertical">
 
     <com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:sothree="http://schemas.android.com/apk/res-auto"
@@ -33,9 +34,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+
         <!-- SLIDING LAYOUT -->
-        <include layout="@layout/play_song" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/track_show">
+
+            <include layout="@layout/play_song" />
+        </FrameLayout>
 
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
-</LinearLayout>
+</FrameLayout>

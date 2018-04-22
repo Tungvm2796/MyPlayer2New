@@ -17,15 +17,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
 /**
@@ -81,11 +82,17 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
         holder.songView.setText(currSong.getTitle());
         holder.artistView.setText(currSong.getArtist());
 
-        Glide.with(mContext).load(function.GetBitMapByte(currSong.getData()))
-                .override(57, 63)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
-                .error(R.drawable.noteicon)
-                .into(holder.coverimg);
+//        Glide.with(mContext).load(function.GetBitMapByte(currSong.getData()))
+//                .override(57, 63)
+//                .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
+//                .error(R.drawable.noteicon)
+//                .into(holder.coverimg);
+
+        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
+        ImageLoader.getInstance().displayImage(function.getAlbumArtUri(currSong.getAlbumid()).toString(),
+                holder.coverimg, new DisplayImageOptions.Builder().cacheInMemory(true)
+                        .showImageOnLoading(R.drawable.noteicon)
+                        .resetViewBeforeLoading(true).build());
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

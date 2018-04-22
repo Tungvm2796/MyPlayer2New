@@ -1,41 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/dragView"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#ffffff"
-    android:clickable="true"
-    android:focusable="false"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:id="@+id/dragview"
+        android:id="@+id/dragView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:background="#ffffff"
+        android:clickable="true"
+        android:focusable="false"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/name"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:paddingLeft="10dp"
-            android:text="Demo slide"
-            android:textColor="@android:color/holo_green_dark"
-            android:textSize="14sp" />
+        <LinearLayout
+            android:id="@+id/dragview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_hide"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical|right"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="Demo slide"
-            android:textSize="14sp" />
+            <TextView
+                android:id="@+id/name"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:text="Demo slide"
+                android:textColor="@android:color/holo_green_dark"
+                android:textSize="14sp" />
+
+            <Button
+                android:id="@+id/btn_hide"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|right"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="Demo slide"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <include layout="@layout/control_play"></include>
+
     </LinearLayout>
-
-    <include layout="@layout/control_play"></include>
-
-</LinearLayout>
+</FrameLayout>
