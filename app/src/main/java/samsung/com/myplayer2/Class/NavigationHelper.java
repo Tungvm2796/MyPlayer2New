@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
 import samsung.com.myplayer2.Activities.MainActivity;
+import samsung.com.myplayer2.Activities.SearchActivity;
 import samsung.com.myplayer2.Fragments.AlbumSongFragment;
 import samsung.com.myplayer2.R;
 
@@ -30,6 +31,13 @@ public class NavigationHelper {
     public static void goToLyrics(Context context) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setAction(Constants.NAVIGATE_LYRICS);
+        context.startActivity(intent);
+    }
+
+    public static void navigateToSearch(Activity context) {
+        final Intent intent = new Intent(context, SearchActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        intent.setAction(Constants.NAVIGATE_SEARCH);
         context.startActivity(intent);
     }
 }

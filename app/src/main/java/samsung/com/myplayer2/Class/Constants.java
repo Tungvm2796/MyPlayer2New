@@ -32,5 +32,6 @@ public class Constants {
     public static final String SONG_PATH = "song_path";
 
     public static final String NAVIGATE_LYRICS = "navigate_lyrics";
+    public static final String NAVIGATE_SEARCH = "navigate_search";
 
 }

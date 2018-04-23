@@ -20,7 +20,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -47,7 +46,7 @@ import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     //private ArrayList<Suggestion> mSuggestion = new ArrayList<>();
 

@@ -87,7 +87,7 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
                     ImageLoader.getInstance().displayImage(artist.mArtwork.get(2).mUrl, holder.artistImg,
                             new DisplayImageOptions.Builder().cacheInMemory(true)
                                     .cacheOnDisk(true)
-                                    .showImageOnLoading(R.drawable.noteicon)
+                                    .showImageOnFail(R.drawable.album_none)
                                     .resetViewBeforeLoading(true)
                                     .displayer(new FadeInBitmapDisplayer(400))
                                     .build(), new SimpleImageLoadingListener() {

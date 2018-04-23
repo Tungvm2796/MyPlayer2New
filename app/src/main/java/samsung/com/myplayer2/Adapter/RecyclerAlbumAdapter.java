@@ -8,12 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Model.Album;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Model.Album;
 import samsung.com.myplayer2.R;
 
 /**
@@ -65,8 +67,13 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
 
         holder.albumName.setText(curAlbum.getAlbumName());
         holder.albumArtist.setText(curAlbum.getArtistName());
-        Glide.with(mContext).load(function.BitmapToByte(curAlbum.getAlbumImg())).into(holder.albumImg);
+//        Glide.with(mContext).load(function.BitmapToByte(curAlbum.getAlbumImg())).into(holder.albumImg);
 
+        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
+        ImageLoader.getInstance().displayImage(function.getAlbumArtUri(curAlbum.getId()).toString(),
+                holder.albumImg, new DisplayImageOptions.Builder().cacheInMemory(true)
+                        .showImageOnLoading(R.drawable.album_none)
+                        .resetViewBeforeLoading(true).build());
     }
 
     @Override

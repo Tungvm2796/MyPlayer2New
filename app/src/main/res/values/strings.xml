@@ -12,6 +12,8 @@
 
     <string name="pause">Pause</string>
 
+    <string name="search">Search</string>
+
     <string name="addToPlayList">Add To Playlist</string>
     <string name="details">Details</string>
     <string name="removeFromPlaylist">Remove from Playlist</string>
