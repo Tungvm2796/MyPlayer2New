@@ -1,16 +1,22 @@
 package samsung.com.myplayer2.Adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.util.ArrayList;
 
@@ -37,6 +43,7 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
     public class MyRecyclerAlbumHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView albumName, albumArtist;
         ImageView albumImg;
+        LinearLayout footer;
 
         public MyRecyclerAlbumHolder(View albumLay) {
             super(albumLay);
@@ -44,6 +51,7 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
             albumName = albumLay.findViewById(R.id.album_name);
             albumArtist = albumLay.findViewById(R.id.album_artist);
             albumImg = albumLay.findViewById(R.id.album_img);
+            footer = albumLay.findViewById(R.id.footer);
             itemView.setOnClickListener(this);
 
         }
@@ -62,7 +70,7 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
     }
 
     @Override
-    public void onBindViewHolder(MyRecyclerAlbumHolder holder, int position) {
+    public void onBindViewHolder(final MyRecyclerAlbumHolder holder, int position) {
         Album curAlbum = albumList.get(position);
 
         holder.albumName.setText(curAlbum.getAlbumName());
@@ -73,7 +81,47 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
         ImageLoader.getInstance().displayImage(function.getAlbumArtUri(curAlbum.getId()).toString(),
                 holder.albumImg, new DisplayImageOptions.Builder().cacheInMemory(true)
                         .showImageOnLoading(R.drawable.album_none)
-                        .resetViewBeforeLoading(true).build());
+                        .resetViewBeforeLoading(true).build(),
+                new SimpleImageLoadingListener() {
+                    @Override
+                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                        super.onLoadingComplete(imageUri, view, loadedImage);
+                        new Palette.Builder(loadedImage).generate(new Palette.PaletteAsyncListener() {
+                            @Override
+                            public void onGenerated(Palette palette) {
+                                Palette.Swatch swatch = palette.getVibrantSwatch();
+                                if (swatch != null) {
+                                    int color = swatch.getRgb();
+                                    holder.footer.setBackgroundColor(color);
+                                    int textColor = function.getBlackWhiteColor(swatch.getTitleTextColor());
+                                    holder.albumName.setTextColor(textColor);
+                                    holder.albumArtist.setTextColor(textColor);
+                                } else {
+                                    Palette.Swatch mutedSwatch = palette.getMutedSwatch();
+                                    if (mutedSwatch != null) {
+                                        int color = mutedSwatch.getRgb();
+                                        holder.footer.setBackgroundColor(color);
+                                        int textColor = function.getBlackWhiteColor(mutedSwatch.getTitleTextColor());
+                                        holder.albumName.setTextColor(textColor);
+                                        holder.albumArtist.setTextColor(textColor);
+                                    }
+                                }
+
+
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                        holder.footer.setBackgroundColor(0);
+                        if (mContext != null) {
+                            holder.albumName.setTextColor(Color.BLACK);
+                            holder.albumArtist.setTextColor(Color.LTGRAY);
+                        }
+                    }
+                }
+        );
     }
 
     @Override
