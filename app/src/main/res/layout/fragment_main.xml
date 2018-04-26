@@ -9,7 +9,6 @@
         android:id="@+id/mainlay1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="50dp"
         android:orientation="vertical"
         android:visibility="visible">
 
@@ -18,11 +17,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <View
-                android:id="@+id/colored_background_view"
-                android:layout_width="wrap_content"
-                android:layout_height="192dp"
-                android:background="#0b65db" />
+            <!--<View-->
+                <!--android:id="@+id/colored_background_view"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="192dp"-->
+                <!--android:background="#0b65db" />-->
 
             <android.support.v4.view.ViewPager
                 android:id="@+id/viewpager"
@@ -82,15 +81,5 @@
 
 
     </LinearLayout>
-
-    <com.arlib.floatingsearchview.FloatingSearchView
-        android:id="@+id/floating_search_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:floatingSearch_close_search_on_keyboard_dismiss="true"
-        app:floatingSearch_leftActionMode="noLeftAction"
-        app:floatingSearch_searchHint="Search..."
-        app:floatingSearch_showSearchKey="true"
-        app:floatingSearch_suggestionsListAnimDuration="250" />
 
 </FrameLayout>

@@ -1,16 +1,13 @@
 package samsung.com.myplayer2.Adapter;
 
 import android.content.Context;
-import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 
 import java.util.ArrayList;
 
@@ -71,12 +68,12 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
         Playlist curPlayList = playList.get(position);
 
         holder.ListName.setText(curPlayList.getName());
-
-        TypedArray images = mContext.getResources().obtainTypedArray(R.array.array_drawables);
-        int choice = (int) (Math.random() * images.length());
-        GlideDrawableImageViewTarget target = new GlideDrawableImageViewTarget(holder.ListImg);
-        Glide.with(mContext).load(images.getResourceId(choice, R.drawable.pic5)).into(target);
-        images.recycle();
+        holder.ListName.setTextColor(Color.BLACK);
+//        TypedArray images = mContext.getResources().obtainTypedArray(R.array.array_drawables);
+//        int choice = (int) (Math.random() * images.length());
+//        GlideDrawableImageViewTarget target = new GlideDrawableImageViewTarget(holder.ListImg);
+//        Glide.with(mContext).load(images.getResourceId(choice, R.drawable.pic5)).into(target);
+//        images.recycle();
     }
 
     @Override

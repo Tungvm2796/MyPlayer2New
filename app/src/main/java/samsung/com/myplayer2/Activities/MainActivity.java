@@ -40,8 +40,12 @@ import java.util.Map;
 
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Fragments.AlbumSongFragment;
+import samsung.com.myplayer2.Fragments.ArtistSongFragment;
+import samsung.com.myplayer2.Fragments.BlankFragment;
 import samsung.com.myplayer2.Fragments.LyricsFragment;
 import samsung.com.myplayer2.Fragments.MainFragment;
+import samsung.com.myplayer2.Fragments.SearchFragment;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
@@ -100,10 +104,10 @@ public class MainActivity extends BaseActivity {
     private Runnable navigatePlaylist = new Runnable() {
         public void run() {
             navigationView.getMenu().findItem(R.id.nav_playlist).setChecked(true);
-            //Fragment fragment = new PlaylistFragment();
+            Fragment fragment = new BlankFragment();            //<-------------------------------<< thay no bang playlist fragment
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.hide(getSupportFragmentManager().findFragmentById(R.id.fragment_container));
-            //transaction.replace(R.id.fragment_container, fragment).commit();
+            transaction.replace(R.id.fragment_container, fragment).commit();
 
         }
     };
@@ -124,6 +128,35 @@ public class MainActivity extends BaseActivity {
         }
     };
 
+    private Runnable navigateAlbum = new Runnable() {
+        public void run() {
+            long albumID = getIntent().getExtras().getLong(Constants.ALBUM_ID);
+            Fragment fragment = AlbumSongFragment.getFragment(albumID);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment).commit();
+        }
+    };
+
+    private Runnable navigateArtist = new Runnable() {
+        public void run() {
+            String artist_name = getIntent().getExtras().getString(Constants.ARTIST);
+            Fragment fragment = ArtistSongFragment.getFragment(artist_name);
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment).commit();
+        }
+    };
+
+    private Runnable navigateSearch = new Runnable() {
+        public void run() {
+            Fragment fragment = new SearchFragment();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, fragment).addToBackStack(null).commit();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -138,6 +171,9 @@ public class MainActivity extends BaseActivity {
         navigationMap.put(Constants.NAVIGATE_LIBRARY, navigateLibrary);
         navigationMap.put(Constants.NAVIGATE_PLAYLIST, navigatePlaylist);
         navigationMap.put(Constants.NAVIGATE_LYRICS, navigateLyrics);
+        navigationMap.put(Constants.NAVIGATE_ALBUM, navigateAlbum);
+        navigationMap.put(Constants.NAVIGATE_ARTIST, navigateArtist);
+        navigationMap.put(Constants.NAVIGATE_SEARCH, navigateSearch);
 
         context = this;
         function = new Function();
@@ -336,29 +372,6 @@ public class MainActivity extends BaseActivity {
 
         btnHide = findViewById(R.id.btn_hide);
     }
-
-//    private void setSuggestion() {
-//        for (Song song : MainSongList) {
-//            mSuggestion.add(new Suggestion(song.getTitle()));
-//            mSuggestion.add(new Suggestion(song.getArtist()));
-//        }
-//        for (Album album : AllAlbum) {
-//            mSuggestion.add(new Suggestion(album.getAlbumName()));
-//        }
-//        for (Artist artist : AllArtist) {
-//            mSuggestion.add(new Suggestion(artist.getName()));
-//        }
-//    }
-
-//    private ArrayList<Suggestion> getSuggestion(String query) {
-//        ArrayList<Suggestion> suggestions = new ArrayList<>();
-//        for (Suggestion suggestion : mSuggestion) {
-//            if (suggestion.getBody().toLowerCase().contains(query.toLowerCase())) {
-//                suggestions.add(suggestion);
-//            }
-//        }
-//        return suggestions;
-//    }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override

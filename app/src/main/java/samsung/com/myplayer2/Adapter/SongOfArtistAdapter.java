@@ -18,9 +18,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 
@@ -31,27 +30,20 @@ import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
-/**
- * Created by 450G4 on 3/10/2018.
- */
-
-public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> {
-
+public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapter.MyRecyclerSongHolder> {
 
     private ArrayList<Song> songs;
     Context mContext;
     ArrayList<String> Namelist;
     ListView lv;
     Function function = new Function();
-    boolean isResult;
 
-    public RecyclerSongAdapter(Context context, ArrayList<Song> data, boolean search) {
+    public SongOfArtistAdapter(Context context, ArrayList<Song> data) {
         this.mContext = context;
         this.songs = data;
-        this.isResult = search;
     }
 
-    public RecyclerSongAdapter() {
+    public SongOfArtistAdapter() {
     }
 
     public class MyRecyclerSongHolder extends RecyclerView.ViewHolder {
@@ -69,15 +61,15 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
         }
     }
 
-    public MyRecyclerSongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public SongOfArtistAdapter.MyRecyclerSongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //map to song layout
         View songView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.song, parent, false);
-        return new MyRecyclerSongHolder(songView);
+        return new SongOfArtistAdapter.MyRecyclerSongHolder(songView);
     }
 
     @Override
-    public void onBindViewHolder(final MyRecyclerSongHolder holder, int position) {
+    public void onBindViewHolder(final SongOfArtistAdapter.MyRecyclerSongHolder holder, int position) {
         //get song using position
         final Song currSong = songs.get(position);
         final int pos = position;
@@ -86,17 +78,11 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
         holder.songView.setText(currSong.getTitle());
         holder.artistView.setText(currSong.getArtist());
 
-//        Glide.with(mContext).load(function.GetBitMapByte(currSong.getData()))
-//                .override(57, 63)
-//                .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
-//                .error(R.drawable.noteicon)
-//                .into(holder.coverimg);
-
-        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
-        ImageLoader.getInstance().displayImage(function.getAlbumArtUri(currSong.getAlbumid()).toString(),
-                holder.coverimg, new DisplayImageOptions.Builder().cacheInMemory(true)
-                        .showImageOnLoading(R.drawable.noteicon)
-                        .resetViewBeforeLoading(true).build());
+        Glide.with(mContext).load(function.GetBitMapByte(currSong.getData()))
+                .override(57, 63)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
+                .error(R.drawable.noteicon)
+                .into(holder.coverimg);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -105,11 +91,7 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                 Intent play = new Intent("ToService");
                 play.setAction("SvPlayOne");
                 play.putExtra("pos", pos);
-                if (isResult) {
-                    play.putExtra(Constants.TYPE_NAME, Constants.SEARCH_TYPE);
-                } else {
-                    play.putExtra(Constants.TYPE_NAME, Constants.SONG_TYPE);
-                }
+                play.putExtra(Constants.TYPE_NAME, Constants.ARTIST_TYPE);
                 c.sendBroadcast(play);
             }
         });
@@ -197,10 +179,6 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                     case R.id.go_to_album:
                         NavigationHelper.navigateToSongAlbum((AppCompatActivity)mContext, songs.get(curpos).getAlbumid());
                         break;
-
-                    case R.id.go_to_artist:
-                        NavigationHelper.navigateToSongArtist((AppCompatActivity)mContext, songs.get(curpos).getArtist());
-                        break;
                 }
                 return false;
             }
@@ -238,13 +216,5 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
 //        });
 //        //displaying the popup
 //        popup2.show();
-    }
-
-    public void updateListSong(ArrayList<Song> update) {
-        this.songs = update;
-    }
-
-    public ArrayList<Song> GetListSong() {
-        return this.songs;
     }
 }

@@ -1,5 +1,6 @@
 package samsung.com.myplayer2.Fragments;
 
+
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -7,17 +8,18 @@ import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
+import samsung.com.myplayer2.Adapter.SongOfArtistAdapter;
+import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -26,56 +28,57 @@ import samsung.com.myplayer2.Service.MyService;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SongListFragment extends Fragment {
+public class ArtistSongFragment extends Fragment {
 
-    public SongListFragment() {
+
+    public ArtistSongFragment() {
         // Required empty public constructor
     }
-
-    public ArrayList<Song> SongList;
-    private RecyclerView songView;
-    Context context;
 
     MyService myService;
     private boolean musicBound = false;
     private Intent playintent;
 
-    Toolbar toolbar;
+    String artistName;
 
-    Function function;
+    SongOfArtistAdapter adapter;
+    RecyclerView ArtistSongView;
+    ArrayList<Song> SongListOfArtist;
+    Function function = new Function();
 
-    RecyclerSongAdapter songAdt;
+    public static ArtistSongFragment getFragment(String artist){
+        ArtistSongFragment fragment = new ArtistSongFragment();
+
+        Bundle args = new Bundle();
+        args.putString(Constants.ARTIST, artist);
+
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Override
-    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            artistName = getArguments().getString(Constants.ARTIST);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_song_list, container, false);
+        View v = inflater.inflate(R.layout.fragment_artist_song, container, false);
 
-        function = new Function();
+        SongListOfArtist = new ArrayList<>();
+        ArtistSongView = v.findViewById(R.id.song_of_artist);
 
-        songView =  v.findViewById(R.id.song_list);
+        adapter = new SongOfArtistAdapter(getContext(), SongListOfArtist);
 
-        context = v.getContext();
-
-        SongList = new ArrayList<>();
-
-        songAdt = new RecyclerSongAdapter(getContext(), SongList, false);
-
-        new GetSong().execute();
-
-        //SongList = ((MainActivity) getActivity()).getAllSong();
-
-//        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
-//        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);
-//        View lasttab = new MainFragment().getView().findViewById(R.id.viewpagertab);
-//        View coloredBackgroundView = new MainFragment().getView().findViewById(R.id.colored_background_view);
+        new GetSongOfArtist().execute();
 
         RecyclerView.LayoutManager mManager = new LinearLayoutManager(getContext());
-        songView.setLayoutManager(mManager);
-        //new GetSong().execute();
-
-        //songView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
+        ArtistSongView.setLayoutManager(mManager);
 
         return v;
     }
@@ -88,7 +91,7 @@ public class SongListFragment extends Fragment {
             myService = binder.getService();
 
             //pass list
-            myService.setAllSongs(SongList);
+            myService.setSongListOfArtist(SongListOfArtist);
 
             musicBound = true;
         }
@@ -119,8 +122,7 @@ public class SongListFragment extends Fragment {
         }
     }
 
-    private class GetSong extends AsyncTask<Void, Void, Void>{
-
+    class GetSongOfArtist extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -128,15 +130,14 @@ public class SongListFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            function.getSongList(getContext(), SongList, null);
+            function.getSongListOfArtist(getContext(), artistName, SongListOfArtist);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            songView.setAdapter(songAdt);
+            ArtistSongView.setAdapter(adapter);
         }
     }
-
 }

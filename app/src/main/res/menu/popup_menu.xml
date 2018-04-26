@@ -7,6 +7,16 @@
         android:title="@string/addToPlayList"
         app:showAsAction="never" />
     <item
+        android:id="@+id/go_to_album"
+        android:orderInCategory="100"
+        android:title="@string/toAlbum"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/go_to_artist"
+        android:orderInCategory="100"
+        android:title="@string/toArtist"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action2"
         android:orderInCategory="100"
         android:title="@string/details"

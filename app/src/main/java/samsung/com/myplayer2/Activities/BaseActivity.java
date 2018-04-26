@@ -35,7 +35,7 @@ public class BaseActivity extends AppCompatActivity {
                 super.onBackPressed();
                 return true;
             case R.id.action_search:
-                NavigationHelper.navigateToSearch(this);
+                NavigationHelper.navigateToSearch(BaseActivity.this);
                 return true;
             case R.id.action_equalizer:
                 Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);

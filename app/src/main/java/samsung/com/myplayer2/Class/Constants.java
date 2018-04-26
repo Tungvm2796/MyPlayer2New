@@ -33,5 +33,8 @@ public class Constants {
 
     public static final String NAVIGATE_LYRICS = "navigate_lyrics";
     public static final String NAVIGATE_SEARCH = "navigate_search";
+    public static final String NAVIGATE_ALBUM = "navigate_album";
+    public static final String NAVIGATE_ARTIST = "navigate_artist";
+
 
 }

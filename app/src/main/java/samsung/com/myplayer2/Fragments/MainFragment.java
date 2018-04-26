@@ -18,14 +18,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.arlib.floatingsearchview.FloatingSearchView;
-import com.arlib.floatingsearchview.suggestions.model.SearchSuggestion;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import samsung.com.myplayer2.Model.Suggestion;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
 
@@ -36,10 +33,8 @@ public class MainFragment extends Fragment {
 
     private ViewPager viewPager;
 
-    FloatingSearchView searchView;
-
     View tabcontainer;
-    View coloredBackgroundView;
+    //View coloredBackgroundView;
     Toolbar toolbar;
 
     MyService myService;
@@ -57,13 +52,11 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        searchView = rootView.findViewById(R.id.floating_search_view);
-
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
         tabcontainer = rootView.findViewById(R.id.tabcontainer);
-        coloredBackgroundView = rootView.findViewById(R.id.colored_background_view);
+        //coloredBackgroundView = rootView.findViewById(R.id.colored_background_view);
 
         final ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         ab.setHomeAsUpIndicator(R.drawable.ic_menu);
@@ -72,54 +65,12 @@ public class MainFragment extends Fragment {
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         if (viewPager != null) {
             setupViewPager(viewPager);
-            viewPager.setOffscreenPageLimit(4);
+            viewPager.setOffscreenPageLimit(3);
         }
 
         SmartTabLayout tabLayout = (SmartTabLayout) rootView.findViewById(R.id.viewpagertab);
         tabLayout.setViewPager(viewPager);
 
-        searchView.setOnQueryChangeListener(new FloatingSearchView.OnQueryChangeListener() {
-            @Override
-            public void onSearchTextChanged(String oldQuery, String newQuery) {
-                if (!oldQuery.equals("") && newQuery.equals("")) {
-                    searchView.clearSuggestions();
-                } else {
-                    searchView.showProgress();
-                    //searchView.swapSuggestions(getSuggestion(newQuery));
-                    searchView.hideProgress();
-                }
-            }
-        });
-
-        searchView.setOnFocusChangeListener(new FloatingSearchView.OnFocusChangeListener() {
-            @Override
-            public void onFocus() {
-                searchView.showProgress();
-                //searchView.swapSuggestions(getSuggestion(searchView.getQuery()));
-                searchView.hideProgress();
-            }
-
-            @Override
-            public void onFocusCleared() {
-
-            }
-        });
-
-        searchView.setOnSearchListener(new FloatingSearchView.OnSearchListener() {
-            @Override
-            public void onSuggestionClicked(SearchSuggestion searchSuggestion) {
-                Suggestion sug = (Suggestion) searchSuggestion;
-
-                //SetDataForResultView(sug.getBody());
-
-                searchView.clearFocus();
-            }
-
-            @Override
-            public void onSearchAction(String currentQuery) {
-                //SetDataForResultView(currentQuery);
-            }
-        });
 
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -163,7 +114,7 @@ public class MainFragment extends Fragment {
                         .animate()
                         .translationY(0)
                         .start();
-                coloredBackgroundView.setTranslationY(0);
+                //coloredBackgroundView.setTranslationY(0);
             }
 
             @Override
@@ -180,7 +131,7 @@ public class MainFragment extends Fragment {
         adapter.addFragment(new SongListFragment(), this.getString(R.string.allSong));
         adapter.addFragment(new AlbumFragment(), this.getString(R.string.albums));
         adapter.addFragment(new ArtistFragment(), this.getString(R.string.artist));
-        adapter.addFragment(new PlaylistFragment(), this.getString(R.string.playlist));
+        //adapter.addFragment(new PlaylistFragment(), this.getString(R.string.playlist));
         adapter.addFragment(new GenresFragment(), this.getString(R.string.genres));
         viewPager.setAdapter(adapter);
     }

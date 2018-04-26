@@ -12,6 +12,10 @@ public class Suggestion implements SearchSuggestion {
     private String mName;
     private boolean mIsHistory = false;
 
+    public String getmName() {
+        return mName;
+    }
+
     public Suggestion(String suggestion) {
         mName= suggestion.toLowerCase();
     }

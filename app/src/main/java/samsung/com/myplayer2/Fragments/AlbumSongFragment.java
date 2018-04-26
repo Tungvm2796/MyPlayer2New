@@ -73,6 +73,7 @@ public class AlbumSongFragment extends Fragment {
         SongListOfAlbum = new ArrayList<>();
         AlbumSongView = v.findViewById(R.id.song_of_album);
 
+        adapter = new SongInAlbumAdapter(getContext(), SongListOfAlbum);
         new GetSongOfAlbum().execute();
 
         RecyclerView.LayoutManager mManager = new LinearLayoutManager(getContext());
@@ -135,7 +136,6 @@ public class AlbumSongFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            adapter = new SongInAlbumAdapter(getContext(), SongListOfAlbum);
             AlbumSongView.setAdapter(adapter);
         }
     }

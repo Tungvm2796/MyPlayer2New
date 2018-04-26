@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Class.NavigationHelper;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -172,6 +174,10 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
 
                     case R.id.action2:
 
+                        break;
+
+                    case R.id.go_to_artist:
+                        NavigationHelper.navigateToSongArtist((AppCompatActivity)mContext, songs.get(curpos).getArtist());
                         break;
                 }
                 return false;

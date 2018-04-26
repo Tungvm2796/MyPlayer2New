@@ -34,10 +34,12 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
     private AlbumClickListener mClickListener;
     Context mContext;
     Function function = new Function();
+    boolean isGrid;
 
-    public RecyclerAlbumAdapter(Context context, ArrayList<Album> albumList) {
+    public RecyclerAlbumAdapter(Context context, ArrayList<Album> albumList, boolean Grid) {
         this.mContext = context;
         this.albumList = albumList;
+        this.isGrid = Grid;
     }
 
     public class MyRecyclerAlbumHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -48,12 +50,18 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
         public MyRecyclerAlbumHolder(View albumLay) {
             super(albumLay);
 
-            albumName = albumLay.findViewById(R.id.album_name);
-            albumArtist = albumLay.findViewById(R.id.album_artist);
-            albumImg = albumLay.findViewById(R.id.album_img);
-            footer = albumLay.findViewById(R.id.footer);
-            itemView.setOnClickListener(this);
+            if (isGrid) {
+                albumName = albumLay.findViewById(R.id.album_name);
+                albumArtist = albumLay.findViewById(R.id.album_artist);
+                albumImg = albumLay.findViewById(R.id.album_img);
+                footer = albumLay.findViewById(R.id.footer);
+            } else {
+                albumName = albumLay.findViewById(R.id.album_name);
+                albumArtist = albumLay.findViewById(R.id.album_artist);
+                albumImg = albumLay.findViewById(R.id.album_coverImg);
+            }
 
+            itemView.setOnClickListener(this);
         }
 
         @Override
@@ -65,7 +73,12 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
 
     @Override
     public MyRecyclerAlbumHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View albumView = LayoutInflater.from(parent.getContext()).inflate(R.layout.albums, parent, false);
+        View albumView;
+        if (isGrid) {
+            albumView = LayoutInflater.from(parent.getContext()).inflate(R.layout.albums, parent, false);
+        } else {
+            albumView = LayoutInflater.from(parent.getContext()).inflate(R.layout.album_search, parent, false);
+        }
         return new MyRecyclerAlbumHolder(albumView);
     }
 
@@ -78,50 +91,57 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
 //        Glide.with(mContext).load(function.BitmapToByte(curAlbum.getAlbumImg())).into(holder.albumImg);
 
         ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
-        ImageLoader.getInstance().displayImage(function.getAlbumArtUri(curAlbum.getId()).toString(),
-                holder.albumImg, new DisplayImageOptions.Builder().cacheInMemory(true)
-                        .showImageOnLoading(R.drawable.album_none)
-                        .resetViewBeforeLoading(true).build(),
-                new SimpleImageLoadingListener() {
-                    @Override
-                    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                        super.onLoadingComplete(imageUri, view, loadedImage);
-                        new Palette.Builder(loadedImage).generate(new Palette.PaletteAsyncListener() {
-                            @Override
-                            public void onGenerated(Palette palette) {
-                                Palette.Swatch swatch = palette.getVibrantSwatch();
-                                if (swatch != null) {
-                                    int color = swatch.getRgb();
-                                    holder.footer.setBackgroundColor(color);
-                                    int textColor = function.getBlackWhiteColor(swatch.getTitleTextColor());
-                                    holder.albumName.setTextColor(textColor);
-                                    holder.albumArtist.setTextColor(textColor);
-                                } else {
-                                    Palette.Swatch mutedSwatch = palette.getMutedSwatch();
-                                    if (mutedSwatch != null) {
-                                        int color = mutedSwatch.getRgb();
+        if (isGrid) {
+            ImageLoader.getInstance().displayImage(function.getAlbumArtUri(curAlbum.getId()).toString(),
+                    holder.albumImg, new DisplayImageOptions.Builder().cacheInMemory(true)
+                            .showImageOnLoading(R.drawable.album_none)
+                            .resetViewBeforeLoading(true).build(),
+                    new SimpleImageLoadingListener() {
+                        @Override
+                        public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
+                            super.onLoadingComplete(imageUri, view, loadedImage);
+                            new Palette.Builder(loadedImage).generate(new Palette.PaletteAsyncListener() {
+                                @Override
+                                public void onGenerated(Palette palette) {
+                                    Palette.Swatch swatch = palette.getVibrantSwatch();
+                                    if (swatch != null) {
+                                        int color = swatch.getRgb();
                                         holder.footer.setBackgroundColor(color);
-                                        int textColor = function.getBlackWhiteColor(mutedSwatch.getTitleTextColor());
+                                        int textColor = function.getBlackWhiteColor(swatch.getTitleTextColor());
                                         holder.albumName.setTextColor(textColor);
                                         holder.albumArtist.setTextColor(textColor);
+                                    } else {
+                                        Palette.Swatch mutedSwatch = palette.getMutedSwatch();
+                                        if (mutedSwatch != null) {
+                                            int color = mutedSwatch.getRgb();
+                                            holder.footer.setBackgroundColor(color);
+                                            int textColor = function.getBlackWhiteColor(mutedSwatch.getTitleTextColor());
+                                            holder.albumName.setTextColor(textColor);
+                                            holder.albumArtist.setTextColor(textColor);
+                                        }
                                     }
+
+
                                 }
+                            });
+                        }
 
-
+                        @Override
+                        public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
+                            holder.footer.setBackgroundColor(0);
+                            if (mContext != null) {
+                                holder.albumName.setTextColor(Color.BLACK);
+                                holder.albumArtist.setTextColor(Color.LTGRAY);
                             }
-                        });
-                    }
-
-                    @Override
-                    public void onLoadingFailed(String imageUri, View view, FailReason failReason) {
-                        holder.footer.setBackgroundColor(0);
-                        if (mContext != null) {
-                            holder.albumName.setTextColor(Color.BLACK);
-                            holder.albumArtist.setTextColor(Color.LTGRAY);
                         }
                     }
-                }
-        );
+            );
+        } else {
+            ImageLoader.getInstance().displayImage(function.getAlbumArtUri(curAlbum.getId()).toString(),
+                    holder.albumImg, new DisplayImageOptions.Builder().cacheInMemory(true)
+                            .showImageOnLoading(R.drawable.album_none)
+                            .resetViewBeforeLoading(true).build());
+        }
     }
 
     @Override
@@ -137,5 +157,9 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
     // parent activity will implement this method to respond to click events
     public interface AlbumClickListener {
         void onAlbumClick(View view, int position);
+    }
+
+    public void updateListAlbum(ArrayList<Album> update) {
+        this.albumList = update;
     }
 }

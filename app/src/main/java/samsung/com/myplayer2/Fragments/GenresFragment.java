@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -41,7 +40,6 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
     ArrayList<Song> songList;
     LinearLayout lin1;
     LinearLayout lin2;
-    RecyclerView songOfGenres;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,11 +61,6 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
         //function.getGenres(getContext(), genList);
 
         genresView = v.findViewById(R.id.genresView);
-
-        songOfGenres = v.findViewById(R.id.song_of_genres);
-        RecyclerView.LayoutManager manager = new LinearLayoutManager(getContext());
-        songOfGenres.setLayoutManager(manager);
-        songOfGenres.setAdapter(null);
 
 //        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
 //        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);

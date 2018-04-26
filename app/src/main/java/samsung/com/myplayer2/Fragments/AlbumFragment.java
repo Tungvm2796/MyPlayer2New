@@ -73,6 +73,9 @@ public class AlbumFragment extends Fragment implements RecyclerAlbumAdapter.Albu
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         albumView.setLayoutManager(mManager);
 
+        albumAdt = new RecyclerAlbumAdapter(getContext(), albumList, true);
+        albumAdt.setAlbumClickListener(AlbumFragment.this);
+
         new GetAlbum().execute();
 
         //albumView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
@@ -94,15 +97,13 @@ public class AlbumFragment extends Fragment implements RecyclerAlbumAdapter.Albu
 
         @Override
         protected Void doInBackground(Void... voids) {
-            function.getAlbumsLists(getContext(), albumList);
+            function.getAlbumsLists(getContext(), albumList, null);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            albumAdt = new RecyclerAlbumAdapter(getContext(), albumList);
-            albumAdt.setAlbumClickListener(AlbumFragment.this);
             albumView.setAdapter(albumAdt);
         }
     }

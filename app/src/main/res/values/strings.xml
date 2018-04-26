@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
 
     <string name="app_name">MyPlayer</string>
 
@@ -16,9 +16,12 @@
 
     <string name="addToPlayList">Add To Playlist</string>
     <string name="details">Details</string>
+    <string name="toAlbum">Go to Album</string>
+    <string name="toArtist">Go to Artist</string>
     <string name="removeFromPlaylist">Remove from Playlist</string>
 
     <string name="allSong">All Song</string>
+    <string name="Songs">Songs</string>
     <string name="albums">Albums</string>
     <string name="artist">Artist</string>
     <string name="playlist">Playlist</string>
@@ -30,4 +33,15 @@
     <string name="lyrics_makeitpersonal">Powered by <a href="https://makeitpersonal.co/">makeitpersonal.co</a></string>
     <string name="lyrics_loading">Loading...</string>
     <string name="no_lyrics">No lyrics found.</string>
+
+    <string name="count_song"><xliff:g id="count">%d</xliff:g> song</string>
+    <string name="count_songs"><xliff:g id="count">%d</xliff:g> songs</string>
+    <string name="count_album"><xliff:g id="count">%d</xliff:g> album</string>
+    <string name="count_albums"><xliff:g id="count">%d</xliff:g> albums</string>
+    <string name="count_artist"><xliff:g id="count">%d</xliff:g> artist</string>
+    <string name="count_artists"><xliff:g id="count">%d</xliff:g> artists</string>
+
+    <string name="combine_two_strings" translatable="false">%1$s | %2$s</string>
+
+    <string name="NoFound">Nothing Found...</string>
 </resources>
