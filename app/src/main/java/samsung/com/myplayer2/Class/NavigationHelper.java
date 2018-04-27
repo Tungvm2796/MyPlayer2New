@@ -15,14 +15,14 @@ import samsung.com.myplayer2.R;
 
 public class NavigationHelper {
 
-    public static void navigateToSongAlbum(Activity context, long albumID) {
+    public static void navigateToSongAlbum(Activity context, long albumID, String albumName) {
 
         FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
         Fragment fragment;
 
         transaction.setCustomAnimations(R.anim.activity_fade_in,
                 R.anim.activity_fade_out, R.anim.activity_fade_in, R.anim.activity_fade_out);
-        fragment = AlbumSongFragment.getFragment(albumID);
+        fragment = AlbumSongFragment.getFragment(albumID, albumName);
 
         transaction.hide(((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.fragment_container));
         transaction.add(R.id.fragment_container, fragment);
@@ -69,10 +69,11 @@ public class NavigationHelper {
         context.startActivity(intent);
     }
 
-    public static void goToAlbum(Context context, long albumId) {
+    public static void goToAlbum(Context context, long albumId, String albumName) {
         Intent intent = new Intent(context, MainActivity.class);
         intent.setAction(Constants.NAVIGATE_ALBUM);
         intent.putExtra(Constants.ALBUM_ID, albumId);
+        intent.putExtra(Constants.ALBUM, albumName);
         context.startActivity(intent);
     }
 }

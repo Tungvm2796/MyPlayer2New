@@ -85,7 +85,8 @@ public class AlbumFragment extends Fragment implements RecyclerAlbumAdapter.Albu
 
     @Override
     public void onAlbumClick(View view, int position) {
-        NavigationHelper.navigateToSongAlbum(getActivity(), albumList.get(position).getId());
+        NavigationHelper.navigateToSongAlbum(getActivity(), albumList.get(position).getId()
+                ,albumList.get(position).getAlbumName());
     }
 
     private class GetAlbum extends AsyncTask<Void, Void, Void> {

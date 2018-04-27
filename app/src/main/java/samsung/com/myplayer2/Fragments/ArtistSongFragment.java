@@ -10,11 +10,20 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.util.ArrayList;
 
@@ -24,6 +33,10 @@ import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
+import samsung.com.myplayer2.lastfmapi.LastFmClient;
+import samsung.com.myplayer2.lastfmapi.callbacks.ArtistInfoListener;
+import samsung.com.myplayer2.lastfmapi.models.ArtistQuery;
+import samsung.com.myplayer2.lastfmapi.models.LastfmArtist;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -39,14 +52,17 @@ public class ArtistSongFragment extends Fragment {
     private boolean musicBound = false;
     private Intent playintent;
 
+    Toolbar toolbar;
+
     String artistName;
 
+    ImageView ArtistImg;
     SongOfArtistAdapter adapter;
     RecyclerView ArtistSongView;
     ArrayList<Song> SongListOfArtist;
     Function function = new Function();
 
-    public static ArtistSongFragment getFragment(String artist){
+    public static ArtistSongFragment getFragment(String artist) {
         ArtistSongFragment fragment = new ArtistSongFragment();
 
         Bundle args = new Bundle();
@@ -70,6 +86,33 @@ public class ArtistSongFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_artist_song, container, false);
 
+        toolbar = v.findViewById(R.id.toolbar);
+        setupToolbar();
+
+        ArtistImg = v.findViewById(R.id.artist_art);
+
+        LastFmClient.getInstance(getContext()).getArtistInfo(new ArtistQuery(artistName), new ArtistInfoListener() {
+            @Override
+            public void artistInfoSucess(LastfmArtist artist) {
+                if (artist != null && artist.mArtwork != null) {
+
+                    ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
+                    ImageLoader.getInstance().displayImage(artist.mArtwork.get(2).mUrl, ArtistImg,
+                            new DisplayImageOptions.Builder().cacheInMemory(true)
+                                    .cacheOnDisk(true)
+                                    .showImageOnFail(R.drawable.album_none)
+                                    .resetViewBeforeLoading(true)
+                                    .displayer(new FadeInBitmapDisplayer(400))
+                                    .build());
+                }
+            }
+
+            @Override
+            public void artistInfoFailed() {
+
+            }
+        });
+
         SongListOfArtist = new ArrayList<>();
         ArtistSongView = v.findViewById(R.id.song_of_artist);
 
@@ -82,6 +125,16 @@ public class ArtistSongFragment extends Fragment {
 
         return v;
     }
+
+    private void setupToolbar() {
+
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
+        final ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        toolbar.setTitle(artistName);
+    }
+
 
     private ServiceConnection musicConnection = new ServiceConnection() {
         @Override

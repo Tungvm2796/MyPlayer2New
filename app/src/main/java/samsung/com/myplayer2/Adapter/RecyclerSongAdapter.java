@@ -195,7 +195,8 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                         break;
 
                     case R.id.go_to_album:
-                        NavigationHelper.navigateToSongAlbum((AppCompatActivity)mContext, songs.get(curpos).getAlbumid());
+                        NavigationHelper.navigateToSongAlbum((AppCompatActivity)mContext, songs.get(curpos).getAlbumid()
+                                ,songs.get(curpos).getAlbum());
                         break;
 
                     case R.id.go_to_artist:

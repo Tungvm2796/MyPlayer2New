@@ -10,11 +10,19 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
@@ -39,18 +47,23 @@ public class AlbumSongFragment extends Fragment {
     private boolean musicBound = false;
     private Intent playintent;
 
-    long albumID;
+    Toolbar toolbar;
 
+    long albumID;
+    String albumName;
+
+    ImageView AlbumImg;
     SongInAlbumAdapter adapter;
     RecyclerView AlbumSongView;
     ArrayList<Song> SongListOfAlbum;
     Function function = new Function();
 
-    public static AlbumSongFragment getFragment(long albumId){
+    public static AlbumSongFragment getFragment(long albumId, String albumName) {
         AlbumSongFragment fragment = new AlbumSongFragment();
 
         Bundle args = new Bundle();
         args.putLong(Constants.ALBUM_ID, albumId);
+        args.putString(Constants.ALBUM, albumName);
 
         fragment.setArguments(args);
         return fragment;
@@ -61,6 +74,7 @@ public class AlbumSongFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             albumID = getArguments().getLong(Constants.ALBUM_ID);
+            albumName = getArguments().getString(Constants.ALBUM);
         }
     }
 
@@ -69,6 +83,17 @@ public class AlbumSongFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_album_song, container, false);
+
+        toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+        setupToolbar();
+
+        AlbumImg = v.findViewById(R.id.album_art);
+
+        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
+        ImageLoader.getInstance().displayImage(function.getAlbumArtUri(albumID).toString(), AlbumImg,
+                new DisplayImageOptions.Builder().cacheInMemory(true)
+                        .showImageOnLoading(R.drawable.album_none)
+                        .resetViewBeforeLoading(true).build());
 
         SongListOfAlbum = new ArrayList<>();
         AlbumSongView = v.findViewById(R.id.song_of_album);
@@ -80,6 +105,21 @@ public class AlbumSongFragment extends Fragment {
         AlbumSongView.setLayoutManager(mManager);
 
         return v;
+    }
+
+    private void setupToolbar() {
+
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
+        final ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        toolbar.setTitle(albumName);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setHasOptionsMenu(true);
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -121,7 +161,7 @@ public class AlbumSongFragment extends Fragment {
         }
     }
 
-    class GetSongOfAlbum extends AsyncTask<Void, Void, Void>{
+    class GetSongOfAlbum extends AsyncTask<Void, Void, Void> {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();

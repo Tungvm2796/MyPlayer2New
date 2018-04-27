@@ -131,7 +131,8 @@ public class MainActivity extends BaseActivity {
     private Runnable navigateAlbum = new Runnable() {
         public void run() {
             long albumID = getIntent().getExtras().getLong(Constants.ALBUM_ID);
-            Fragment fragment = AlbumSongFragment.getFragment(albumID);
+            String albumName = getIntent().getExtras().getString(Constants.ALBUM);
+            Fragment fragment = AlbumSongFragment.getFragment(albumID, albumName);
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction()
                     .replace(R.id.fragment_container, fragment).commit();

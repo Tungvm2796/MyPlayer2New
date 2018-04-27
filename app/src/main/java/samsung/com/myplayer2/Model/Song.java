@@ -9,16 +9,17 @@ public class Song implements Serializable {
     private long id;
     private String title;
     private String artist;
-    //private Bitmap img;
+    private String album;
     private String data;
     private long albumid;
     private String genres;
 
-    public Song(long songID, String songTitle, String songArtist, String input, long albumID, String SongGen) {
+    public Song(long songID, String songTitle, String songArtist, String songAlbum, String input, long albumID, String SongGen) {
         id = songID;
         title = songTitle;
         artist = songArtist;
-        //img = image;
+        album = songAlbum;
+
         data = input;
         albumid = albumID;
         genres = SongGen;
@@ -35,6 +36,14 @@ public class Song implements Serializable {
 
     public String getArtist() {
         return artist;
+    }
+
+    public String getAlbum() {
+        return album;
+    }
+
+    public void setAlbum(String album) {
+        this.album = album;
     }
 
     public void setId(long id) {

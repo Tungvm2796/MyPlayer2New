@@ -283,7 +283,8 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
 
     @Override
     public void onAlbumClick(View view, int position) {
-        NavigationHelper.navigateToSongAlbum(getActivity(), resultAlbum.get(position).getId());
+        NavigationHelper.navigateToSongAlbum(getActivity(), resultAlbum.get(position).getId()
+            ,resultAlbum.get(position).getAlbumName());
     }
 
     @Override
