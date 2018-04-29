@@ -23,7 +23,7 @@
         android:gravity="bottom"
         sothree:umanoDragView="@+id/dragView"
         sothree:umanoOverlay="false"
-        sothree:umanoPanelHeight="52dp"
+        sothree:umanoPanelHeight="72dp"
         sothree:umanoParallaxOffset="100dp"
         sothree:umanoShadowHeight="2dp">
 

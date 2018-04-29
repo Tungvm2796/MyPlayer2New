@@ -35,6 +35,7 @@ import java.util.Random;
 import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Handler.MusicStore;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
@@ -65,18 +66,8 @@ public class MyService extends Service implements
 
     Function function = new Function();
 
-    //song list of all
-    private ArrayList<Song> allsongs;
-    //List from Album
-    private ArrayList<Song> SongListOfAlbum;
-    //List from Artist
-    private ArrayList<Song> SongListOfArtist;
-    //List from Playlist
-    private ArrayList<Song> SongListOfPlaylist;
-    //List from Genres
-    private ArrayList<Song> SongListOfGenres;
-    //List from Search
-    private ArrayList<Song> SongListOfSearch;
+    public static final MusicStore musicStore = new MusicStore();
+
     //song list to play
     private ArrayList<Song> songs;
 
@@ -116,7 +107,6 @@ public class MyService extends Service implements
         rand = new Random();
         //create player
         player = new MediaPlayer();
-
 
         context = this;
 
@@ -239,22 +229,22 @@ public class MyService extends Service implements
         //get song
         switch (type) {
             case Constants.SONG_TYPE:
-                setList(allsongs);
+                setList(musicStore.getAllsongs());
                 break;
             case Constants.ALBUM_TYPE:
-                setList(getSongListOfAlbum());
+                setList(musicStore.getSongListOfAlbum());
                 break;
             case Constants.ARTIST_TYPE:
-                setList(getSongListOfArtist());
+                setList(musicStore.getSongListOfArtist());
                 break;
             case Constants.PLAYLIST_TYPE:
-                setList(getSongListOfPlaylist());
+                setList(musicStore.getSongListOfPlaylist());
                 break;
             case Constants.GENRES_TYPE:
-                setList(getSongListOfGenres());
+                setList(musicStore.getSongListOfGenres());
                 break;
             case Constants.SEARCH_TYPE:
-                setList(getSongListOfSearch());
+                setList(musicStore.getSongListOfSearch());
                 break;
         }
         Song playSong = songs.get(songPosn);
@@ -540,7 +530,7 @@ public class MyService extends Service implements
                 setListType(getType);
 
                 if (SizeList() <= posn)
-                    songs = allsongs;
+                    songs = musicStore.getAllsongs();
 
                 setSong(posn);
 
@@ -654,7 +644,7 @@ public class MyService extends Service implements
 
     //set list of all songs
     public void setAllSongs(ArrayList<Song> listAll) {
-        allsongs = listAll;
+        musicStore.setAllsongs(listAll);
     }
 
     //pass song list
@@ -662,44 +652,24 @@ public class MyService extends Service implements
         songs = theSongs;
     }
 
-    public ArrayList<Song> getSongListOfAlbum() {
-        return SongListOfAlbum;
-    }
-
-    public ArrayList<Song> getSongListOfArtist() {
-        return SongListOfArtist;
-    }
-
-    public ArrayList<Song> getSongListOfPlaylist() {
-        return SongListOfPlaylist;
-    }
-
-    public ArrayList<Song> getSongListOfGenres() {
-        return SongListOfGenres;
-    }
-
-    public ArrayList<Song> getSongListOfSearch() {
-        return SongListOfSearch;
-    }
-
     public void setSongListOfAlbum(ArrayList<Song> songListOfAlbum) {
-        SongListOfAlbum = songListOfAlbum;
+        musicStore.setSongListOfAlbum(songListOfAlbum);
     }
 
     public void setSongListOfArtist(ArrayList<Song> songListOfArtist) {
-        SongListOfArtist = songListOfArtist;
+        musicStore.setSongListOfArtist(songListOfArtist);
     }
 
     public void setSongListOfPlaylist(ArrayList<Song> songListOfPlaylist) {
-        SongListOfPlaylist = songListOfPlaylist;
+        musicStore.setSongListOfPlaylist(songListOfPlaylist);
     }
 
     public void setSongListOfGenres(ArrayList<Song> songListOfGenres) {
-        SongListOfGenres = songListOfGenres;
+        musicStore.setSongListOfGenres(songListOfGenres);
     }
 
     public void setSongListOfSearch(ArrayList<Song> songListOfSearch) {
-        SongListOfSearch = songListOfSearch;
+        musicStore.setSongListOfSearch(songListOfSearch);
     }
 
     public void setListType(String type) {
@@ -898,5 +868,13 @@ public class MyService extends Service implements
         }
 
         return largeIcon;
+    }
+
+    public int getAudioSessionId() {
+        try {
+            return player.getAudioSessionId();
+        }catch (Exception e){
+            return 0;
+        }
     }
 }

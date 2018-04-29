@@ -1,11 +1,14 @@
 package samsung.com.myplayer2.Class;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.media.audiofx.AudioEffect;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Fragments.AlbumSongFragment;
@@ -75,5 +78,20 @@ public class NavigationHelper {
         intent.putExtra(Constants.ALBUM_ID, albumId);
         intent.putExtra(Constants.ALBUM, albumName);
         context.startActivity(intent);
+    }
+
+    public static void navigateToEqualizer(Activity context, int AudioSessionId) {
+        try {
+            // The google MusicFX apps need to be started using startActivityForResult
+            context.startActivityForResult(createEffectsIntent(AudioSessionId), 666);
+        } catch (final ActivityNotFoundException notFound) {
+            Toast.makeText(context, "Equalizer not found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public static Intent createEffectsIntent(int AusioSessionId) {
+        final Intent effects = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+        effects.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, AusioSessionId);
+        return effects;
     }
 }

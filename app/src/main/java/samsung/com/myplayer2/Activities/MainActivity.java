@@ -40,6 +40,7 @@ import java.util.Map;
 
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Class.NavigationHelper;
 import samsung.com.myplayer2.Fragments.AlbumSongFragment;
 import samsung.com.myplayer2.Fragments.ArtistSongFragment;
 import samsung.com.myplayer2.Fragments.BlankFragment;
@@ -65,18 +66,20 @@ public class MainActivity extends BaseActivity {
     private boolean musicBound = false;
     private Intent playintent;
 
+    ImageButton btnPlayPauseSmall;
+    ImageView PlayingSongImgSmall;
     Button btnHide;
 
     TextView txtTitle;
     TextView txtArtist;
-    public ImageButton btnPlayPause;
+    ImageButton btnPlayPause;
     ImageButton next;
     ImageButton prev;
     ImageButton shuffle;
     ImageButton repeat;
-    public TextView txtTimeSong;
-    public TextView txtTotal;
-    public SeekBar seekBar;
+    TextView txtTimeSong;
+    TextView txtTotal;
+    SeekBar seekBar;
     ImageView imgDisc;
 
     String SongPath;
@@ -412,6 +415,16 @@ public class MainActivity extends BaseActivity {
         this.startService(playintent);
         this.bindService(playintent, musicConnection, Context.BIND_AUTO_CREATE);
         registerReceiver(myMainBroadcast, new IntentFilter("ToActivity"));
+
+        try {
+            if (myService.isPng()) {
+                btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
+            } else {
+                btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
+            }
+        }catch (Exception e){
+
+        }
     }
 
     @Override
@@ -537,12 +550,22 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home: {
+            case android.R.id.home:
                 if (isNavigatingMain()) {
                     drawerLayout.openDrawer(GravityCompat.START);
                 } else super.onBackPressed();
                 return true;
-            }
+            case R.id.action_equalizer:
+//                Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
+//                if ((intent.resolveActivity(getPackageManager()) != null)) {
+//                    startActivityForResult(intent, RESULT_OK);
+//                } else {
+//                    // No equalizer found
+//                }
+
+                NavigationHelper.navigateToEqualizer(MainActivity.this, myService.getAudioSessionId());
+
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
