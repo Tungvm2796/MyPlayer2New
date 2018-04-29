@@ -36,13 +36,7 @@
 
 
         <!-- SLIDING LAYOUT -->
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/track_show">
-
-            <include layout="@layout/play_song" />
-        </FrameLayout>
+        <include layout="@layout/play_song" />
 
     </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 

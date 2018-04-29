@@ -55,7 +55,7 @@ public class MainFragment extends Fragment {
         toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
-        tabcontainer = rootView.findViewById(R.id.tabcontainer);
+        //tabcontainer = rootView.findViewById(R.id.tabcontainer);
         //coloredBackgroundView = rootView.findViewById(R.id.colored_background_view);
 
         final ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
@@ -65,7 +65,7 @@ public class MainFragment extends Fragment {
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         if (viewPager != null) {
             setupViewPager(viewPager);
-            viewPager.setOffscreenPageLimit(3);
+            viewPager.setOffscreenPageLimit(4);
         }
 
         SmartTabLayout tabLayout = (SmartTabLayout) rootView.findViewById(R.id.viewpagertab);
@@ -109,11 +109,11 @@ public class MainFragment extends Fragment {
                             break;
                     }
                 }
-                tabcontainer.clearAnimation();
-                tabcontainer
-                        .animate()
-                        .translationY(0)
-                        .start();
+                //tabcontainer.clearAnimation();
+//                tabcontainer
+//                        .animate()
+//                        .translationY(0)
+//                        .start();
                 //coloredBackgroundView.setTranslationY(0);
             }
 
