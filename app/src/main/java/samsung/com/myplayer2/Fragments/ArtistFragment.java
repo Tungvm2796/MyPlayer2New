@@ -62,8 +62,7 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         artistView.setLayoutManager(mManager);
 
-        artistAdt = new RecyclerArtistAdapter(getContext(), artists, true);
-        artistAdt.setArtistClickListener(ArtistFragment.this);
+
 
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
             new GetArtist().execute();
@@ -89,6 +88,8 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
         @Override
         protected Void doInBackground(Void... voids) {
             function.getArtist(getContext(), artists, null);
+            artistAdt = new RecyclerArtistAdapter(getContext(), artists, true);
+            artistAdt.setArtistClickListener(ArtistFragment.this);
             return null;
         }
 

@@ -19,7 +19,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="45dp"
+                android:layout_width="72dp"
                 android:layout_height="match_parent" />
 
             <TextView
@@ -33,24 +33,30 @@
                 android:textColor="@android:color/holo_green_dark"
                 android:textSize="14sp" />
 
-            <ImageButton
-                android:id="@+id/btn_pp_small"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical|right"
-                android:src="@drawable/ic_pause_black_24dp"
-                android:background="@color/transparent"
-                android:textSize="14sp" />
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp">
 
-            <Button
-                android:id="@+id/btn_hide"
-                android:layout_width="27dp"
-                android:layout_height="match_parent"
-                android:gravity="center_vertical|right"
-                android:text="8"
-                android:textSize="14sp"
-                android:visibility="invisible"/>
+                <ImageButton
+                    android:id="@+id/btn_pp_small"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:background="@color/transparent"
+                    android:gravity="center_vertical|right"
+                    android:src="@drawable/ic_pause_black_24dp"
+                    android:textSize="14sp" />
 
+                <Button
+                    android:id="@+id/btn_hide"
+                    android:layout_width="72dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|right"
+                    android:text="LYRICS"
+                    android:textAlignment="center"
+                    android:textSize="12sp"
+                    android:visibility="invisible"
+                    android:background="@color/transparent"/>
+            </FrameLayout>
         </LinearLayout>
 
         <include layout="@layout/control_play"></include>

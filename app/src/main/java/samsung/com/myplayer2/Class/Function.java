@@ -228,7 +228,6 @@ public class Function {
 
         String[] Column = {"name"};
 
-
         genresCursor = mContext.getContentResolver().query(genresUri, Column, null, null, null);
 //        int genre_column_index = genresCursor.getColumnIndexOrThrow(MediaStore.Audio.Genres.NAME);
 

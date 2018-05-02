@@ -27,6 +27,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.bumptech.glide.Glide;
@@ -204,9 +205,13 @@ public class MainActivity extends BaseActivity {
                 if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                     if (myService.isPng())
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
+                    btnHide.setVisibility(View.INVISIBLE);
+                    btnPlayPauseSmall.setVisibility(View.VISIBLE);
                 } else if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     if (myService.isPng())
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
+                    btnHide.setVisibility(View.VISIBLE);
+                    btnPlayPauseSmall.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -312,6 +317,13 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        btnPlayPauseSmall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(context, "Click vao pp small", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         navDrawerRunnable.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -375,6 +387,8 @@ public class MainActivity extends BaseActivity {
         imgDisc = findViewById(R.id.imageViewDisc);
 
         btnHide = findViewById(R.id.btn_hide);
+
+        btnPlayPauseSmall = findViewById(R.id.btn_pp_small);
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {

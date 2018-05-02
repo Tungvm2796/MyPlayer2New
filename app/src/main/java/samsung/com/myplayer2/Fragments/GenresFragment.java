@@ -16,7 +16,6 @@ import java.util.ArrayList;
 
 import samsung.com.myplayer2.Adapter.RecyclerGenresAdapter;
 import samsung.com.myplayer2.Class.Function;
-import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
 /**
@@ -36,8 +35,6 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
 
     Toolbar toolbar;
 
-    ArrayList<Song> AllSong;
-    ArrayList<Song> songList;
     LinearLayout lin1;
     LinearLayout lin2;
 
@@ -52,11 +49,6 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
         lin2 = v.findViewById(R.id.lin2);
 
 
-        songList = new ArrayList<>();
-
-        AllSong = new ArrayList<>();
-        //AllSong = ((MainActivity) getActivity()).getAllSong();
-
         genList = new ArrayList<>();
         //function.getGenres(getContext(), genList);
 
@@ -70,7 +62,9 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         genresView.setLayoutManager(mManager);
 
-        //new GetGenres().execute();
+
+
+        new GetGenres().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         //genresView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
 
@@ -91,14 +85,14 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
         @Override
         protected Void doInBackground(Void... voids) {
             function.getGenres(getContext(), genList);
+            recyclerGenresAdapter = new RecyclerGenresAdapter(getContext(), genList);
+            recyclerGenresAdapter.setGenresClickListener(GenresFragment.this);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            recyclerGenresAdapter = new RecyclerGenresAdapter(getContext(), genList);
-            recyclerGenresAdapter.setGenresClickListener(GenresFragment.this);
             genresView.setAdapter(recyclerGenresAdapter);
         }
     }
