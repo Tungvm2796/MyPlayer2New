@@ -134,7 +134,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
 
                 queryString = sug.getBody();
 
-                mSearchTask = new SearchTask().executeOnExecutor(executor, queryString);
+                mSearchTask = new SearchTask().execute(queryString);
 
                 searchView.clearFocus();
             }
@@ -147,7 +147,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
                     mSearchTask = null;
                 }
 
-                mSearchTask = new SearchTask().executeOnExecutor(executor, currentQuery);
+                mSearchTask = new SearchTask().execute(currentQuery);
 
             }
         });
@@ -282,14 +282,14 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
     }
 
     @Override
-    public void onAlbumClick(View view, int position) {
+    public void onAlbumClick(RecyclerAlbumAdapter.MyRecyclerAlbumHolder view, int position) {
         NavigationHelper.navigateToSongAlbum(getActivity(), resultAlbum.get(position).getId()
-            ,resultAlbum.get(position).getAlbumName());
+            ,resultAlbum.get(position).getAlbumName(), null);
     }
 
     @Override
-    public void onArtistClick(View view, int position) {
-        NavigationHelper.navigateToSongArtist(getActivity(), resultArtist.get(position).getName());
+    public void onArtistClick(RecyclerArtistAdapter.MyRecyclerArtistHolder view, int position) {
+        NavigationHelper.navigateToSongArtist(getActivity(), resultArtist.get(position).getName(), null);
     }
 
     class SetSuggestion extends AsyncTask<Void, Void, Void> {
@@ -336,7 +336,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
             if (resultSong != null)
                 resultSong.clear();
             String key = "title LIKE '" + params[0] + "%'";
-            function.getSongList(getContext(), resultSong, key);
+            function.getSongs(getContext(), key, resultSong);
 
             if (isCancelled()) {
                 return null;

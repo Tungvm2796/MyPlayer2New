@@ -5,9 +5,12 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.media.audiofx.AudioEffect;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Fade;
+import android.view.View;
 import android.widget.Toast;
 
 import samsung.com.myplayer2.Activities.MainActivity;
@@ -18,31 +21,53 @@ import samsung.com.myplayer2.R;
 
 public class NavigationHelper {
 
-    public static void navigateToSongAlbum(Activity context, long albumID, String albumName) {
+    //Notice: API >= 21 (Android 5.0 Lollipop or higher) can use
+
+    public static void navigateToSongAlbum(Activity context, long albumID, String albumName, View view) {
 
         FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
         Fragment fragment;
 
-        transaction.setCustomAnimations(R.anim.activity_fade_in,
-                R.anim.activity_fade_out, R.anim.activity_fade_in, R.anim.activity_fade_out);
+//        transaction.setCustomAnimations(R.anim.activity_fade_in,
+//                R.anim.activity_fade_out, R.anim.activity_fade_in, R.anim.activity_fade_out);
         fragment = AlbumSongFragment.getFragment(albumID, albumName);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.setSharedElementEnterTransition(new DetailsTransition());
+            fragment.setEnterTransition(new Fade());
+            fragment.setExitTransition(new Fade());
+            fragment.setSharedElementReturnTransition(new DetailsTransition());
+        }
+
+        if(view != null) {
+            transaction.addSharedElement(view,  "transition_album_art");
+        }
         transaction.hide(((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.fragment_container));
         transaction.add(R.id.fragment_container, fragment);
         transaction.addToBackStack(null).commit();
     }
 
-    public static void navigateToSongArtist(Activity context, String artist_name) {
+    public static void navigateToSongArtist(Activity context, String artist_name, View view) {
 
         FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
         Fragment fragment;
 
-        transaction.setCustomAnimations(R.anim.activity_fade_in,
-                R.anim.activity_fade_out, R.anim.activity_fade_in, R.anim.activity_fade_out);
+//        transaction.setCustomAnimations(R.anim.activity_fade_in,
+//                R.anim.activity_fade_out, R.anim.activity_fade_in, R.anim.activity_fade_out);
         fragment = ArtistSongFragment.getFragment(artist_name);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.setSharedElementEnterTransition(new DetailsTransition());
+            fragment.setEnterTransition(new Fade());
+            fragment.setExitTransition(new Fade());
+            fragment.setSharedElementReturnTransition(new DetailsTransition());
+        }
+
+        if(view != null) {
+            transaction.addSharedElement(view,  "transition_artist_art");
+        }
         transaction.hide(((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.fragment_container));
-        transaction.add(R.id.fragment_container, fragment);
+        transaction.add(R.id.fragment_container, fragment); //replace() can show transition effect but not nice, so just use fade effect
         transaction.addToBackStack(null).commit();
     }
 

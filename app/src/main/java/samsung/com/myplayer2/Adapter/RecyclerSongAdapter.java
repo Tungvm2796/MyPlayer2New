@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
@@ -92,7 +91,7 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
 //                .error(R.drawable.noteicon)
 //                .into(holder.coverimg);
 
-        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
+        //ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
         ImageLoader.getInstance().displayImage(function.getAlbumArtUri(currSong.getAlbumid()).toString(),
                 holder.coverimg, new DisplayImageOptions.Builder().cacheInMemory(true)
                         .showImageOnLoading(R.drawable.noteicon)
@@ -196,11 +195,11 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
 
                     case R.id.go_to_album:
                         NavigationHelper.navigateToSongAlbum((AppCompatActivity)mContext, songs.get(curpos).getAlbumid()
-                                ,songs.get(curpos).getAlbum());
+                                ,songs.get(curpos).getAlbum(), null);
                         break;
 
                     case R.id.go_to_artist:
-                        NavigationHelper.navigateToSongArtist((AppCompatActivity)mContext, songs.get(curpos).getArtist());
+                        NavigationHelper.navigateToSongArtist((AppCompatActivity)mContext, songs.get(curpos).getArtist(), null);
                         break;
                 }
                 return false;

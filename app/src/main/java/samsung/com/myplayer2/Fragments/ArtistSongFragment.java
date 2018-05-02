@@ -22,7 +22,6 @@ import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import java.util.ArrayList;
@@ -96,7 +95,7 @@ public class ArtistSongFragment extends Fragment {
             public void artistInfoSucess(LastfmArtist artist) {
                 if (artist != null && artist.mArtwork != null) {
 
-                    ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
+                    //ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
                     ImageLoader.getInstance().displayImage(artist.mArtwork.get(2).mUrl, ArtistImg,
                             new DisplayImageOptions.Builder().cacheInMemory(true)
                                     .cacheOnDisk(true)

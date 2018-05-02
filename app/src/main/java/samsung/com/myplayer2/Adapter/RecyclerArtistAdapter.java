@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.annotation.ColorInt;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
@@ -48,10 +48,10 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
         this.isGrid = Grid;
     }
 
-    public class MyRecyclerArtistHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class MyRecyclerArtistHolder extends RecyclerView.ViewHolder {
         TextView artistName;
         TextView count;
-        ImageView artistImg;
+        public ImageView artistImg;
         LinearLayout footer;
 
         public MyRecyclerArtistHolder(View artistLay) {
@@ -68,14 +68,14 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
                 artistImg = (ImageView) artistLay.findViewById(R.id.artist_coverImg);
             }
 
-            itemView.setOnClickListener(this);
+            //itemView.setOnClickListener(this);
         }
-
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null)
-                mClickListener.onArtistClick(view, getAdapterPosition());
-        }
+//        @Override
+//        public void onClick(View view) {
+//            if (mClickListener != null)
+//                mClickListener.onArtistClick(view, getAdapterPosition());
+//        }
+        // just implement View.OnClickListener
     }
 
     @Override
@@ -91,6 +91,7 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
 
     @Override
     public void onBindViewHolder(final MyRecyclerArtistHolder holder, int position) {
+        final int pos = position;
         Artist curArtist = artists.get(position);
 
         holder.artistName.setText(curArtist.getName());
@@ -103,7 +104,7 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
             public void artistInfoSucess(LastfmArtist artist) {
                 if (artist != null && artist.mArtwork != null) {
 
-                    ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
+                    //ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
                     if (isGrid) {
                         ImageLoader.getInstance().displayImage(artist.mArtwork.get(2).mUrl, holder.artistImg,
                                 new DisplayImageOptions.Builder().cacheInMemory(true)
@@ -161,6 +162,21 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
 
             }
         });
+
+        // It is important that each shared element in the source screen has a unique transition name.
+        // For example, we can't just give all the images in our grid the transition name "kittenImage"
+        // because then we would have conflicting transition names.
+        // By appending "_image" to the position, we can support having multiple shared elements in each
+        // grid cell in the future.
+        ViewCompat.setTransitionName(holder.artistImg, String.valueOf(position) + "_artist_image");
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(mClickListener != null)
+                    mClickListener.onArtistClick(holder, pos);
+            }
+        });
     }
 
     @Override
@@ -175,7 +191,7 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
 
     // parent activity will implement this method to respond to click events
     public interface ArtistClickListener {
-        void onArtistClick(View view, int position);
+        void onArtistClick(MyRecyclerArtistHolder view, int position);
     }
 
     public static int getOpaqueColor(@ColorInt int paramInt) {

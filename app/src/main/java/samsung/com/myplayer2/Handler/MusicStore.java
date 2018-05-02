@@ -23,7 +23,7 @@ public class MusicStore {
     private ArrayList<Song> SongListOfSearch;
 
 
-    
+
     public ArrayList<Song> getAllsongs() {
         return allsongs;
     }

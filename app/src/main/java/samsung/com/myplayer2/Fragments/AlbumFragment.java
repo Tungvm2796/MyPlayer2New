@@ -3,11 +3,11 @@ package samsung.com.myplayer2.Fragments;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,8 +42,6 @@ public class AlbumFragment extends Fragment implements RecyclerAlbumAdapter.Albu
 
     Function function;
 
-    Toolbar toolbar;
-
     RecyclerAlbumAdapter albumAdt;
 
     @Override
@@ -65,28 +63,24 @@ public class AlbumFragment extends Fragment implements RecyclerAlbumAdapter.Albu
 
         albumList = new ArrayList<>();
 
-//        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
-//        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);
-//        View lasttab = new MainFragment().getView().findViewById(R.id.viewpagertab);
-//        View coloredBackgroundView = new MainFragment().getView().findViewById(R.id.colored_background_view);
-
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         albumView.setLayoutManager(mManager);
 
         albumAdt = new RecyclerAlbumAdapter(getContext(), albumList, true);
         albumAdt.setAlbumClickListener(AlbumFragment.this);
 
-        new GetAlbum().execute();
-
-        //albumView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
-
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            new GetAlbum().execute();
+        } else {
+            new GetAlbum().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
         return v;
     }
 
     @Override
-    public void onAlbumClick(View view, int position) {
+    public void onAlbumClick(RecyclerAlbumAdapter.MyRecyclerAlbumHolder view, int position) {
         NavigationHelper.navigateToSongAlbum(getActivity(), albumList.get(position).getId()
-                ,albumList.get(position).getAlbumName());
+                , albumList.get(position).getAlbumName(), view.albumImg);
     }
 
     private class GetAlbum extends AsyncTask<Void, Void, Void> {

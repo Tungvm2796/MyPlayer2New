@@ -178,7 +178,7 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
 
                     case R.id.go_to_album:
                         NavigationHelper.navigateToSongAlbum((AppCompatActivity)mContext, songs.get(curpos).getAlbumid()
-                                ,songs.get(curpos).getAlbum());
+                                ,songs.get(curpos).getAlbum(), null);
                         break;
                 }
                 return false;

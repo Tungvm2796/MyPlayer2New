@@ -3,6 +3,7 @@ package samsung.com.myplayer2.Adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,7 +15,6 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
@@ -42,9 +42,9 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
         this.isGrid = Grid;
     }
 
-    public class MyRecyclerAlbumHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class MyRecyclerAlbumHolder extends RecyclerView.ViewHolder {
         TextView albumName, albumArtist;
-        ImageView albumImg;
+        public ImageView albumImg;
         LinearLayout footer;
 
         public MyRecyclerAlbumHolder(View albumLay) {
@@ -60,14 +60,6 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
                 albumArtist = albumLay.findViewById(R.id.album_artist);
                 albumImg = albumLay.findViewById(R.id.album_coverImg);
             }
-
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View view) {
-            if (mClickListener != null)
-                mClickListener.onAlbumClick(view, getAdapterPosition());
         }
     }
 
@@ -84,13 +76,14 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
 
     @Override
     public void onBindViewHolder(final MyRecyclerAlbumHolder holder, int position) {
+        final int pos = position;
         Album curAlbum = albumList.get(position);
 
         holder.albumName.setText(curAlbum.getAlbumName());
         holder.albumArtist.setText(curAlbum.getArtistName());
 //        Glide.with(mContext).load(function.BitmapToByte(curAlbum.getAlbumImg())).into(holder.albumImg);
 
-        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
+        //ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(mContext));
         if (isGrid) {
             ImageLoader.getInstance().displayImage(function.getAlbumArtUri(curAlbum.getId()).toString(),
                     holder.albumImg, new DisplayImageOptions.Builder().cacheInMemory(true)
@@ -142,6 +135,21 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
                             .showImageOnLoading(R.drawable.album_none)
                             .resetViewBeforeLoading(true).build());
         }
+
+        // It is important that each shared element in the source screen has a unique transition name.
+        // For example, we can't just give all the images in our grid the transition name "kittenImage"
+        // because then we would have conflicting transition names.
+        // By appending "_image" to the position, we can support having multiple shared elements in each
+        // grid cell in the future.
+        ViewCompat.setTransitionName(holder.albumImg, String.valueOf(position) + "_album_image");
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mClickListener != null)
+                    mClickListener.onAlbumClick(holder, pos);
+            }
+        });
     }
 
     @Override
@@ -156,7 +164,7 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
 
     // parent activity will implement this method to respond to click events
     public interface AlbumClickListener {
-        void onAlbumClick(View view, int position);
+        void onAlbumClick(MyRecyclerAlbumHolder view, int position);
     }
 
     public void updateListAlbum(ArrayList<Album> update) {

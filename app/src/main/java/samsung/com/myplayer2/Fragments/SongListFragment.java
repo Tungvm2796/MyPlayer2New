@@ -5,12 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,13 +34,10 @@ public class SongListFragment extends Fragment {
 
     public ArrayList<Song> SongList;
     private RecyclerView songView;
-    Context context;
 
     MyService myService;
     private boolean musicBound = false;
     private Intent playintent;
-
-    Toolbar toolbar;
 
     Function function;
 
@@ -54,28 +51,18 @@ public class SongListFragment extends Fragment {
 
         function = new Function();
 
-        songView =  v.findViewById(R.id.song_list);
-
-        context = v.getContext();
+        songView = v.findViewById(R.id.song_list);
 
         SongList = new ArrayList<>();
 
-        songAdt = new RecyclerSongAdapter(getContext(), SongList, false);
-
-        new GetSong().execute();
-
-        //SongList = ((MainActivity) getActivity()).getAllSong();
-
-//        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
-//        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);
-//        View lasttab = new MainFragment().getView().findViewById(R.id.viewpagertab);
-//        View coloredBackgroundView = new MainFragment().getView().findViewById(R.id.colored_background_view);
-
-        RecyclerView.LayoutManager mManager = new LinearLayoutManager(getContext());
+        RecyclerView.LayoutManager mManager = new LinearLayoutManager(getActivity());
         songView.setLayoutManager(mManager);
-        //new GetSong().execute();
 
-        //songView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            new GetSong().execute();
+        } else {
+            new GetSong().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
 
         return v;
     }
@@ -119,23 +106,22 @@ public class SongListFragment extends Fragment {
         }
     }
 
-    private class GetSong extends AsyncTask<Void, Void, Void>{
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
+    private class GetSong extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            function.getSongList(getContext(), SongList, null);
+            function.getSongs(getActivity(), null, SongList);
+            songAdt = new RecyclerSongAdapter(getActivity(), SongList, false);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
             songView.setAdapter(songAdt);
+        }
+
+        @Override
+        protected void onPreExecute() {
         }
     }
 

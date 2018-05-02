@@ -22,7 +22,6 @@ import android.widget.ImageView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 
 import java.util.ArrayList;
 
@@ -89,7 +88,7 @@ public class AlbumSongFragment extends Fragment {
 
         AlbumImg = v.findViewById(R.id.album_art);
 
-        ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
+        //ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
         ImageLoader.getInstance().displayImage(function.getAlbumArtUri(albumID).toString(), AlbumImg,
                 new DisplayImageOptions.Builder().cacheInMemory(true)
                         .showImageOnLoading(R.drawable.album_none)

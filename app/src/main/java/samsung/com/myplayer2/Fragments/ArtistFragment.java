@@ -3,11 +3,11 @@ package samsung.com.myplayer2.Fragments;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,8 +41,6 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
     LinearLayout lin2;
     Function function;
 
-    Toolbar toolbar;
-
     RecyclerArtistAdapter artistAdt;
 
     @Override
@@ -59,18 +57,7 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
 
         setRetainInstance(true);
 
-
-
-        //function.getSongList(getActivity(), songListTake);
-        //songListTake = ((MainActivity)getActivity()).getAllSong();
-
         artists = new ArrayList<>();
-        //function.getArtist(getActivity(), artists);
-
-//        View tabcontainer = new MainFragment().getView().findViewById(R.id.tabcontainer);
-//        toolbar = new MainFragment().getView().findViewById(R.id.toolbar);
-//        View lasttab = new MainFragment().getView().findViewById(R.id.viewpagertab);
-//        View coloredBackgroundView = new MainFragment().getView().findViewById(R.id.colored_background_view);
 
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         artistView.setLayoutManager(mManager);
@@ -78,16 +65,17 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
         artistAdt = new RecyclerArtistAdapter(getContext(), artists, true);
         artistAdt.setArtistClickListener(ArtistFragment.this);
 
-        new GetArtist().execute();
-
-        //artistView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
-
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
+            new GetArtist().execute();
+        } else {
+            new GetArtist().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
         return v;
     }
 
     @Override
-    public void onArtistClick(View view, int position) {
-        NavigationHelper.navigateToSongArtist(getActivity(), artists.get(position).getName());
+    public void onArtistClick(RecyclerArtistAdapter.MyRecyclerArtistHolder view, int position) {
+        NavigationHelper.navigateToSongArtist(getActivity(), artists.get(position).getName(), view.artistImg);
     }
 
     private class GetArtist extends AsyncTask<Void, Void, Void> {

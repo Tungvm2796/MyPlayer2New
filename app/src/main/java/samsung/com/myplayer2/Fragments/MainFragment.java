@@ -65,7 +65,6 @@ public class MainFragment extends Fragment {
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         if (viewPager != null) {
             setupViewPager(viewPager);
-            viewPager.setOffscreenPageLimit(4);
         }
 
         SmartTabLayout tabLayout = (SmartTabLayout) rootView.findViewById(R.id.viewpagertab);
@@ -134,6 +133,7 @@ public class MainFragment extends Fragment {
         //adapter.addFragment(new PlaylistFragment(), this.getString(R.string.playlist));
         adapter.addFragment(new GenresFragment(), this.getString(R.string.genres));
         viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(adapter.getCount() - 1);
     }
 
     static class FragmentAdapter extends FragmentPagerAdapter {

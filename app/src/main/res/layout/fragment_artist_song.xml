@@ -30,7 +30,7 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 android:scaleType="centerCrop"
-                android:transitionName="transition_album_art"
+                android:transitionName="transition_artist_art"
                 app:layout_collapseMode="parallax" />
 
             <View

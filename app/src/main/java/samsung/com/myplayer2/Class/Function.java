@@ -11,7 +11,6 @@ import android.graphics.Matrix;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.text.TextUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -56,8 +55,6 @@ public class Function {
             }
         });
     }
-
-
 
 
     public Bitmap GetBitmap(String filePath) {
@@ -112,12 +109,11 @@ public class Function {
     }
 
 
-
-//Get Data------------------------------------------------------------
+    //Get Data------------------------------------------------------------
     public static void getSongList(Context mContext, ArrayList<Song> ArraySong, String keyword) {
         //retrieve song info
         //MediaMetadataRetriever mr = new MediaMetadataRetriever();
-        String customQuery = " AND "+keyword;
+        String customQuery = " AND " + keyword;
 
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -126,7 +122,7 @@ public class Function {
 
         String selectOption1 = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
 
-        String selectOption2 = keyword == null ? selectOption1 : selectOption1+customQuery;
+        String selectOption2 = keyword == null ? selectOption1 : selectOption1 + customQuery;
 
         Cursor musicCursor = musicResolver.query(musicUri, ColumnIndex, selectOption2, null, null);
 
@@ -399,8 +395,7 @@ public class Function {
     }
 
 
-
-    public ArrayList<Suggestion> LoadDataForSuggest(Context context){
+    public ArrayList<Suggestion> LoadDataForSuggest(Context context) {
         ArrayList<Suggestion> result = new ArrayList<>();
 
         ContentResolver musicResolver = context.getContentResolver();
@@ -451,7 +446,6 @@ public class Function {
     }
 
 
-
     public static Uri getAlbumArtUri(long albumId) {
         return ContentUris.withAppendedId(Uri.parse("content://media/external/audio/albumart"), albumId);
     }
@@ -464,8 +458,6 @@ public class Function {
     }
 
 
-
-
     public static final String makeLabel(final Context context, final int pluralInt, final int number) {
         return context.getResources().getQuantityString(pluralInt, number, number);
     }
@@ -476,43 +468,43 @@ public class Function {
     }
 
 
-
     //Get All Song ----------------------------------------------------------
-    public static ArrayList<Song> getAllSongs(Context context) {
-        return getSongsForCursor(makeSongCursor(context, null, null));
+
+    public static void getSongs(Context context, String selection, ArrayList<Song> arrayList) {
+        getSongsForCursor(makeSongCursor(context, selection, null), arrayList);
     }
 
-    public static ArrayList<Song> getSongsForCursor(Cursor cursor) {
-        ArrayList arrayList = new ArrayList();
-        if ((cursor != null) && (cursor.moveToFirst()))
+    public static void getSongsForCursor(Cursor musicCursor, ArrayList<Song> arrayList) {
+        if ((musicCursor != null) && (musicCursor.moveToFirst()))
             do {
-                long thisId = cursor.getLong(0);
-                String thisTitle = cursor.getString(1);
-                String thisArtis = cursor.getString(2);
-                String thisAlbum = cursor.getString(3);
-                String thisData = cursor.getString(4);
-                long albumId = cursor.getLong(5);
+                long thisId = musicCursor.getLong(0);
+                String thisTitle = musicCursor.getString(1);
+                String thisArtis = musicCursor.getString(2);
+                String thisAlbum = musicCursor.getString(3);
+                String thisData = musicCursor.getString(4);
+                long albumId = musicCursor.getLong(5);
 
                 arrayList.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, null));
             }
-            while (cursor.moveToNext());
-        if (cursor != null)
-            cursor.close();
-        SortBySongName(arrayList);
-        return arrayList;
+            while (musicCursor.moveToNext());
+        if (musicCursor != null)
+            musicCursor.close();
     }
 
     public static Cursor makeSongCursor(Context context, String selection, String[] paramArrayOfString) {
-        return makeSongCursor(context, selection, paramArrayOfString, null);
+
+        return makeSongCursor(context, selection, paramArrayOfString, MediaStore.Audio.Media.DEFAULT_SORT_ORDER);
     }
 
     private static Cursor makeSongCursor(Context context, String selection, String[] paramArrayOfString, String sortOrder) {
-        String selectionStatement = "is_music=1 AND title != ''";
 
-        if (!TextUtils.isEmpty(selection)) {
-            selectionStatement = selectionStatement + " AND " + selection;
-        }
-        return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{"_id", "title", "artist", "album", "_data", "album_id"}, selectionStatement, paramArrayOfString, sortOrder);
+        String defaultSelection = "is_music = 1 AND title != ''";
+
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+
+        String finalSelection = selection == null ? defaultSelection : defaultSelection + " AND " + selection;
+
+        return context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, ColumnIndex, finalSelection, paramArrayOfString, sortOrder);
 
     }
 }

@@ -177,7 +177,7 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
                         break;
 
                     case R.id.go_to_artist:
-                        NavigationHelper.navigateToSongArtist((AppCompatActivity)mContext, songs.get(curpos).getArtist());
+                        NavigationHelper.navigateToSongArtist((AppCompatActivity)mContext, songs.get(curpos).getArtist(), null);
                         break;
                 }
                 return false;

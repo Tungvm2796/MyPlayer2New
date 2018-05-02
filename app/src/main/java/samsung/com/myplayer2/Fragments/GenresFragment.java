@@ -70,7 +70,7 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         genresView.setLayoutManager(mManager);
 
-        new GetGenres().execute();
+        //new GetGenres().execute();
 
         //genresView.addOnScrollListener(new ToolbarHidingOnScrollListener(getActivity(), tabcontainer, toolbar, lasttab, coloredBackgroundView));
 
