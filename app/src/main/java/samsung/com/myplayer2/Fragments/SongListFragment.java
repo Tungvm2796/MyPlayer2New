@@ -111,7 +111,7 @@ public class SongListFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             function.getSongs(getActivity(), null, SongList);
-            songAdt = new RecyclerSongAdapter(getActivity(), SongList, false);
+            songAdt = new RecyclerSongAdapter(getActivity(), SongList, false, false, false, false);
             return null;
         }
 

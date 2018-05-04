@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.audiofx.AudioEffect;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,6 +91,8 @@ public class MainActivity extends BaseActivity {
     NavigationView navigationView;
 
     private musiXmatchLyricsConnector mLyricsPlugin = null;
+
+    RelativeLayout dragView2;
 
     private String action;
     private Runnable runnable;
@@ -194,6 +198,8 @@ public class MainActivity extends BaseActivity {
 
         initView();
 
+        dragView2 = findViewById(R.id.dragView2);
+
         slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -207,11 +213,15 @@ public class MainActivity extends BaseActivity {
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
                     btnHide.setVisibility(View.INVISIBLE);
                     btnPlayPauseSmall.setVisibility(View.VISIBLE);
+                    dragView2.setBackgroundColor(Color.WHITE);
+                    txtTitle.setTextColor(Color.BLACK);
                 } else if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     if (myService.isPng())
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
                     btnHide.setVisibility(View.VISIBLE);
                     btnPlayPauseSmall.setVisibility(View.INVISIBLE);
+                    dragView2.setBackgroundColor(0x8e757575);
+                    txtTitle.setTextColor(Color.WHITE);
                 }
             }
         });

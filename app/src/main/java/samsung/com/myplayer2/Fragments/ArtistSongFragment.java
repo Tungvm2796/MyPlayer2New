@@ -115,7 +115,7 @@ public class ArtistSongFragment extends Fragment {
         SongListOfArtist = new ArrayList<>();
         ArtistSongView = v.findViewById(R.id.song_of_artist);
 
-        adapter = new SongOfArtistAdapter(getContext(), SongListOfArtist);
+        adapter = new SongOfArtistAdapter(getContext(), SongListOfArtist, true);
 
         new GetSongOfArtist().execute();
 

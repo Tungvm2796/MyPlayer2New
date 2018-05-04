@@ -20,12 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Adapter.SongInAlbumAdapter;
+import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Model.Song;
@@ -35,10 +35,10 @@ import samsung.com.myplayer2.Service.MyService;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AlbumSongFragment extends Fragment {
+public class GenresSongFragment extends Fragment {
 
 
-    public AlbumSongFragment() {
+    public GenresSongFragment() {
         // Required empty public constructor
     }
 
@@ -48,21 +48,20 @@ public class AlbumSongFragment extends Fragment {
 
     Toolbar toolbar;
 
-    long albumID;
-    String albumName;
+    ImageView genresImg;
+    RecyclerSongAdapter genresSongAdt;
+    RecyclerView genresSongView;
 
-    ImageView AlbumImg;
-    SongInAlbumAdapter adapter;
-    RecyclerView AlbumSongView;
-    ArrayList<Song> SongListOfAlbum;
+    ArrayList<Song> SongListOfGenres;
     Function function = new Function();
 
-    public static AlbumSongFragment getFragment(long albumId, String albumName) {
-        AlbumSongFragment fragment = new AlbumSongFragment();
+    String genres_name;
+
+    public static GenresSongFragment getFragment(String genres) {
+        GenresSongFragment fragment = new GenresSongFragment();
 
         Bundle args = new Bundle();
-        args.putLong(Constants.ALBUM_ID, albumId);
-        args.putString(Constants.ALBUM, albumName);
+        args.putString(Constants.GENRES, genres);
 
         fragment.setArguments(args);
         return fragment;
@@ -72,8 +71,7 @@ public class AlbumSongFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            albumID = getArguments().getLong(Constants.ALBUM_ID);
-            albumName = getArguments().getString(Constants.ALBUM);
+            genres_name = getArguments().getString(Constants.GENRES);
         }
     }
 
@@ -81,27 +79,26 @@ public class AlbumSongFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_album_song, container, false);
+        View v = inflater.inflate(R.layout.fragment_genres_song, container, false);
 
         toolbar = (Toolbar) v.findViewById(R.id.toolbar);
         setupToolbar();
 
-        AlbumImg = v.findViewById(R.id.album_art);
+        genresImg = v.findViewById(R.id.genres_art);
 
-        //ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
-        ImageLoader.getInstance().displayImage(function.getAlbumArtUri(albumID).toString(), AlbumImg,
-                new DisplayImageOptions.Builder().cacheInMemory(true)
-                        .showImageOnLoading(R.drawable.album_none)
-                        .resetViewBeforeLoading(true).build());
+        int resID = getContext().getResources().getIdentifier(genres_name.toLowerCase()+"_music", "drawable", getContext().getPackageName());
+        Glide.with(getContext()).load(resID)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
+                .error(R.drawable.music_frame).into(genresImg);
 
-        SongListOfAlbum = new ArrayList<>();
-        AlbumSongView = v.findViewById(R.id.song_of_album);
+        SongListOfGenres = new ArrayList<>();
+        genresSongView = v.findViewById(R.id.song_of_genres);
 
-        adapter = new SongInAlbumAdapter(getContext(), SongListOfAlbum, true);
-        new GetSongOfAlbum().execute();
+        RecyclerView.LayoutManager manager = new LinearLayoutManager(getContext());
+        genresSongView.setLayoutManager(manager);
 
-        RecyclerView.LayoutManager mManager = new LinearLayoutManager(getContext());
-        AlbumSongView.setLayoutManager(mManager);
+        genresSongAdt = new RecyclerSongAdapter(getContext(), SongListOfGenres, false, true, false, true);
+        new GetSongOfGenres().execute();
 
         return v;
     }
@@ -112,7 +109,7 @@ public class AlbumSongFragment extends Fragment {
 
         final ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        toolbar.setTitle(albumName);
+        toolbar.setTitle(genres_name);
     }
 
     @Override
@@ -129,7 +126,7 @@ public class AlbumSongFragment extends Fragment {
             myService = binder.getService();
 
             //pass list
-            myService.setSongListOfAlbum(SongListOfAlbum);
+            myService.setSongListOfGenres(SongListOfGenres);
 
             musicBound = true;
         }
@@ -160,7 +157,8 @@ public class AlbumSongFragment extends Fragment {
         }
     }
 
-    class GetSongOfAlbum extends AsyncTask<Void, Void, Void> {
+    class GetSongOfGenres extends AsyncTask<Void, Void, Void>{
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -168,15 +166,34 @@ public class AlbumSongFragment extends Fragment {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            function.getSongListOfAlbum(getContext(), albumID, SongListOfAlbum);
+            function.getSongListOfGenres(getContext(), genres_name, SongListOfGenres);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            AlbumSongView.setAdapter(adapter);
+
+//            genresSongView.setHasFixedSize(true);
+//
+//            AnimationSet set = new AnimationSet(true);
+//
+//            Animation animation = new AlphaAnimation(0.0f, 1.0f);
+//            animation.setDuration(500);
+//            set.addAnimation(animation);
+//
+//            animation = new TranslateAnimation(
+//                    Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
+//                    Animation.RELATIVE_TO_SELF, -1.0f, Animation.RELATIVE_TO_SELF, 0.0f
+//            );
+//            animation.setDuration(100);
+//            set.addAnimation(animation);
+//
+//            LayoutAnimationController controller = new LayoutAnimationController(set, 0.5f);
+//
+//            genresSongView.setLayoutAnimation(controller);
+
+            genresSongView.setAdapter(genresSongAdt);
         }
     }
-
 }

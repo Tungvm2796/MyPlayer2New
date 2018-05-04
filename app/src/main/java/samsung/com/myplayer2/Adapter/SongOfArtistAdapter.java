@@ -3,6 +3,7 @@ package samsung.com.myplayer2.Adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -11,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -37,10 +40,13 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
     ArrayList<String> Namelist;
     ListView lv;
     Function function = new Function();
+    boolean animate;
+    private int lastPosition = -1;
 
-    public SongOfArtistAdapter(Context context, ArrayList<Song> data) {
+    public SongOfArtistAdapter(Context context, ArrayList<Song> data, boolean anim) {
         this.mContext = context;
         this.songs = data;
+        this.animate = anim;
     }
 
     public SongOfArtistAdapter() {
@@ -96,12 +102,30 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
             }
         });
 
+        if (animate) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                setAnimation(holder.itemView, pos);
+            else {
+                if (pos > 10)
+                    setAnimation(holder.itemView, pos);
+            }
+        }
+
         holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 createPopUp(mContext, holder.btn, pos);
             }
         });
+    }
+
+    private void setAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.abc_slide_in_bottom);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
     @Override

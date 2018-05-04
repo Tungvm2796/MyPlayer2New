@@ -16,6 +16,7 @@ import android.widget.Toast;
 import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Fragments.AlbumSongFragment;
 import samsung.com.myplayer2.Fragments.ArtistSongFragment;
+import samsung.com.myplayer2.Fragments.GenresSongFragment;
 import samsung.com.myplayer2.Fragments.SearchFragment;
 import samsung.com.myplayer2.R;
 
@@ -65,6 +66,30 @@ public class NavigationHelper {
 
         if(view != null) {
             transaction.addSharedElement(view,  "transition_artist_art");
+        }
+        transaction.hide(((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.fragment_container));
+        transaction.add(R.id.fragment_container, fragment); //replace() can show transition effect but not nice, so just use fade effect
+        transaction.addToBackStack(null).commit();
+    }
+
+    public static void navigateToSongGenres(Activity context, String genres_name, View view) {
+
+        FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
+        Fragment fragment;
+
+//        transaction.setCustomAnimations(R.anim.activity_fade_in,
+//                R.anim.activity_fade_out, R.anim.activity_fade_in, R.anim.activity_fade_out);
+        fragment = GenresSongFragment.getFragment(genres_name);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.setSharedElementEnterTransition(new DetailsTransition());
+            fragment.setEnterTransition(new Fade());
+            fragment.setExitTransition(new Fade());
+            fragment.setSharedElementReturnTransition(new DetailsTransition());
+        }
+
+        if(view != null) {
+            transaction.addSharedElement(view,  "transition_genres_art");
         }
         transaction.hide(((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.fragment_container));
         transaction.add(R.id.fragment_container, fragment); //replace() can show transition effect but not nice, so just use fade effect

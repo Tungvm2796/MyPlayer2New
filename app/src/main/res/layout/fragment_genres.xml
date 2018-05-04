@@ -16,10 +16,6 @@
             android:id="@+id/genresView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:nestedScrollingEnabled="false"
-            android:paddingBottom="45dp"
-            android:paddingTop="108dp"
             android:scrollbars="vertical">
 
         </android.support.v7.widget.RecyclerView>
@@ -28,3 +24,5 @@
 
 
 </FrameLayout>
+
+    <!--android:nestedScrollingEnabled="false"-->

@@ -3,6 +3,7 @@ package samsung.com.myplayer2.Adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -11,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -43,11 +46,18 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
     ListView lv;
     Function function = new Function();
     boolean isResult;
+    boolean isGenres;
+    boolean isPlaylist;
+    boolean animate;
+    private int lastPosition = -1;
 
-    public RecyclerSongAdapter(Context context, ArrayList<Song> data, boolean search) {
+    public RecyclerSongAdapter(Context context, ArrayList<Song> data, boolean search, boolean genres, boolean pl, boolean anim) {
         this.mContext = context;
         this.songs = data;
         this.isResult = search;
+        this.isGenres = genres;
+        this.isPlaylist = pl;
+        this.animate = anim;
     }
 
     public RecyclerSongAdapter() {
@@ -106,6 +116,10 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                 play.putExtra("pos", pos);
                 if (isResult) {
                     play.putExtra(Constants.TYPE_NAME, Constants.SEARCH_TYPE);
+                } else if (isGenres) {
+                    play.putExtra(Constants.TYPE_NAME, Constants.GENRES_TYPE);
+                } else if (isPlaylist) {
+                    play.putExtra(Constants.TYPE_NAME, Constants.PLAYLIST_TYPE);
                 } else {
                     play.putExtra(Constants.TYPE_NAME, Constants.SONG_TYPE);
                 }
@@ -113,12 +127,30 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
             }
         });
 
+        if (animate) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                setAnimation(holder.itemView, pos);
+            else {
+                if (pos > 10)
+                    setAnimation(holder.itemView, pos);
+            }
+        }
+
         holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 createPopUp(mContext, holder.btn, pos);
             }
         });
+    }
+
+    private void setAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.abc_slide_in_bottom);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
     @Override
@@ -194,12 +226,12 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                         break;
 
                     case R.id.go_to_album:
-                        NavigationHelper.navigateToSongAlbum((AppCompatActivity)mContext, songs.get(curpos).getAlbumid()
-                                ,songs.get(curpos).getAlbum(), null);
+                        NavigationHelper.navigateToSongAlbum((AppCompatActivity) mContext, songs.get(curpos).getAlbumid()
+                                , songs.get(curpos).getAlbum(), null);
                         break;
 
                     case R.id.go_to_artist:
-                        NavigationHelper.navigateToSongArtist((AppCompatActivity)mContext, songs.get(curpos).getArtist(), null);
+                        NavigationHelper.navigateToSongArtist((AppCompatActivity) mContext, songs.get(curpos).getArtist(), null);
                         break;
                 }
                 return false;

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import samsung.com.myplayer2.Adapter.RecyclerGenresAdapter;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Class.NavigationHelper;
 import samsung.com.myplayer2.R;
 
 /**
@@ -72,8 +73,8 @@ public class GenresFragment extends Fragment implements RecyclerGenresAdapter.Ge
     }
 
     @Override
-    public void onGenresClick(View view, int position) {
-
+    public void onGenresClick(RecyclerGenresAdapter.MyRecyclerGenresHolder view, int position) {
+        NavigationHelper.navigateToSongGenres(getActivity(), genList.get(position), view.genresImg);
     }
 
     private class GetGenres extends AsyncTask<Void, Void, Void>{

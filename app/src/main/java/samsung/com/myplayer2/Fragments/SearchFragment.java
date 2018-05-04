@@ -134,7 +134,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
 
                 queryString = sug.getBody();
 
-                mSearchTask = new SearchTask().execute(queryString);
+                mSearchTask = new SearchTask().executeOnExecutor(executor, queryString);
 
                 searchView.clearFocus();
             }
@@ -147,7 +147,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
                     mSearchTask = null;
                 }
 
-                mSearchTask = new SearchTask().execute(currentQuery);
+                mSearchTask = new SearchTask().executeOnExecutor(executor, currentQuery);
 
             }
         });
@@ -175,7 +175,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
         resultAlbum = new ArrayList<>();
         resultArtist = new ArrayList<>();
 
-        songAdapter = new RecyclerSongAdapter(getContext(), resultSong, true);
+        songAdapter = new RecyclerSongAdapter(getContext(), resultSong, true, false, false, false);
         albumAdapter = new RecyclerAlbumAdapter(getContext(), resultAlbum, false);
         artistAdapter = new RecyclerArtistAdapter(getContext(), resultArtist, false);
 
