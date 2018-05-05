@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -55,7 +55,7 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
     public class MyRecyclerSongHolder extends RecyclerView.ViewHolder {
         TextView songView, artistView;
         ImageView coverimg;
-        Button btn;
+        ImageButton btn;
 
         public MyRecyclerSongHolder(View songLay) {
             super(songLay);

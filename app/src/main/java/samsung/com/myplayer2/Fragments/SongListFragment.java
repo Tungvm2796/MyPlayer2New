@@ -35,6 +35,8 @@ public class SongListFragment extends Fragment {
     public ArrayList<Song> SongList;
     private RecyclerView songView;
 
+
+
     MyService myService;
     private boolean musicBound = false;
     private Intent playintent;
@@ -53,6 +55,8 @@ public class SongListFragment extends Fragment {
 
         songView = v.findViewById(R.id.song_list);
 
+
+
         SongList = new ArrayList<>();
 
         RecyclerView.LayoutManager mManager = new LinearLayoutManager(getActivity());
@@ -63,6 +67,8 @@ public class SongListFragment extends Fragment {
         } else {
             new GetSong().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
+
+
 
         return v;
     }

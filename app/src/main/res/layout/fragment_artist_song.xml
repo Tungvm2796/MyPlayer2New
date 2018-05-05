@@ -54,7 +54,6 @@
         android:id="@+id/song_of_artist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/holo_green_light"
         android:scrollbars="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
     </android.support.v7.widget.RecyclerView>

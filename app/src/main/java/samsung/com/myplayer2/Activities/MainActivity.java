@@ -215,13 +215,15 @@ public class MainActivity extends BaseActivity {
                     btnPlayPauseSmall.setVisibility(View.VISIBLE);
                     dragView2.setBackgroundColor(Color.WHITE);
                     txtTitle.setTextColor(Color.BLACK);
+                    txtArtist.setTextColor(Color.GRAY);
                 } else if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     if (myService.isPng())
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
                     btnHide.setVisibility(View.VISIBLE);
                     btnPlayPauseSmall.setVisibility(View.INVISIBLE);
-                    dragView2.setBackgroundColor(0x8e757575);
+                    dragView2.setBackgroundColor(0xbb424242);
                     txtTitle.setTextColor(Color.WHITE);
+                    txtArtist.setTextColor(getResources().getColor(R.color.colorAccent));
                 }
             }
         });

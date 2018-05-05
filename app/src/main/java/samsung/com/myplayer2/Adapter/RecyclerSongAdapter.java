@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -15,7 +16,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
@@ -37,7 +39,7 @@ import samsung.com.myplayer2.R;
  * Created by 450G4 on 3/10/2018.
  */
 
-public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> {
+public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> implements FastScrollRecyclerView.SectionedAdapter{
 
 
     private ArrayList<Song> songs;
@@ -63,10 +65,16 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
     public RecyclerSongAdapter() {
     }
 
+    @NonNull
+    @Override
+    public String getSectionName(int position) {
+        return songs.get(position).getTitle().substring(0, 1);
+    }
+
     public class MyRecyclerSongHolder extends RecyclerView.ViewHolder {
         TextView songView, artistView;
         ImageView coverimg;
-        Button btn;
+        ImageButton btn;
 
         public MyRecyclerSongHolder(View songLay) {
             super(songLay);

@@ -16,9 +16,10 @@
             android:scaleType="centerCrop" />
 
         <View
+            android:id="@+id/control_view"
             android:layout_width="match_parent"
             android:layout_height="110dp"
-            android:background="#8e757575"
+            android:background="#bb424242"
             android:layout_alignParentBottom="true"/>
 
         <TextView

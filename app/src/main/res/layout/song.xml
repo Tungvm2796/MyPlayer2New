@@ -42,10 +42,13 @@
 
     </LinearLayout>
 
-    <Button
+    <ImageButton
         android:id="@+id/menuSong"
         android:layout_width="25dp"
         android:layout_height="63dp"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:background="@color/transparent"
+        android:scaleType="center"
+        android:src="@drawable/ic_more_vert_black_24dp" />
 
 </RelativeLayout>
