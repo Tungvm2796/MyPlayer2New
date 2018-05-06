@@ -252,7 +252,7 @@ public class MyService extends Service implements
                     setList(musicStore.getSongListOfSearch());
                     break;
                 case Constants.LAST_TYPE:
-                    setList(getLastList(PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.LAST_TYPE, Constants.SONG_TYPE)));
+                    setList(getLastList(PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.LAST_TYPE, "0")));
                     songPosn = PreferenceManager.getDefaultSharedPreferences(context).getInt(Constants.LAST_POSITION, 0);
                     break;
             }
@@ -297,7 +297,7 @@ public class MyService extends Service implements
         //Store infomation of playing song, to resume the song and the list song after stop service and kill app
         shared = PreferenceManager.getDefaultSharedPreferences(context);
         editor = shared.edit();
-        editor.clear();
+        //editor.clear();
         editor.putInt(Constants.LAST_POSITION, songPosn);
         editor.putString(Constants.LAST_SONG_TITLE, songs.get(songPosn).getTitle());
         editor.putString(Constants.LAST_ARTIST, songs.get(songPosn).getArtist());
@@ -348,7 +348,7 @@ public class MyService extends Service implements
 
 
     private String getLastString(String key) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getString(key, Constants.SONG_TYPE);
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(key, "0");
     }
 
     //set the song postion in list to play
@@ -542,20 +542,20 @@ public class MyService extends Service implements
                     //String songlen = Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("Position", 0));
                     //Toast.makeText(getApplicationContext(), songlen, Toast.LENGTH_SHORT).show();
 
-                    if (songs.size() == 0) {
-                        playSong(Constants.LAST_TYPE);
-                    } else {
                         mController.getTransportControls().pause();
 
                         progressHandler.removeCallbacks(run);
-                    }
 
                 } else if (intent.getStringExtra(Constants.KEY).equals(Constants.PLAY)) {
                     //String songlen = Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("Position", 0));
                     //Toast.makeText(getApplicationContext(), songlen, Toast.LENGTH_SHORT).show();
 
                     if (songs.size() == 0) {
+                        setListType(getLastString(Constants.LAST_TYPE));
+                        setLastGenres(getLastString(Constants.LAST_GENRES));
+                        setLastKeyword(getLastString(Constants.LAST_KEYWORD));
                         playSong(Constants.LAST_TYPE);
+                        //Toast.makeText(context, PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.LAST_TYPE, "0"), Toast.LENGTH_SHORT).show();
                     } else {
                         mController.getTransportControls().play();
 
