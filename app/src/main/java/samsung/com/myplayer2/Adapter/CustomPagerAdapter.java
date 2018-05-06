@@ -8,7 +8,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import samsung.com.myplayer2.Fragments.AlbumFragment;
 import samsung.com.myplayer2.Fragments.ArtistFragment;
 import samsung.com.myplayer2.Fragments.GenresFragment;
-import samsung.com.myplayer2.Fragments.PlaylistFragment;
 import samsung.com.myplayer2.Fragments.SongListFragment;
 import samsung.com.myplayer2.R;
 
@@ -50,13 +49,12 @@ public class CustomPagerAdapter extends FragmentPagerAdapter {
 
             case 3:
 
-                frag = new PlaylistFragment();
+                frag = new GenresFragment();
 
                 break;
 
             case 4:
 
-                frag = new GenresFragment();
 
                 break;
 
@@ -83,10 +81,9 @@ public class CustomPagerAdapter extends FragmentPagerAdapter {
                 title = mContext.getResources().getString(R.string.frag3);
                 break;
             case 3:
-                title = mContext.getResources().getString(R.string.frag4);
+                title = mContext.getResources().getString(R.string.frag5);
                 break;
             case 4:
-                title = mContext.getResources().getString(R.string.frag5);
                 break;
         }
         return title;

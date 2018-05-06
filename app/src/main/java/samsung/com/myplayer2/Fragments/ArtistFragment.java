@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
@@ -37,8 +36,6 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
 
     RecyclerView artistView;
     Context context;
-    LinearLayout lin1;
-    LinearLayout lin2;
     Function function;
 
     RecyclerArtistAdapter artistAdt;
@@ -51,9 +48,6 @@ public class ArtistFragment extends Fragment implements RecyclerArtistAdapter.Ar
         function = new Function();
         context = super.getActivity();
         artistView = v.findViewById(R.id.artistView);
-
-        lin1 = v.findViewById(R.id.lin1);
-        lin2 = v.findViewById(R.id.lin2);
 
         setRetainInstance(true);
 

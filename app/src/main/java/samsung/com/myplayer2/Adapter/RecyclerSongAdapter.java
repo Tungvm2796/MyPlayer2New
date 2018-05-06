@@ -39,7 +39,7 @@ import samsung.com.myplayer2.R;
  * Created by 450G4 on 3/10/2018.
  */
 
-public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> implements FastScrollRecyclerView.SectionedAdapter{
+public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> implements FastScrollRecyclerView.SectionedAdapter {
 
 
     private ArrayList<Song> songs;
@@ -119,9 +119,9 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
             @Override
             public void onClick(View view) {
                 Context c = view.getContext();
-                Intent play = new Intent("ToService");
-                play.setAction("SvPlayOne");
-                play.putExtra("pos", pos);
+                Intent play = new Intent(Constants.TO_SERVICE);
+                play.setAction(Constants.SV_PLAYONE);
+                play.putExtra(Constants.POSITION, pos);
                 if (isResult) {
                     play.putExtra(Constants.TYPE_NAME, Constants.SEARCH_TYPE);
                 } else if (isGenres) {

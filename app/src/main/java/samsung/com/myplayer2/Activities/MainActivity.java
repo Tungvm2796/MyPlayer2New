@@ -9,7 +9,6 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.media.audiofx.AudioEffect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,9 +45,9 @@ import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
 import samsung.com.myplayer2.Fragments.AlbumSongFragment;
 import samsung.com.myplayer2.Fragments.ArtistSongFragment;
-import samsung.com.myplayer2.Fragments.BlankFragment;
 import samsung.com.myplayer2.Fragments.LyricsFragment;
 import samsung.com.myplayer2.Fragments.MainFragment;
+import samsung.com.myplayer2.Fragments.PlaylistFragment;
 import samsung.com.myplayer2.Fragments.SearchFragment;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -112,7 +111,7 @@ public class MainActivity extends BaseActivity {
     private Runnable navigatePlaylist = new Runnable() {
         public void run() {
             navigationView.getMenu().findItem(R.id.nav_playlist).setChecked(true);
-            Fragment fragment = new BlankFragment();            //<-------------------------------<< thay no bang playlist fragment
+            Fragment fragment = new PlaylistFragment();            //<-------------------------------<< thay no bang playlist fragment
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.hide(getSupportFragmentManager().findFragmentById(R.id.fragment_container));
             transaction.replace(R.id.fragment_container, fragment).commit();
@@ -136,6 +135,7 @@ public class MainActivity extends BaseActivity {
         }
     };
 
+    //Tam thoi chua su dung
     private Runnable navigateAlbum = new Runnable() {
         public void run() {
             long albumID = getIntent().getExtras().getLong(Constants.ALBUM_ID);
@@ -147,6 +147,7 @@ public class MainActivity extends BaseActivity {
         }
     };
 
+    //Tam thoi chua su dung
     private Runnable navigateArtist = new Runnable() {
         public void run() {
             String artist_name = getIntent().getExtras().getString(Constants.ARTIST);
@@ -157,6 +158,7 @@ public class MainActivity extends BaseActivity {
         }
     };
 
+    //Tam thoi chua su dung
     private Runnable navigateSearch = new Runnable() {
         public void run() {
             Fragment fragment = new SearchFragment();
@@ -188,12 +190,12 @@ public class MainActivity extends BaseActivity {
         function = new Function();
 
 
-        IntentFilter toActivity = new IntentFilter("ToActivity");
-        toActivity.addAction("PlayPause");
-        toActivity.addAction("StartPlay");
-        toActivity.addAction("timeSong");
-        toActivity.addAction("timeTotal");
-        toActivity.addAction("seekbar");
+        IntentFilter toActivity = new IntentFilter(Constants.TO_ACTIVITY);
+        toActivity.addAction(Constants.PLAY_PAUSE);
+        toActivity.addAction(Constants.START_PLAY);
+        toActivity.addAction(Constants.TIME_SONG);
+        toActivity.addAction(Constants.TIME_TOTAL);
+        toActivity.addAction(Constants.SEEKBAR);
         registerReceiver(myMainBroadcast, toActivity);
 
         initView();
@@ -242,17 +244,17 @@ public class MainActivity extends BaseActivity {
                 if (myService.isPng()) {
                     //myService.pausePlayer();
                     btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
-                    Intent pauseIntent = new Intent("ToService");
-                    pauseIntent.setAction("SvPlayPause");
-                    pauseIntent.putExtra("key", "pause");
+                    Intent pauseIntent = new Intent(Constants.TO_SERVICE);
+                    pauseIntent.setAction(Constants.SV_PLAY_PAUSE);
+                    pauseIntent.putExtra(Constants.KEY, Constants.PAUSE);
                     sendBroadcast(pauseIntent);
 
                 } else {
                     //myService.go();
                     btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
-                    Intent playIntent = new Intent("ToService");
-                    playIntent.setAction("SvPlayPause");
-                    playIntent.putExtra("key", "play");
+                    Intent playIntent = new Intent(Constants.TO_SERVICE);
+                    playIntent.setAction(Constants.SV_PLAY_PAUSE);
+                    playIntent.putExtra(Constants.KEY, Constants.PLAY);
                     sendBroadcast(playIntent);
                 }
             }
@@ -440,7 +442,7 @@ public class MainActivity extends BaseActivity {
         playintent = new Intent(this, MyService.class);
         this.startService(playintent);
         this.bindService(playintent, musicConnection, Context.BIND_AUTO_CREATE);
-        registerReceiver(myMainBroadcast, new IntentFilter("ToActivity"));
+        registerReceiver(myMainBroadcast, new IntentFilter(Constants.TO_ACTIVITY));
 
         try {
             if (myService.isPng()) {
@@ -448,7 +450,7 @@ public class MainActivity extends BaseActivity {
             } else {
                 btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
     }
@@ -466,19 +468,18 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onResume() {
 
-        IntentFilter toActivity = new IntentFilter("ToActivity");
-        toActivity.addAction("PlayPause");
-        toActivity.addAction("StartPlay");
-        toActivity.addAction("timeSong");
-        toActivity.addAction("timeTotal");
-        toActivity.addAction("seekbar");
-        toActivity.addAction("FragIndex");
+        IntentFilter toActivity = new IntentFilter(Constants.TO_ACTIVITY);
+        toActivity.addAction(Constants.PLAY_PAUSE);
+        toActivity.addAction(Constants.START_PLAY);
+        toActivity.addAction(Constants.TIME_SONG);
+        toActivity.addAction(Constants.TIME_TOTAL);
+        toActivity.addAction(Constants.SEEKBAR);
         registerReceiver(myMainBroadcast, toActivity);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-        String saveTitle = settings.getString("Title", "0");
-        String saveArtist = settings.getString("Artist", "0");
-        String savePath = settings.getString("Path", "0");
+        String saveTitle = settings.getString(Constants.LAST_SONG_TITLE, "0");
+        String saveArtist = settings.getString(Constants.LAST_ARTIST, "0");
+        String savePath = settings.getString(Constants.LAST_PATH, "0");
         txtTitle.setText(saveTitle);
         txtArtist.setText(saveArtist);
         if (!savePath.equals("0"))
@@ -492,10 +493,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onPause() {
         unregisterReceiver(myMainBroadcast);
-
-        Intent intent = new Intent("ToPlaylist");
-        intent.setAction("Unregister");
-        sendBroadcast(intent);
 
         mLyricsPlugin.doUnbindService();
 
@@ -521,37 +518,37 @@ public class MainActivity extends BaseActivity {
             if (action != null) {
                 switch (action) {
 
-                    case "PlayPause":
-                        String od = intent.getStringExtra("key");
-                        if (od.equals("pause")) {
+                    case Constants.PLAY_PAUSE:
+                        String od = intent.getStringExtra(Constants.KEY);
+                        if (od.equals(Constants.PAUSE)) {
                             btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
-                        } else if (od.equals("play")) {
+                        } else if (od.equals(Constants.PLAY)) {
                             btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
-                        } else if (od.equals("complete"))
+                        } else if (od.equals(Constants.COMPLETE))
                             btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
                         break;
 
-                    case "StartPlay":
-                        txtTitle.setText(intent.getStringExtra("title"));
-                        txtArtist.setText(intent.getStringExtra("artist"));
+                    case Constants.START_PLAY:
+                        txtTitle.setText(intent.getStringExtra(Constants.SONG_TITLE));
+                        txtArtist.setText(intent.getStringExtra(Constants.ARTIST));
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
-                        SongPath = intent.getStringExtra("songpath");
+                        SongPath = intent.getStringExtra(Constants.SONG_PATH);
                         Glide.with(context).load(function.GetBitMapByte(SongPath)).into(imgDisc);
                         break;
 
-                    case "timeTotal":
-                        int timeTotal = intent.getIntExtra("key", 0);
+                    case Constants.TIME_TOTAL:
+                        int timeTotal = intent.getIntExtra(Constants.KEY, 0);
                         seekBar.setMax(timeTotal);
                         txtTotal.setText(simpleDateFormat.format(timeTotal));
                         break;
 
-                    case "timeSong":
-                        int timeSong = intent.getIntExtra("key", 0);
+                    case Constants.TIME_SONG:
+                        int timeSong = intent.getIntExtra(Constants.KEY, 0);
                         seekBar.setProgress(timeSong);
                         txtTimeSong.setText(simpleDateFormat.format(timeSong));
                         break;
 
-                    case "seekbar":
+                    case Constants.SEEKBAR:
                         seekBar.setProgress(0);
                         break;
                 }
@@ -623,12 +620,7 @@ public class MainActivity extends BaseActivity {
                 break;
 
             case R.id.nav_equalizer:
-                Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
-                if ((intent.resolveActivity(getPackageManager()) != null)) {
-                    startActivityForResult(intent, RESULT_OK);
-                } else {
-                    // No equalizer found
-                }
+                NavigationHelper.navigateToEqualizer(MainActivity.this, myService.getAudioSessionId());
                 break;
         }
 

@@ -20,6 +20,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.ItemTouchHelperAdapter;
 import samsung.com.myplayer2.Class.ItemTouchHelperViewHolder;
@@ -95,9 +96,9 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
             @Override
             public void onClick(View view) {
                 Context c = view.getContext();
-                Intent play = new Intent("ToService");
-                play.setAction("SvPlayOne");
-                play.putExtra("pos", position);
+                Intent play = new Intent(Constants.TO_SERVICE);
+                play.setAction(Constants.SV_PLAYONE);
+                play.putExtra(Constants.POSITION, position);
                 c.sendBroadcast(play);
             }
         });

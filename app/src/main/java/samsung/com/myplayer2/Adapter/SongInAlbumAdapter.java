@@ -94,9 +94,9 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
             @Override
             public void onClick(View view) {
                 Context c = view.getContext();
-                Intent play = new Intent("ToService");
-                play.setAction("SvPlayOne");
-                play.putExtra("pos", pos);
+                Intent play = new Intent(Constants.TO_SERVICE);
+                play.setAction(Constants.SV_PLAYONE);
+                play.putExtra(Constants.POSITION, pos);
                 play.putExtra(Constants.TYPE_NAME, Constants.ALBUM_TYPE);
                 c.sendBroadcast(play);
             }

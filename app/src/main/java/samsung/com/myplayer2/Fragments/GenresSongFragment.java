@@ -86,7 +86,7 @@ public class GenresSongFragment extends Fragment {
 
         genresImg = v.findViewById(R.id.genres_art);
 
-        int resID = getContext().getResources().getIdentifier(genres_name.toLowerCase()+"_music", "drawable", getContext().getPackageName());
+        int resID = getContext().getResources().getIdentifier(genres_name.toLowerCase() + "_music", "drawable", getContext().getPackageName());
         Glide.with(getContext()).load(resID)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
                 .error(R.drawable.music_frame).into(genresImg);
@@ -127,6 +127,7 @@ public class GenresSongFragment extends Fragment {
 
             //pass list
             myService.setSongListOfGenres(SongListOfGenres);
+            myService.setLastGenres(genres_name);
 
             musicBound = true;
         }
@@ -157,7 +158,7 @@ public class GenresSongFragment extends Fragment {
         }
     }
 
-    class GetSongOfGenres extends AsyncTask<Void, Void, Void>{
+    class GetSongOfGenres extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {

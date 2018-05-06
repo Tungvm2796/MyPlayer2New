@@ -73,6 +73,10 @@ public class MyService extends Service implements
 
     //Number of song list
     private String ListType = "";
+    //LastKeyword when search
+    private String LastKeyword = "";
+    //LastGenres choosen
+    private String LastGenres = "";
     //Number of song list in Fragments
     private int ListNumberFrag = 1;
     //current position
@@ -110,9 +114,9 @@ public class MyService extends Service implements
 
         context = this;
 
-        IntentFilter svintent = new IntentFilter("ToService");
-        svintent.addAction("SvPlayPause");
-        svintent.addAction("SvPlayOne");
+        IntentFilter svintent = new IntentFilter(Constants.TO_SERVICE);
+        svintent.addAction(Constants.SV_PLAY_PAUSE);
+        svintent.addAction(Constants.SV_PLAYONE);
         svintent.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         registerReceiver(myServBroadcast, svintent);
 
@@ -227,26 +231,33 @@ public class MyService extends Service implements
         //play
         player.reset();
         //get song
-        switch (type) {
-            case Constants.SONG_TYPE:
-                setList(musicStore.getAllsongs());
-                break;
-            case Constants.ALBUM_TYPE:
-                setList(musicStore.getSongListOfAlbum());
-                break;
-            case Constants.ARTIST_TYPE:
-                setList(musicStore.getSongListOfArtist());
-                break;
-            case Constants.PLAYLIST_TYPE:
-                setList(musicStore.getSongListOfPlaylist());
-                break;
-            case Constants.GENRES_TYPE:
-                setList(musicStore.getSongListOfGenres());
-                break;
-            case Constants.SEARCH_TYPE:
-                setList(musicStore.getSongListOfSearch());
-                break;
+        if (type != null) {
+            switch (type) {
+                case Constants.SONG_TYPE:
+                    setList(musicStore.getAllsongs());
+                    break;
+                case Constants.ALBUM_TYPE:
+                    setList(musicStore.getSongListOfAlbum());
+                    break;
+                case Constants.ARTIST_TYPE:
+                    setList(musicStore.getSongListOfArtist());
+                    break;
+                case Constants.PLAYLIST_TYPE:
+                    setList(musicStore.getSongListOfPlaylist());
+                    break;
+                case Constants.GENRES_TYPE:
+                    setList(musicStore.getSongListOfGenres());
+                    break;
+                case Constants.SEARCH_TYPE:
+                    setList(musicStore.getSongListOfSearch());
+                    break;
+                case Constants.LAST_TYPE:
+                    setList(getLastList(PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.LAST_TYPE, Constants.SONG_TYPE)));
+                    songPosn = PreferenceManager.getDefaultSharedPreferences(context).getInt(Constants.LAST_POSITION, 0);
+                    break;
+            }
         }
+
         Song playSong = songs.get(songPosn);
         //get title
         songTitle = playSong.getTitle();
@@ -254,10 +265,12 @@ public class MyService extends Service implements
         songArtist = playSong.getArtist();
         //get id
         long currSong = playSong.getID();
+
         //set uri
         Uri trackUri = ContentUris.withAppendedId(
                 android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 currSong);
+
         //set the data source
         try {
             player.setDataSource(getApplicationContext(), trackUri);
@@ -273,21 +286,29 @@ public class MyService extends Service implements
 
         //player.prepareAsync();
 
-        Intent setup = new Intent("ToActivity");
-        setup.setAction("StartPlay");
-        setup.putExtra("title", songTitle);
-        setup.putExtra("artist", songArtist);
-        setup.putExtra("songpath", playSong.getData());
+        //Send broadcast to MainActivity to set infomation of the song playing
+        Intent setup = new Intent(Constants.TO_ACTIVITY);
+        setup.setAction(Constants.START_PLAY);
+        setup.putExtra(Constants.SONG_TITLE, songTitle);
+        setup.putExtra(Constants.ARTIST, songArtist);
+        setup.putExtra(Constants.SONG_PATH, playSong.getData());
         sendBroadcast(setup);
 
+        //Store infomation of playing song, to resume the song and the list song after stop service and kill app
         shared = PreferenceManager.getDefaultSharedPreferences(context);
         editor = shared.edit();
         editor.clear();
-        editor.putString("Title", songs.get(songPosn).getTitle());
-        editor.putString("Artist", songs.get(songPosn).getArtist());
-        editor.putString("Path", songs.get(songPosn).getData());
+        editor.putInt(Constants.LAST_POSITION, songPosn);
+        editor.putString(Constants.LAST_SONG_TITLE, songs.get(songPosn).getTitle());
+        editor.putString(Constants.LAST_ARTIST, songs.get(songPosn).getArtist());
+        editor.putString(Constants.LAST_PATH, songs.get(songPosn).getData());
+        editor.putString(Constants.LAST_ALBUMID, Long.toString(songs.get(songPosn).getAlbumid()));
+        editor.putString(Constants.LAST_TYPE, ListType);
+        editor.putString(Constants.LAST_KEYWORD, LastKeyword);
+        editor.putString(Constants.LAST_GENRES, LastGenres);
         editor.apply();
 
+        //Prepare
         player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
@@ -298,7 +319,39 @@ public class MyService extends Service implements
         });
     }
 
-    //set the song list to play
+    private ArrayList<Song> getLastList(String type) {
+        ArrayList<Song> arrayList = new ArrayList<>();
+
+        switch (type) {
+            case Constants.SONG_TYPE:
+                function.getLastSongList(context, null, arrayList);
+                break;
+            case Constants.ALBUM_TYPE:
+                function.getLastSongList(context, "album_id LIKE '" + getLastString(Constants.LAST_ALBUMID) + "'", arrayList);
+                break;
+            case Constants.ARTIST_TYPE:
+                function.getLastSongList(context, "artist LIKE '" + getLastString(Constants.LAST_ARTIST) + "'", arrayList);
+                break;
+            case Constants.GENRES_TYPE:
+                function.getLastSongListOfGenres(context, getLastString(Constants.LAST_GENRES), arrayList);
+                break;
+            case Constants.PLAYLIST_TYPE:
+                function.getLastSongList(context, null, arrayList);
+                break;
+            case Constants.SEARCH_TYPE:
+                function.getLastSongList(context, "title LIKE '" + getLastString(Constants.LAST_KEYWORD) + "%'", arrayList);
+                break;
+        }
+
+        return arrayList;
+    }
+
+
+    private String getLastString(String key) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getString(key, Constants.SONG_TYPE);
+    }
+
+    //set the song postion in list to play
     public void setSong(int songIndex) {
         songPosn = songIndex;
     }
@@ -481,50 +534,40 @@ public class MyService extends Service implements
             return true;
     }
 
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        if (!player.isPlaying()) {
-            stopForeground(true);
-
-            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.cancel(NOTIFY_ID);
-
-            //unregisterReceiver(myServBroadcast);
-            stopSelf();
-            Log.i("Thong bao", "Da dung lai Service ");
-        } else {
-            checkBothRun();
-        }
-
-        Log.i("Thong bao", "Da kill task xxxxxxxxxxxxxxxxx ");
-
-        super.onTaskRemoved(rootIntent);
-
-    }
-
     BroadcastReceiver myServBroadcast = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().toString().equals("SvPlayPause")) {
-                if (intent.getStringExtra("key").equals("pause")) {
-                    Toast.makeText(getApplicationContext(), "Service received: Pause", Toast.LENGTH_SHORT).show();
+            if (intent.getAction().toString().equals(Constants.SV_PLAY_PAUSE)) {
+                if (intent.getStringExtra(Constants.KEY).equals(Constants.PAUSE)) {
+                    //String songlen = Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("Position", 0));
+                    //Toast.makeText(getApplicationContext(), songlen, Toast.LENGTH_SHORT).show();
 
-                    mController.getTransportControls().pause();
+                    if (songs.size() == 0) {
+                        playSong(Constants.LAST_TYPE);
+                    } else {
+                        mController.getTransportControls().pause();
 
-                    progressHandler.removeCallbacks(run);
+                        progressHandler.removeCallbacks(run);
+                    }
 
-                } else if (intent.getStringExtra("key").equals("play")) {
-                    Toast.makeText(getApplicationContext(), "Service received: Play", Toast.LENGTH_SHORT).show();
+                } else if (intent.getStringExtra(Constants.KEY).equals(Constants.PLAY)) {
+                    //String songlen = Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("Position", 0));
+                    //Toast.makeText(getApplicationContext(), songlen, Toast.LENGTH_SHORT).show();
 
-                    mController.getTransportControls().play();
+                    if (songs.size() == 0) {
+                        playSong(Constants.LAST_TYPE);
+                    } else {
+                        mController.getTransportControls().play();
 
-                    updateProgress();
+                        updateProgress();
+                    }
+
                 }
-            } else if (intent.getAction().toString().equals("SvPlayOne")) {
+            } else if (intent.getAction().toString().equals(Constants.SV_PLAYONE)) {
 
-                Toast.makeText(getApplicationContext(), "Service received: Play One", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Service received: Play One", Toast.LENGTH_SHORT).show();
 
-                Integer posn = intent.getIntExtra("pos", 0);
+                Integer posn = intent.getIntExtra(Constants.POSITION, 0);
                 String getType = intent.getStringExtra(Constants.TYPE_NAME);
 
                 setListType(getType);
@@ -536,9 +579,9 @@ public class MyService extends Service implements
 
                 playSong(ListType);
 
-                Intent intent4 = new Intent("ToActivity");
-                intent4.setAction("PlayPause");
-                intent4.putExtra("key", "pause");
+                Intent intent4 = new Intent(Constants.TO_ACTIVITY);
+                intent4.setAction(Constants.PLAY_PAUSE);
+                intent4.putExtra(Constants.KEY, Constants.PAUSE);
                 sendBroadcast(intent4);
 
             } else if (intent.getAction().compareTo(AudioManager.ACTION_AUDIO_BECOMING_NOISY) == 0) {
@@ -568,17 +611,17 @@ public class MyService extends Service implements
 
             try {
 
-                Intent intent1 = new Intent("ToActivity");
-                intent1.setAction("timeTotal");
-                intent1.putExtra("key", player.getDuration());
+                Intent intent1 = new Intent(Constants.TO_ACTIVITY);
+                intent1.setAction(Constants.TIME_TOTAL);
+                intent1.putExtra(Constants.KEY, player.getDuration());
                 sendBroadcast(intent1);
 
                 //seekPro.get().setMax(player.getDuration());
                 //txtTotal.get().setText(simpleDateFormat.format(player.getDuration()));
 
-                Intent intent2 = new Intent("ToActivity");
-                intent2.setAction("timeSong");
-                intent2.putExtra("key", player.getCurrentPosition());
+                Intent intent2 = new Intent(Constants.TO_ACTIVITY);
+                intent2.setAction(Constants.TIME_SONG);
+                intent2.putExtra(Constants.KEY, player.getCurrentPosition());
                 sendBroadcast(intent2);
                 //txtCurTime.get().setText(simpleDateFormat.format(player.getCurrentPosition()));
 
@@ -598,16 +641,16 @@ public class MyService extends Service implements
     @Override
     public void onCompletion(MediaPlayer mp) {
         //check if playback has reached the end of a track
-        Intent intent3 = new Intent("ToActivity");
-        intent3.setAction("seekbar");
+        Intent intent3 = new Intent(Constants.TO_ACTIVITY);
+        intent3.setAction(Constants.SEEKBAR);
         //intent3.putExtra("key", 0);
         sendBroadcast(intent3);
 
         progressHandler.removeCallbacks(run);
 
-        Intent intent4 = new Intent("ToActivity");
-        intent4.setAction("PlayPause");
-        intent4.putExtra("key", "complete");
+        Intent intent4 = new Intent(Constants.TO_ACTIVITY);
+        intent4.setAction(Constants.PLAY_PAUSE);
+        intent4.putExtra(Constants.KEY, Constants.COMPLETE);
         sendBroadcast(intent4);
         //btnPayPause.get().setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
         if (player.getCurrentPosition() > 0) {
@@ -676,8 +719,20 @@ public class MyService extends Service implements
         ListType = type;
     }
 
+    public void setLastKeyword(String key) {
+        LastKeyword = key;
+    }
+
+    public void setLastGenres(String key) {
+        LastGenres = key;
+    }
+
     public Song getCurSong() {
-        return songs.get(songPosn);
+        try {
+            return songs.get(songPosn);
+        } catch (Exception e) {
+            return musicStore.getAllsongs().get(0);
+        }
     }
 
     private void handleIntent(Intent intent) {
@@ -791,9 +846,9 @@ public class MyService extends Service implements
                 super.onPlay();
 
                 go();
-                Intent intent2 = new Intent("ToActivity");
-                intent2.setAction("PlayPause");
-                intent2.putExtra("key", "play");
+                Intent intent2 = new Intent(Constants.TO_ACTIVITY);
+                intent2.setAction(Constants.PLAY_PAUSE);
+                intent2.putExtra(Constants.KEY, Constants.PLAY);
                 sendBroadcast(intent2);
 
                 updateProgress();
@@ -807,9 +862,9 @@ public class MyService extends Service implements
                 super.onPause();
 
                 pausePlayer();
-                Intent intent1 = new Intent("ToActivity");
-                intent1.setAction("PlayPause");
-                intent1.putExtra("key", "pause");
+                Intent intent1 = new Intent(Constants.TO_ACTIVITY);
+                intent1.setAction(Constants.PLAY_PAUSE);
+                intent1.putExtra(Constants.KEY, Constants.PAUSE);
                 sendBroadcast(intent1);
 
                 progressHandler.removeCallbacks(run);
@@ -854,7 +909,32 @@ public class MyService extends Service implements
     public void onDestroy() {
         super.onDestroy();
         mediaSession.release();
+        if (player != null) {
+            player.stop();
+            player.release();
+        }
         unregisterReceiver(myServBroadcast);
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        if (!player.isPlaying()) {
+            stopForeground(true);
+
+            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.cancel(NOTIFY_ID);
+
+            //unregisterReceiver(myServBroadcast);
+            stopSelf();
+            Log.i("Thong bao", "Da dung lai Service ");
+        } else {
+            checkBothRun();
+        }
+
+        Log.i("Thong bao", "Da kill task xxxxxxxxxxxxxxxxx ");
+
+        super.onTaskRemoved(rootIntent);
+
     }
 
     private Bitmap loadLargeIcon(String path) {
@@ -873,7 +953,7 @@ public class MyService extends Service implements
     public int getAudioSessionId() {
         try {
             return player.getAudioSessionId();
-        }catch (Exception e){
+        } catch (Exception e) {
             return 0;
         }
     }

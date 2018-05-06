@@ -82,6 +82,8 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
     private TextView countArtist;
     private TextView countSong;
 
+    private static String keyword = "";
+
     private Toolbar toolbar;
 
 
@@ -336,7 +338,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
             if (resultSong != null)
                 resultSong.clear();
             String key = "title LIKE '" + params[0] + "%'";
-            function.getSongs(getContext(), key, resultSong);
+            function.getSongList(getContext(), resultSong, key);
 
             if (isCancelled()) {
                 return null;
@@ -355,6 +357,8 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
                 resultArtist.clear();
             String key3 = "artist LIKE '" + params[0] + "%'";
             function.getArtist(getContext(), resultArtist, key3);
+
+            keyword = params[0];
 
             return null;
         }
@@ -391,6 +395,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
             artistAdapter.notifyDataSetChanged();
 
             myService.setSongListOfSearch(songAdapter.GetListSong());
+            myService.setLastKeyword(keyword);
         }
     }
 }

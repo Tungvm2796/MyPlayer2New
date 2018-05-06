@@ -11,7 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 
@@ -37,9 +36,6 @@ public class AlbumFragment extends Fragment implements RecyclerAlbumAdapter.Albu
 
     RecyclerView albumView;
     Context context;
-    LinearLayout lin1;
-    LinearLayout lin2;
-
     Function function;
 
     RecyclerAlbumAdapter albumAdt;
@@ -55,9 +51,6 @@ public class AlbumFragment extends Fragment implements RecyclerAlbumAdapter.Albu
         context = super.getActivity();
         albumView = v.findViewById(R.id.albumView);
 
-
-        lin1 = v.findViewById(R.id.lin1);
-        lin2 = v.findViewById(R.id.lin2);
 
         setRetainInstance(true);
 
