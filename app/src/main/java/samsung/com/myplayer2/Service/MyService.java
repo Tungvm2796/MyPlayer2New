@@ -16,6 +16,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.session.MediaSession;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -298,9 +299,6 @@ public class MyService extends Service implements
     private void getLastList(String type) {
 
         switch (type) {
-//            case Constants.SONG_TYPE:
-//                setAllSongs(function.getLastSongList(context, null));
-//                break;
             case Constants.ALBUM_TYPE:
                 setSongListOfAlbum(function.getLastSongList(context, "album_id LIKE '" + getLastString(Constants.LAST_ALBUMID) + "'"));
                 break;
@@ -473,54 +471,80 @@ public class MyService extends Service implements
 
     //skip to previous track
     public void playPrev() {
-        if (songs.size() == 0) {
-            setListType(getLastString(Constants.LAST_TYPE));
-            setLastGenres(getLastString(Constants.LAST_GENRES));
-            setLastKeyword(getLastString(Constants.LAST_KEYWORD));
-            getLastList(ListType);
-        }
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
 
-        progressHandler.removeCallbacks(run);
-        if (shuffle) {
-            int newSong = songPosn;
-            while (newSong == songPosn) {
-                newSong = rand.nextInt(songs.size());
+                if (songs.size() == 0) {
+                    setListType(getLastString(Constants.LAST_TYPE));
+                    setLastGenres(getLastString(Constants.LAST_GENRES));
+                    setLastKeyword(getLastString(Constants.LAST_KEYWORD));
+                    getLastList(ListType);
+                }
+
+                return null;
             }
-            songPosn = newSong;
-        } else {
-            songPosn--;
-            if (songPosn < 0) songPosn = songs.size() - 1;
-        }
-        
-        playSong(ListType);
-        updateProgress();
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                progressHandler.removeCallbacks(run);
+                if (shuffle) {
+                    int newSong = songPosn;
+                    while (newSong == songPosn) {
+                        newSong = rand.nextInt(songs.size());
+                    }
+                    songPosn = newSong;
+                } else {
+                    songPosn--;
+                    if (songPosn < 0) songPosn = songs.size() - 1;
+                }
+
+                playSong(ListType);
+                updateProgress();
+            }
+        }.execute();
     }
 
     //skip to next
     public void playNext() {
-        if (songs.size() == 0) {
-            setListType(getLastString(Constants.LAST_TYPE));
-            setLastGenres(getLastString(Constants.LAST_GENRES));
-            setLastKeyword(getLastString(Constants.LAST_KEYWORD));
-            getLastList(ListType);
-        }
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
 
-        progressHandler.removeCallbacks(run);
-        if (!repeat) {
-            if (shuffle) {
-                int newSong = songPosn;
-                while (newSong == songPosn) {
-                    newSong = rand.nextInt(songs.size());
+                if (songs.size() == 0) {
+                    setListType(getLastString(Constants.LAST_TYPE));
+                    setLastGenres(getLastString(Constants.LAST_GENRES));
+                    setLastKeyword(getLastString(Constants.LAST_KEYWORD));
+                    getLastList(ListType);
                 }
-                songPosn = newSong;
-            } else {
-                songPosn++;
-                if (songPosn >= songs.size()) songPosn = 0;
-            }
-        }
 
-        playSong(ListType);
-        updateProgress();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                progressHandler.removeCallbacks(run);
+                if (!repeat) {
+                    if (shuffle) {
+                        int newSong = songPosn;
+                        while (newSong == songPosn) {
+                            newSong = rand.nextInt(songs.size());
+                        }
+                        songPosn = newSong;
+                    } else {
+                        songPosn++;
+                        if (songPosn >= songs.size()) songPosn = 0;
+                    }
+                }
+
+                playSong(ListType);
+                updateProgress();
+            }
+        }.execute();
     }
 
     //toggle shuffle
@@ -567,11 +591,22 @@ public class MyService extends Service implements
                     //Toast.makeText(getApplicationContext(), songlen, Toast.LENGTH_SHORT).show();
 
                     if (songs.size() == 0) {
-                        setListType(getLastString(Constants.LAST_TYPE));
-                        setLastGenres(getLastString(Constants.LAST_GENRES));
-                        setLastKeyword(getLastString(Constants.LAST_KEYWORD));
-                        getLastList(ListType);
-                        playSong(ListType);
+                        new AsyncTask<Void, Void, Void>() {
+                            @Override
+                            protected Void doInBackground(Void... voids) {
+                                setListType(getLastString(Constants.LAST_TYPE));
+                                setLastGenres(getLastString(Constants.LAST_GENRES));
+                                setLastKeyword(getLastString(Constants.LAST_KEYWORD));
+                                getLastList(ListType);
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Void aVoid) {
+                                super.onPostExecute(aVoid);
+                                playSong(ListType);
+                            }
+                        }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                         //Toast.makeText(context, PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.LAST_TYPE, "0"), Toast.LENGTH_SHORT).show();
                     } else {
                         mController.getTransportControls().play();

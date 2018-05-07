@@ -558,13 +558,13 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        //If SlidingUp Panel is show, collapse it
-        if (slidingLayout != null &&
+        //If DrawerLayout is show, close it. Then if SlidingUp Panel is show, collapse it
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else if (slidingLayout != null &&
                 (slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED ||
                         slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED)) {
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-        } else if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
