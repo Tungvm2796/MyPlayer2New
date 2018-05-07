@@ -389,7 +389,9 @@ public class Function {
         //SortBySongName(ArraySong);
     }
 
-    public static void getLastSongList(Context mContext, String keyword, ArrayList<Song> ArraySong) {
+    public static ArrayList<Song> getLastSongList(Context mContext, String keyword) {
+        ArrayList<Song> ArraySong = new ArrayList<>();
+
         //retrieve song info
         //MediaMetadataRetriever mr = new MediaMetadataRetriever();
         String customQuery = " AND " + keyword;
@@ -436,9 +438,13 @@ public class Function {
             //Close Cursor when done
             musicCursor.close();
         }
+
+        return ArraySong;
     }
 
-    public static void getLastSongListOfGenres(Context mContext, String genres_name, ArrayList<Song> ArraySong) {
+    public static ArrayList<Song> getLastSongListOfGenres(Context mContext, String genres_name) {
+
+        ArrayList<Song> ArraySong = new ArrayList<>();
         //retrieve song info
         MediaMetadataRetriever mr = new MediaMetadataRetriever();
 
@@ -485,7 +491,7 @@ public class Function {
             //Close Cursor when done
             musicCursor.close();
         }
-        //SortBySongName(ArraySong);
+        return ArraySong;
     }
 
     public String getURLForResource(int resourceId) {

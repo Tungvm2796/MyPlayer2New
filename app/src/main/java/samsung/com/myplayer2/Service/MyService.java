@@ -230,33 +230,9 @@ public class MyService extends Service implements
     public void playSong(String type) {
         //play
         player.reset();
+
         //get song
-        if (type != null) {
-            switch (type) {
-                case Constants.SONG_TYPE:
-                    setList(musicStore.getAllsongs());
-                    break;
-                case Constants.ALBUM_TYPE:
-                    setList(musicStore.getSongListOfAlbum());
-                    break;
-                case Constants.ARTIST_TYPE:
-                    setList(musicStore.getSongListOfArtist());
-                    break;
-                case Constants.PLAYLIST_TYPE:
-                    setList(musicStore.getSongListOfPlaylist());
-                    break;
-                case Constants.GENRES_TYPE:
-                    setList(musicStore.getSongListOfGenres());
-                    break;
-                case Constants.SEARCH_TYPE:
-                    setList(musicStore.getSongListOfSearch());
-                    break;
-                case Constants.LAST_TYPE:
-                    setList(getLastList(PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.LAST_TYPE, "0")));
-                    songPosn = PreferenceManager.getDefaultSharedPreferences(context).getInt(Constants.LAST_POSITION, 0);
-                    break;
-            }
-        }
+        SetListByType(type);
 
         Song playSong = songs.get(songPosn);
         //get title
@@ -297,7 +273,7 @@ public class MyService extends Service implements
         //Store infomation of playing song, to resume the song and the list song after stop service and kill app
         shared = PreferenceManager.getDefaultSharedPreferences(context);
         editor = shared.edit();
-        //editor.clear();
+        //editor.clear();   //Luu y la sharedPreference tu dong xoa cap key-value truoc do bi trung
         editor.putInt(Constants.LAST_POSITION, songPosn);
         editor.putString(Constants.LAST_SONG_TITLE, songs.get(songPosn).getTitle());
         editor.putString(Constants.LAST_ARTIST, songs.get(songPosn).getArtist());
@@ -319,36 +295,62 @@ public class MyService extends Service implements
         });
     }
 
-    private ArrayList<Song> getLastList(String type) {
-        ArrayList<Song> arrayList = new ArrayList<>();
+    private void getLastList(String type) {
 
         switch (type) {
-            case Constants.SONG_TYPE:
-                function.getLastSongList(context, null, arrayList);
-                break;
+//            case Constants.SONG_TYPE:
+//                setAllSongs(function.getLastSongList(context, null));
+//                break;
             case Constants.ALBUM_TYPE:
-                function.getLastSongList(context, "album_id LIKE '" + getLastString(Constants.LAST_ALBUMID) + "'", arrayList);
+                setSongListOfAlbum(function.getLastSongList(context, "album_id LIKE '" + getLastString(Constants.LAST_ALBUMID) + "'"));
                 break;
             case Constants.ARTIST_TYPE:
-                function.getLastSongList(context, "artist LIKE '" + getLastString(Constants.LAST_ARTIST) + "'", arrayList);
+                setSongListOfArtist(function.getLastSongList(context, "artist LIKE '" + getLastString(Constants.LAST_ARTIST) + "'"));
                 break;
             case Constants.GENRES_TYPE:
-                function.getLastSongListOfGenres(context, getLastString(Constants.LAST_GENRES), arrayList);
+                setSongListOfGenres(function.getLastSongListOfGenres(context, getLastString(Constants.LAST_GENRES)));
                 break;
             case Constants.PLAYLIST_TYPE:
-                function.getLastSongList(context, null, arrayList);
+                setSongListOfPlaylist(function.getLastSongList(context, null));
                 break;
             case Constants.SEARCH_TYPE:
-                function.getLastSongList(context, "title LIKE '" + getLastString(Constants.LAST_KEYWORD) + "%'", arrayList);
+                setSongListOfSearch(function.getLastSongList(context, "title LIKE '" + getLastString(Constants.LAST_KEYWORD) + "%'"));
                 break;
         }
 
-        return arrayList;
+        SetListByType(type);
+
+        songPosn = PreferenceManager.getDefaultSharedPreferences(context).getInt(Constants.LAST_POSITION, 0);
     }
 
 
     private String getLastString(String key) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(key, "0");
+    }
+
+    private void SetListByType(String type) {
+        if (type != null) {
+            switch (type) {
+                case Constants.SONG_TYPE:
+                    setList(musicStore.getAllsongs());
+                    break;
+                case Constants.ALBUM_TYPE:
+                    setList(musicStore.getSongListOfAlbum());
+                    break;
+                case Constants.ARTIST_TYPE:
+                    setList(musicStore.getSongListOfArtist());
+                    break;
+                case Constants.PLAYLIST_TYPE:
+                    setList(musicStore.getSongListOfPlaylist());
+                    break;
+                case Constants.GENRES_TYPE:
+                    setList(musicStore.getSongListOfGenres());
+                    break;
+                case Constants.SEARCH_TYPE:
+                    setList(musicStore.getSongListOfSearch());
+                    break;
+            }
+        }
     }
 
     //set the song postion in list to play
@@ -471,6 +473,13 @@ public class MyService extends Service implements
 
     //skip to previous track
     public void playPrev() {
+        if (songs.size() == 0) {
+            setListType(getLastString(Constants.LAST_TYPE));
+            setLastGenres(getLastString(Constants.LAST_GENRES));
+            setLastKeyword(getLastString(Constants.LAST_KEYWORD));
+            getLastList(ListType);
+        }
+
         progressHandler.removeCallbacks(run);
         if (shuffle) {
             int newSong = songPosn;
@@ -481,13 +490,21 @@ public class MyService extends Service implements
         } else {
             songPosn--;
             if (songPosn < 0) songPosn = songs.size() - 1;
-            playSong(ListType);
         }
+        
+        playSong(ListType);
         updateProgress();
     }
 
     //skip to next
     public void playNext() {
+        if (songs.size() == 0) {
+            setListType(getLastString(Constants.LAST_TYPE));
+            setLastGenres(getLastString(Constants.LAST_GENRES));
+            setLastKeyword(getLastString(Constants.LAST_KEYWORD));
+            getLastList(ListType);
+        }
+
         progressHandler.removeCallbacks(run);
         if (!repeat) {
             if (shuffle) {
@@ -500,9 +517,8 @@ public class MyService extends Service implements
                 songPosn++;
                 if (songPosn >= songs.size()) songPosn = 0;
             }
-        } else if (repeat) {
-
         }
+
         playSong(ListType);
         updateProgress();
     }
@@ -542,9 +558,9 @@ public class MyService extends Service implements
                     //String songlen = Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("Position", 0));
                     //Toast.makeText(getApplicationContext(), songlen, Toast.LENGTH_SHORT).show();
 
-                        mController.getTransportControls().pause();
+                    mController.getTransportControls().pause();
 
-                        progressHandler.removeCallbacks(run);
+                    progressHandler.removeCallbacks(run);
 
                 } else if (intent.getStringExtra(Constants.KEY).equals(Constants.PLAY)) {
                     //String songlen = Integer.toString(PreferenceManager.getDefaultSharedPreferences(context).getInt("Position", 0));
@@ -554,7 +570,8 @@ public class MyService extends Service implements
                         setListType(getLastString(Constants.LAST_TYPE));
                         setLastGenres(getLastString(Constants.LAST_GENRES));
                         setLastKeyword(getLastString(Constants.LAST_KEYWORD));
-                        playSong(Constants.LAST_TYPE);
+                        getLastList(ListType);
+                        playSong(ListType);
                         //Toast.makeText(context, PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.LAST_TYPE, "0"), Toast.LENGTH_SHORT).show();
                     } else {
                         mController.getTransportControls().play();

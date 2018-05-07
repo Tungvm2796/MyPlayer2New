@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/song_title"
             android:gravity="left"
-            android:textColor="#bfb2b2" />
+            android:textColor="#988b8b" />
 
     </LinearLayout>
 
