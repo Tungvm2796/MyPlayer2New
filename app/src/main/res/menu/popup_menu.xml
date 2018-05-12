@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action1"
+        android:id="@+id/add_to_playlist"
         android:orderInCategory="100"
         android:title="@string/addToPlayList"
         app:showAsAction="never" />
@@ -17,7 +17,7 @@
         android:title="@string/toArtist"
         app:showAsAction="never" />
     <item
-        android:id="@+id/action2"
+        android:id="@+id/details"
         android:orderInCategory="100"
         android:title="@string/details"
         app:showAsAction="never" />

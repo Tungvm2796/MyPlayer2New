@@ -20,14 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Adapter.SongInAlbumAdapter;
+import samsung.com.myplayer2.Adapter.SongInPlaylistAdapter;
 import samsung.com.myplayer2.Class.Constants;
-import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
@@ -35,12 +32,15 @@ import samsung.com.myplayer2.Service.MyService;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class AlbumSongFragment extends Fragment {
+public class PlaylistSongFragment extends Fragment {
 
 
-    public AlbumSongFragment() {
+    public PlaylistSongFragment() {
         // Required empty public constructor
     }
+
+    Long playlistId;
+    String playlistName;
 
     MyService myService;
     private boolean musicBound = false;
@@ -48,21 +48,18 @@ public class AlbumSongFragment extends Fragment {
 
     Toolbar toolbar;
 
-    long albumID;
-    String albumName;
+    ImageView PlaylistImg;
+    SongInPlaylistAdapter adapter;
+    RecyclerView PlaylistSongView;
+    ArrayList<Song> SongOfPlaylist;
+    PlaylistFunction playlistFunction = new PlaylistFunction();
 
-    ImageView AlbumImg;
-    SongInAlbumAdapter adapter;
-    RecyclerView AlbumSongView;
-    ArrayList<Song> SongListOfAlbum;
-    Function function = new Function();
-
-    public static AlbumSongFragment getFragment(long albumId, String albumName) {
-        AlbumSongFragment fragment = new AlbumSongFragment();
+    public static PlaylistSongFragment getFragment(Long playlistID, String playlistName) {
+        PlaylistSongFragment fragment = new PlaylistSongFragment();
 
         Bundle args = new Bundle();
-        args.putLong(Constants.ALBUM_ID, albumId);
-        args.putString(Constants.ALBUM, albumName);
+        args.putLong(Constants.PLAYLIST_ID, playlistID);
+        args.putString(Constants.PLAYLIST_NAME, playlistName);
 
         fragment.setArguments(args);
         return fragment;
@@ -72,8 +69,8 @@ public class AlbumSongFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            albumID = getArguments().getLong(Constants.ALBUM_ID);
-            albumName = getArguments().getString(Constants.ALBUM);
+            playlistId = getArguments().getLong(Constants.PLAYLIST_ID);
+            playlistName = getArguments().getString(Constants.PLAYLIST_NAME);
         }
     }
 
@@ -81,27 +78,19 @@ public class AlbumSongFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_album_song, container, false);
+        View v = inflater.inflate(R.layout.fragment_playlist_song, container, false);
 
-        toolbar = (Toolbar) v.findViewById(R.id.toolbar);
+        toolbar = v.findViewById(R.id.toolbar);
         setupToolbar();
 
-        AlbumImg = v.findViewById(R.id.album_art);
-
-        //ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(getContext()));
-        ImageLoader.getInstance().displayImage(function.getAlbumArtUri(albumID).toString(), AlbumImg,
-                new DisplayImageOptions.Builder().cacheInMemory(true)
-                        .showImageOnLoading(R.drawable.album_none)
-                        .resetViewBeforeLoading(true).build());
-
-        SongListOfAlbum = new ArrayList<>();
-        AlbumSongView = v.findViewById(R.id.song_of_album);
-
-        adapter = new SongInAlbumAdapter((AppCompatActivity) getActivity(), SongListOfAlbum, true);
-        new GetSongOfAlbum().execute();
+        PlaylistImg = v.findViewById(R.id.playlist_art);
+        PlaylistSongView = v.findViewById(R.id.song_of_playlist);
+        SongOfPlaylist = new ArrayList<>();
 
         RecyclerView.LayoutManager mManager = new LinearLayoutManager(getContext());
-        AlbumSongView.setLayoutManager(mManager);
+        PlaylistSongView.setLayoutManager(mManager);
+
+        new LoadPlaylistSong().execute();
 
         return v;
     }
@@ -112,13 +101,7 @@ public class AlbumSongFragment extends Fragment {
 
         final ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        toolbar.setTitle(albumName);
-    }
-
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        setHasOptionsMenu(true);
+        toolbar.setTitle(playlistName);
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
@@ -129,7 +112,7 @@ public class AlbumSongFragment extends Fragment {
             myService = binder.getService();
 
             //pass list
-            myService.setSongListOfAlbum(SongListOfAlbum);
+            myService.setSongListOfPlaylist(SongOfPlaylist);
 
             musicBound = true;
         }
@@ -160,23 +143,18 @@ public class AlbumSongFragment extends Fragment {
         }
     }
 
-    class GetSongOfAlbum extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
+    class LoadPlaylistSong extends AsyncTask<Void, Void, Void>{
         @Override
         protected Void doInBackground(Void... voids) {
-            function.getSongListOfAlbum(getContext(), albumID, SongListOfAlbum);
+            playlistFunction.getSongsInPlaylist(getContext(), playlistId, SongOfPlaylist);
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            AlbumSongView.setAdapter(adapter);
+            adapter = new SongInPlaylistAdapter(getContext(), SongOfPlaylist, true);
+            PlaylistSongView.setAdapter(adapter);
         }
     }
-
 }

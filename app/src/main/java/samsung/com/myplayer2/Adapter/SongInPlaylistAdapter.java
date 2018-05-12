@@ -3,13 +3,16 @@ package samsung.com.myplayer2.Adapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,8 +27,8 @@ import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.ItemTouchHelperAdapter;
 import samsung.com.myplayer2.Class.ItemTouchHelperViewHolder;
-import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
 public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAdapter.MyRecyclerSongHolder> implements ItemTouchHelperAdapter {
@@ -36,10 +39,13 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
     ListView lv;
     Function function = new Function();
     private static String listId = "";
+    private int lastPosition = -1;
+    boolean animate;
 
-    public SongInPlaylistAdapter(Context context, ArrayList<Song> data) {
+    public SongInPlaylistAdapter(Context context, ArrayList<Song> data, boolean anim) {
         this.mContext = context;
         this.songs = data;
+        this.animate = anim;
     }
 
     public SongInPlaylistAdapter() {
@@ -48,7 +54,7 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
     public class MyRecyclerSongHolder extends RecyclerView.ViewHolder implements ItemTouchHelperViewHolder {
         TextView songView, artistView;
         ImageView coverimg;
-        Button btn;
+        ImageButton btn;
 
         public MyRecyclerSongHolder(View songLay) {
             super(songLay);
@@ -78,7 +84,9 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
     }
 
     @Override
-    public void onBindViewHolder(final SongInPlaylistAdapter.MyRecyclerSongHolder holder, final int position) {
+    public void onBindViewHolder(final SongInPlaylistAdapter.MyRecyclerSongHolder holder, int position) {
+        final int pos= position;
+
         //get song using position
         final Song currSong = songs.get(position);
 
@@ -98,7 +106,8 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
                 Context c = view.getContext();
                 Intent play = new Intent(Constants.TO_SERVICE);
                 play.setAction(Constants.SV_PLAYONE);
-                play.putExtra(Constants.POSITION, position);
+                play.putExtra(Constants.POSITION, pos);
+                play.putExtra(Constants.TYPE_NAME, Constants.PLAYLIST_TYPE);
                 c.sendBroadcast(play);
             }
         });
@@ -106,9 +115,27 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
         holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createPopUp(mContext, holder.btn, position);
+                createPopUp(mContext, holder.btn, pos);
             }
         });
+
+        if (animate) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                setAnimation(holder.itemView, pos);
+            else {
+                if (pos > 10)
+                    setAnimation(holder.itemView, pos);
+            }
+        }
+    }
+
+    private void setAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.abc_slide_in_bottom);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
     @Override

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -46,7 +47,7 @@ import samsung.com.myplayer2.Service.MyService;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.AlbumClickListener, RecyclerArtistAdapter.ArtistClickListener{
+public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.AlbumClickListener, RecyclerArtistAdapter.ArtistClickListener {
 
 
     public SearchFragment() {
@@ -136,7 +137,11 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
 
                 queryString = sug.getBody();
 
-                mSearchTask = new SearchTask().executeOnExecutor(executor, queryString);
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
+                    mSearchTask = new SearchTask().execute(queryString);
+                }else {
+                    mSearchTask = new SearchTask().executeOnExecutor(executor, queryString);
+                }
 
                 searchView.clearFocus();
             }
@@ -149,7 +154,11 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
                     mSearchTask = null;
                 }
 
-                mSearchTask = new SearchTask().executeOnExecutor(executor, currentQuery);
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB_MR1) {
+                    mSearchTask = new SearchTask().execute(currentQuery);
+                }else {
+                    mSearchTask = new SearchTask().executeOnExecutor(executor, currentQuery);
+                }
 
             }
         });
@@ -177,7 +186,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
         resultAlbum = new ArrayList<>();
         resultArtist = new ArrayList<>();
 
-        songAdapter = new RecyclerSongAdapter(getContext(), resultSong, true, false, false, false);
+        songAdapter = new RecyclerSongAdapter((AppCompatActivity) getActivity(), resultSong, true, false, false);
         albumAdapter = new RecyclerAlbumAdapter(getContext(), resultAlbum, false);
         artistAdapter = new RecyclerArtistAdapter(getContext(), resultArtist, false);
 
@@ -286,7 +295,7 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
     @Override
     public void onAlbumClick(RecyclerAlbumAdapter.MyRecyclerAlbumHolder view, int position) {
         NavigationHelper.navigateToSongAlbum(getActivity(), resultAlbum.get(position).getId()
-            ,resultAlbum.get(position).getAlbumName(), null);
+                , resultAlbum.get(position).getAlbumName(), null);
     }
 
     @Override

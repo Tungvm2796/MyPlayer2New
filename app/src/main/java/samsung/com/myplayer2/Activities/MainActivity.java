@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -221,7 +222,7 @@ public class MainActivity extends BaseActivity {
                 } else if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     if (myService.isPng())
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
-                    btnHide.setVisibility(View.VISIBLE);
+                    //btnHide.setVisibility(View.VISIBLE);
                     btnPlayPauseSmall.setVisibility(View.INVISIBLE);
                     dragView2.setBackgroundColor(0xbb424242);
                     txtTitle.setTextColor(Color.WHITE);
@@ -354,18 +355,21 @@ public class MainActivity extends BaseActivity {
 
     private void initPermission() {
         if (Build.VERSION.SDK_INT >= 23) {
-            //if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-            //}
-            //if (checkSelfPermission(Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
+            }
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            }
+            if (checkSelfPermission(Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.WAKE_LOCK}, 1);
-            //}
-            //if (checkSelfPermission(Manifest.permission.MEDIA_CONTENT_CONTROL) != PackageManager.PERMISSION_GRANTED) {
+            }
+            if (checkSelfPermission(Manifest.permission.MEDIA_CONTENT_CONTROL) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.MEDIA_CONTENT_CONTROL}, 1);
-            //}
-            //if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+            }
+            if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.INTERNET}, 1);
-            //}
+            }
         }
     }
 
@@ -494,6 +498,10 @@ public class MainActivity extends BaseActivity {
     protected void onPause() {
         unregisterReceiver(myMainBroadcast);
 
+        Intent toPl = new Intent(Constants.TO_PLAYLIST);
+        toPl.setAction("Unregister");
+        sendBroadcast(toPl);
+
         mLyricsPlugin.doUnbindService();
 
         super.onPause();
@@ -574,7 +582,7 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (isNavigatingMain()) {
+                if (isNavigatingMain() || isNavigatingPlayList()) {
                     drawerLayout.openDrawer(GravityCompat.START);
                 } else super.onBackPressed();
                 return true;
@@ -658,6 +666,11 @@ public class MainActivity extends BaseActivity {
     private boolean isNavigatingMain() {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         return (currentFragment instanceof MainFragment);
+    }
+
+    private boolean isNavigatingPlayList() {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        return (currentFragment instanceof PlaylistFragment);
     }
 
 }

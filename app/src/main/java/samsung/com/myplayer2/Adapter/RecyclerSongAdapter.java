@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
+import samsung.com.myplayer2.Dialogs.AddToPlaylistDialog;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -43,22 +44,20 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
 
 
     private ArrayList<Song> songs;
-    Context mContext;
+    AppCompatActivity mContext;
     ArrayList<String> Namelist;
     ListView lv;
     Function function = new Function();
     boolean isResult;
     boolean isGenres;
-    boolean isPlaylist;
     boolean animate;
     private int lastPosition = -1;
 
-    public RecyclerSongAdapter(Context context, ArrayList<Song> data, boolean search, boolean genres, boolean pl, boolean anim) {
+    public RecyclerSongAdapter(AppCompatActivity context, ArrayList<Song> data, boolean search, boolean genres, boolean anim) {
         this.mContext = context;
         this.songs = data;
         this.isResult = search;
         this.isGenres = genres;
-        this.isPlaylist = pl;
         this.animate = anim;
     }
 
@@ -126,8 +125,6 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                     play.putExtra(Constants.TYPE_NAME, Constants.SEARCH_TYPE);
                 } else if (isGenres) {
                     play.putExtra(Constants.TYPE_NAME, Constants.GENRES_TYPE);
-                } else if (isPlaylist) {
-                    play.putExtra(Constants.TYPE_NAME, Constants.PLAYLIST_TYPE);
                 } else {
                     play.putExtra(Constants.TYPE_NAME, Constants.SONG_TYPE);
                 }
@@ -166,6 +163,14 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
         return songs.size();
     }
 
+    public void updateListSong(ArrayList<Song> update) {
+        this.songs = update;
+    }
+
+    public ArrayList<Song> GetListSong() {
+        return this.songs;
+    }
+
     private void createPopUp(Context context, View view, final int curpos) {
 
 
@@ -177,11 +182,44 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-
                 switch (item.getItemId()) {
+                    case R.id.add_to_playlist:
+                        AddToPlaylistDialog.newInstance(songs.get(curpos)).show(mContext.getSupportFragmentManager(), "ADD_PLAYLIST");
+                        break;
 
-                    case R.id.action1:
+                    case R.id.go_to_album:
+                        NavigationHelper.navigateToSongAlbum((AppCompatActivity) mContext, songs.get(curpos).getAlbumid()
+                                , songs.get(curpos).getAlbum(), null);
+                        break;
 
+                    case R.id.go_to_artist:
+                        NavigationHelper.navigateToSongArtist((AppCompatActivity) mContext, songs.get(curpos).getArtist(), null);
+                        break;
+
+                    case R.id.details:
+
+                        break;
+                }
+                return false;
+            }
+        });
+        //displaying the popup
+        popup.show();
+    }
+
+    private void createPopUp2(Context context, View view, final int curpos) {
+
+
+        //creating a popup menu for song in songlist
+        PopupMenu popup = new PopupMenu(context, view);
+        //inflating menu from xml resource
+        popup.inflate(R.menu.popup_menu);
+        //adding click listener
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.add_to_playlist:
                         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                         View customview = inflater.inflate(R.layout.alert_layout, null);
                         lv = customview.findViewById(R.id.listPlaylist);
@@ -229,7 +267,7 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
 
                         break;
 
-                    case R.id.action2:
+                    case R.id.details:
 
                         break;
 
@@ -278,13 +316,5 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
 //        });
 //        //displaying the popup
 //        popup2.show();
-    }
-
-    public void updateListSong(ArrayList<Song> update) {
-        this.songs = update;
-    }
-
-    public ArrayList<Song> GetListSong() {
-        return this.songs;
     }
 }

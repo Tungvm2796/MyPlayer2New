@@ -72,19 +72,19 @@ public class Function {
         return image;
     }
 
-    public byte[] BitmapToByte(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        if (bitmap != null)
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        return stream.toByteArray();
-    }
-
     public byte[] GetBitMapByte(String filePath) {
         MediaMetadataRetriever mData = new MediaMetadataRetriever();
         mData.setDataSource(filePath);
 
         //byte art[] = mData.getEmbeddedPicture();
         return mData.getEmbeddedPicture();
+    }
+
+    public byte[] BitmapToByte(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        if (bitmap != null)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        return stream.toByteArray();
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newWidth, int newHeight) {
@@ -370,14 +370,14 @@ public class Function {
                 String thisData = musicCursor.getString(4);
                 long albumId = musicCursor.getLong(5);
 
-                Uri trackUri = MediaStore.Audio.Genres.getContentUriForAudioId("external", (int)thisId);
-                Cursor genresCursor = mContext.getContentResolver().query(trackUri, Column, null ,null, MediaStore.Audio.Genres.DEFAULT_SORT_ORDER);
+                Uri trackUri = MediaStore.Audio.Genres.getContentUriForAudioId("external", (int) thisId);
+                Cursor genresCursor = mContext.getContentResolver().query(trackUri, Column, null, null, MediaStore.Audio.Genres.DEFAULT_SORT_ORDER);
 
                 String genres;
-                if(genresCursor != null && genresCursor.moveToFirst() ) {
+                if (genresCursor != null && genresCursor.moveToFirst()) {
                     genres = genresCursor.getString(0);
                     genresCursor.close();
-                }else {
+                } else {
                     genres = null;
                 }
 
@@ -497,6 +497,8 @@ public class Function {
         }
         return ArraySong;
     }
+
+
 
     public String getURLForResource(int resourceId) {
         return Uri.parse("android.resource://" + R.class.getPackage().getName() + "/" + resourceId).toString();

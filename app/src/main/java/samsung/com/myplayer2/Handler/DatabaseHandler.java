@@ -99,7 +99,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         if (cursor.moveToFirst()) {
             do {
                 Playlist playlist = new Playlist();
-                playlist.setListid(cursor.getString(0));
+                playlist.setListid(cursor.getLong(0));
                 playlist.setName(cursor.getString(1));
                 // Adding contact to list
                 returnlist.add(playlist);

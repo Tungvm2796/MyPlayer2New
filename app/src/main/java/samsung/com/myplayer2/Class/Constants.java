@@ -39,6 +39,8 @@ public class Constants {
     public static final String ARTIST = "artist_name";
     public static final String GENRES = "genres_name";
     public static final String SONG_PATH = "song_path";
+    public static final String PLAYLIST_ID = "playlist_id";
+    public static final String PLAYLIST_NAME = "playlist_name";
 
     public static final String NAVIGATE_LYRICS = "navigate_lyrics";
     public static final String NAVIGATE_SEARCH = "navigate_search";
@@ -61,4 +63,8 @@ public class Constants {
     public static final String TIME_SONG = "timeSong";
     public static final String SEEKBAR = "seekbar";
 
+    public static final String TO_PLAYLIST = "ToPlaylist";
+    public static final String RELOAD_PLAYLIST = "ReloadPlaylist";
+
+    public static final String MYPLAYER_PL_CR = "zzMyPlayer_PlayList_Createdzz";
 }

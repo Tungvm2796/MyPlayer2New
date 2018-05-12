@@ -633,7 +633,7 @@ public class MyService extends Service implements
 
                 Intent intent4 = new Intent(Constants.TO_ACTIVITY);
                 intent4.setAction(Constants.PLAY_PAUSE);
-                intent4.putExtra(Constants.KEY, Constants.PAUSE);
+                intent4.putExtra(Constants.KEY, Constants.PLAY);
                 sendBroadcast(intent4);
 
             } else if (intent.getAction().compareTo(AudioManager.ACTION_AUDIO_BECOMING_NOISY) == 0) {

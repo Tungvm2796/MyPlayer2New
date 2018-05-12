@@ -5,23 +5,24 @@ package samsung.com.myplayer2.Model;
  */
 
 public class Playlist {
-    String listid;
+    long listid;
     String name;
+    int songCount;
 
     public Playlist() {
     }
 
-    public Playlist(String listid, String name) {
+    public Playlist(long listid, String name, int count) {
         this.listid = listid;
         this.name = name;
-
+        this.songCount = count;
     }
 
-    public String getListid() {
+    public Long getListid() {
         return listid;
     }
 
-    public void setListid(String listid) {
+    public void setListid(Long listid) {
         this.listid = listid;
     }
 
@@ -31,6 +32,14 @@ public class Playlist {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getSongCount() {
+        return songCount;
+    }
+
+    public void setSongCount(int songCount) {
+        this.songCount = songCount;
     }
 
 }

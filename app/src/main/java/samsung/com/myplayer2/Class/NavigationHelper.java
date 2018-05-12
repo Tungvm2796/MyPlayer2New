@@ -17,6 +17,7 @@ import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Fragments.AlbumSongFragment;
 import samsung.com.myplayer2.Fragments.ArtistSongFragment;
 import samsung.com.myplayer2.Fragments.GenresSongFragment;
+import samsung.com.myplayer2.Fragments.PlaylistSongFragment;
 import samsung.com.myplayer2.Fragments.SearchFragment;
 import samsung.com.myplayer2.R;
 
@@ -93,6 +94,30 @@ public class NavigationHelper {
         }
         transaction.hide(((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.fragment_container));
         transaction.add(R.id.fragment_container, fragment); //replace() can show transition effect but not nice, so just use fade effect
+        transaction.addToBackStack(null).commit();
+    }
+
+    public static void navigateToSongPlaylist(Activity context, Long playlistID, String playlistName, View view) {
+
+        FragmentTransaction transaction = ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction();
+        Fragment fragment;
+
+//        transaction.setCustomAnimations(R.anim.activity_fade_in,
+//                R.anim.activity_fade_out, R.anim.activity_fade_in, R.anim.activity_fade_out);
+        fragment = PlaylistSongFragment.getFragment(playlistID, playlistName);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            fragment.setSharedElementEnterTransition(new DetailsTransition());
+            fragment.setEnterTransition(new Fade());
+            fragment.setExitTransition(new Fade());
+            fragment.setSharedElementReturnTransition(new DetailsTransition());
+        }
+
+        if(view != null) {
+            transaction.addSharedElement(view,  "transition_artist_art");
+        }
+        transaction.hide(((AppCompatActivity) context).getSupportFragmentManager().findFragmentById(R.id.fragment_container));
+        transaction.add(R.id.fragment_container, fragment); //replace() can show transition effect but need to reload fragment, so just use fade effect
         transaction.addToBackStack(null).commit();
     }
 

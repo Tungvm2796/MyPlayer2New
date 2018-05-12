@@ -97,7 +97,7 @@ public class GenresSongFragment extends Fragment {
         RecyclerView.LayoutManager manager = new LinearLayoutManager(getContext());
         genresSongView.setLayoutManager(manager);
 
-        genresSongAdt = new RecyclerSongAdapter(getContext(), SongListOfGenres, false, true, false, true);
+        genresSongAdt = new RecyclerSongAdapter((AppCompatActivity) getActivity(), SongListOfGenres, false, true, true);
         new GetSongOfGenres().execute();
 
         return v;

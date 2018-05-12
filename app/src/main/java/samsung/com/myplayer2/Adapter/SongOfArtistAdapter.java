@@ -1,10 +1,8 @@
 package samsung.com.myplayer2.Adapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -14,12 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -29,21 +25,21 @@ import java.util.ArrayList;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
-import samsung.com.myplayer2.Handler.DatabaseHandler;
+import samsung.com.myplayer2.Dialogs.AddToPlaylistDialog;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
 public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapter.MyRecyclerSongHolder> {
 
     private ArrayList<Song> songs;
-    Context mContext;
+    AppCompatActivity mContext;
     ArrayList<String> Namelist;
     ListView lv;
     Function function = new Function();
     boolean animate;
     private int lastPosition = -1;
 
-    public SongOfArtistAdapter(Context context, ArrayList<Song> data, boolean anim) {
+    public SongOfArtistAdapter(AppCompatActivity context, ArrayList<Song> data, boolean anim) {
         this.mContext = context;
         this.songs = data;
         this.animate = anim;
@@ -144,65 +140,22 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-
                 switch (item.getItemId()) {
-
-                    case R.id.action1:
-
-                        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        View customview = inflater.inflate(R.layout.alert_layout, null);
-                        lv = customview.findViewById(R.id.listPlaylist);
-                        Namelist = new ArrayList<>();
-                        final DatabaseHandler db = new DatabaseHandler(mContext);
-                        Namelist = db.GetAllPlaylistName();
-                        SongAdapter adapter = new SongAdapter(mContext, Namelist);
-                        lv.setAdapter(adapter);
-
-                        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> adapterView, View view, int pos, long l) {
-                                long idsong = songs.get(curpos).getID();
-                                String idpl = db.getIdByName(Namelist.get(pos));
-                                if (!db.CheckSongAdded(Long.toString(idsong), idpl)) {
-                                    db.addSongToPlaylist(Long.toString(idsong), idpl);
-                                    Toast.makeText(mContext, "Song added", Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(mContext, "Song already Exist !", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-                        });
-
-                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext, R.style.AlertDialogTheme);
-                        alertDialog.setTitle("Add To Playlist");
-                        alertDialog.setMessage("Select Playlist Name");
-
-                        alertDialog.setView(customview);
-
-                        alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
-
-                        alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                            }
-                        });
-
-                        AlertDialog alert = alertDialog.create();
-                        alert.show();
-
-                        break;
-
-                    case R.id.action2:
-
+                    case R.id.add_to_playlist:
+                        AddToPlaylistDialog.newInstance(songs.get(curpos)).show(mContext.getSupportFragmentManager(), "ADD_PLAYLIST");
                         break;
 
                     case R.id.go_to_album:
-                        NavigationHelper.navigateToSongAlbum((AppCompatActivity)mContext, songs.get(curpos).getAlbumid()
-                                ,songs.get(curpos).getAlbum(), null);
+                        NavigationHelper.navigateToSongAlbum((AppCompatActivity) mContext, songs.get(curpos).getAlbumid()
+                                , songs.get(curpos).getAlbum(), null);
+                        break;
+
+                    case R.id.go_to_artist:
+                        NavigationHelper.navigateToSongArtist((AppCompatActivity) mContext, songs.get(curpos).getArtist(), null);
+                        break;
+
+                    case R.id.details:
+
                         break;
                 }
                 return false;
@@ -210,36 +163,6 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
         });
         //displaying the popup
         popup.show();
-
-
-        //creating a popup menu for playlist song
-//        PopupMenu popup2 = new PopupMenu(context, view);
-//        //inflating menu from xml resource
-//        popup2.inflate(R.menu.popup_menu_in_playlist);
-//        //adding click listener
-//        popup2.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-//            @Override
-//            public boolean onMenuItemClick(MenuItem item) {
-//
-//                switch (item.getItemId()) {
-//
-//                    case R.id.action_in_pl_1:
-//                        long idsong = songs.get(curpos).getID();
-//
-//                        Intent remove = new Intent("ToPlaylist");
-//                        remove.setAction("Remove");
-//                        remove.putExtra("songid", idsong);
-//                        mContext.sendBroadcast(remove);
-//
-//                        break;
-//
-//                    case R.id.action_in_pl_2:
-//                        break;
-//                }
-//                return false;
-//            }
-//        });
-//        //displaying the popup
-//        popup2.show();
+        popup.getMenu().findItem(R.id.go_to_artist).setVisible(false);
     }
 }

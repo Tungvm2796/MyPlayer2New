@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -117,7 +118,7 @@ public class SongListFragment extends Fragment {
         @Override
         protected Void doInBackground(Void... voids) {
             function.getSongs(getActivity(), null, SongList);
-            songAdt = new RecyclerSongAdapter(getActivity(), SongList, false, false, false, false);
+            songAdt = new RecyclerSongAdapter((AppCompatActivity) getActivity(), SongList, false, false, false);
             return null;
         }
 
