@@ -21,6 +21,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 import java.util.ArrayList;
 
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Class.ToolFunction;
 import samsung.com.myplayer2.Model.Album;
 import samsung.com.myplayer2.R;
 
@@ -100,7 +101,7 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
                                     if (swatch != null) {
                                         int color = swatch.getRgb();
                                         holder.footer.setBackgroundColor(color);
-                                        int textColor = function.getBlackWhiteColor(swatch.getTitleTextColor());
+                                        int textColor = ToolFunction.getBlackWhiteColor(swatch.getTitleTextColor());
                                         holder.albumName.setTextColor(textColor);
                                         holder.albumArtist.setTextColor(textColor);
                                     } else {
@@ -108,7 +109,7 @@ public class RecyclerAlbumAdapter extends RecyclerView.Adapter<RecyclerAlbumAdap
                                         if (mutedSwatch != null) {
                                             int color = mutedSwatch.getRgb();
                                             holder.footer.setBackgroundColor(color);
-                                            int textColor = function.getBlackWhiteColor(mutedSwatch.getTitleTextColor());
+                                            int textColor = ToolFunction.getBlackWhiteColor(mutedSwatch.getTitleTextColor());
                                             holder.albumName.setTextColor(textColor);
                                             holder.albumArtist.setTextColor(textColor);
                                         }

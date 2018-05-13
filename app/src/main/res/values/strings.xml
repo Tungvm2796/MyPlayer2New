@@ -20,6 +20,8 @@
     <string name="toAlbum">Go to Album</string>
     <string name="toArtist">Go to Artist</string>
     <string name="removeFromPlaylist">Remove from Playlist</string>
+    <string name="share">Share</string>
+    <string name="delete">Delete from device</string>
 
     <string name="allSong">All Song</string>
     <string name="Songs">Songs</string>

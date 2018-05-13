@@ -16,6 +16,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import samsung.com.myplayer2.Adapter.RecyclerSongAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Dialogs.AddToPlaylistDialog;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
@@ -116,6 +120,22 @@ public class GenresSongFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.add_all_song_to_playlist, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_add_all_song_to_playlist:
+                AddToPlaylistDialog.newInstance(genresSongAdt.getSongIds()).show(getActivity().getSupportFragmentManager(), "ADD_PLAYLIST");
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {

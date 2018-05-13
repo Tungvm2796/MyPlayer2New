@@ -36,6 +36,7 @@ import java.util.Random;
 import samsung.com.myplayer2.Activities.MainActivity;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Handler.MusicStore;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -78,6 +79,8 @@ public class MyService extends Service implements
     private String LastKeyword = "";
     //LastGenres choosen
     private String LastGenres = "";
+    //Last Playlist choosen
+    private Long LastPlaylistId = Long.valueOf(1);
     //Number of song list in Fragments
     private int ListNumberFrag = 1;
     //current position
@@ -283,6 +286,7 @@ public class MyService extends Service implements
         editor.putString(Constants.LAST_TYPE, ListType);
         editor.putString(Constants.LAST_KEYWORD, LastKeyword);
         editor.putString(Constants.LAST_GENRES, LastGenres);
+        editor.putLong(Constants.LAST_PLAYLIST_ID, LastPlaylistId);
         editor.apply();
 
         //Prepare
@@ -309,7 +313,7 @@ public class MyService extends Service implements
                 setSongListOfGenres(function.getLastSongListOfGenres(context, getLastString(Constants.LAST_GENRES)));
                 break;
             case Constants.PLAYLIST_TYPE:
-                setSongListOfPlaylist(function.getLastSongList(context, null));
+                setSongListOfPlaylist(PlaylistFunction.getLastSongsInPlaylist(context, getLastLongId(Constants.LAST_PLAYLIST_ID)));
                 break;
             case Constants.SEARCH_TYPE:
                 setSongListOfSearch(function.getLastSongList(context, "title LIKE '" + getLastString(Constants.LAST_KEYWORD) + "%'"));
@@ -324,6 +328,10 @@ public class MyService extends Service implements
 
     private String getLastString(String key) {
         return PreferenceManager.getDefaultSharedPreferences(context).getString(key, "0");
+    }
+
+    private Long getLastLongId(String key){
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.LAST_PLAYLIST_ID, 1);
     }
 
     private void SetListByType(String type) {
@@ -479,6 +487,7 @@ public class MyService extends Service implements
                     setListType(getLastString(Constants.LAST_TYPE));
                     setLastGenres(getLastString(Constants.LAST_GENRES));
                     setLastKeyword(getLastString(Constants.LAST_KEYWORD));
+                    setLastPlaylistId(getLastLongId(Constants.LAST_PLAYLIST_ID));
                     getLastList(ListType);
                 }
 
@@ -517,6 +526,7 @@ public class MyService extends Service implements
                     setListType(getLastString(Constants.LAST_TYPE));
                     setLastGenres(getLastString(Constants.LAST_GENRES));
                     setLastKeyword(getLastString(Constants.LAST_KEYWORD));
+                    setLastPlaylistId(getLastLongId(Constants.LAST_PLAYLIST_ID));
                     getLastList(ListType);
                 }
 
@@ -597,6 +607,7 @@ public class MyService extends Service implements
                                 setListType(getLastString(Constants.LAST_TYPE));
                                 setLastGenres(getLastString(Constants.LAST_GENRES));
                                 setLastKeyword(getLastString(Constants.LAST_KEYWORD));
+                                setLastPlaylistId(getLastLongId(Constants.LAST_PLAYLIST_ID));
                                 getLastList(ListType);
                                 return null;
                             }
@@ -777,6 +788,10 @@ public class MyService extends Service implements
 
     public void setLastGenres(String key) {
         LastGenres = key;
+    }
+
+    public void setLastPlaylistId(Long Id){
+        LastPlaylistId = Id;
     }
 
     public Song getCurSong() {

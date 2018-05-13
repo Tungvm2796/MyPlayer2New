@@ -1,9 +1,11 @@
 package samsung.com.myplayer2.Fragments;
 
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +17,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +27,7 @@ import java.util.ArrayList;
 
 import samsung.com.myplayer2.Adapter.SongInPlaylistAdapter;
 import samsung.com.myplayer2.Class.Constants;
+import samsung.com.myplayer2.Class.EditItemTouchHelperCallback;
 import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -54,6 +58,8 @@ public class PlaylistSongFragment extends Fragment {
     ArrayList<Song> SongOfPlaylist;
     PlaylistFunction playlistFunction = new PlaylistFunction();
 
+    ItemTouchHelper mItemTouchHelper;
+
     public static PlaylistSongFragment getFragment(Long playlistID, String playlistName) {
         PlaylistSongFragment fragment = new PlaylistSongFragment();
 
@@ -79,6 +85,10 @@ public class PlaylistSongFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_playlist_song, container, false);
+
+        IntentFilter toPlaylistSong = new IntentFilter(Constants.TO_PLAYLIST_SONG);
+        toPlaylistSong.addAction(Constants.RELOAD_PLAYLIST_SONG);
+        getActivity().registerReceiver(PlaylistSongBroadcast, toPlaylistSong);
 
         toolbar = v.findViewById(R.id.toolbar);
         setupToolbar();
@@ -113,6 +123,7 @@ public class PlaylistSongFragment extends Fragment {
 
             //pass list
             myService.setSongListOfPlaylist(SongOfPlaylist);
+            myService.setLastPlaylistId(playlistId);
 
             musicBound = true;
         }
@@ -143,6 +154,19 @@ public class PlaylistSongFragment extends Fragment {
         }
     }
 
+    BroadcastReceiver PlaylistSongBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() != null) {
+                if (intent.getAction().equals(Constants.RELOAD_PLAYLIST_SONG)) {
+                    myService.setSongListOfPlaylist(adapter.getSongs());
+                } else if (intent.getAction().equals("Unregister")) {
+                    getActivity().unregisterReceiver(PlaylistSongBroadcast);
+                }
+            }
+        }
+    };
+
     class LoadPlaylistSong extends AsyncTask<Void, Void, Void>{
         @Override
         protected Void doInBackground(Void... voids) {
@@ -153,7 +177,14 @@ public class PlaylistSongFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            adapter = new SongInPlaylistAdapter(getContext(), SongOfPlaylist, true);
+            adapter = new SongInPlaylistAdapter((AppCompatActivity) getActivity(), SongOfPlaylist, true);
+
+            ItemTouchHelper.Callback callback =
+                    new EditItemTouchHelperCallback(adapter);
+            mItemTouchHelper = new ItemTouchHelper(callback);
+            mItemTouchHelper.attachToRecyclerView(PlaylistSongView);
+
+            adapter.setPlaylistId(playlistId);
             PlaylistSongView.setAdapter(adapter);
         }
     }

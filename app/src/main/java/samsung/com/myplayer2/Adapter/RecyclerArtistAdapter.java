@@ -22,7 +22,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 
 import java.util.ArrayList;
 
-import samsung.com.myplayer2.Class.Function;
+import samsung.com.myplayer2.Class.ToolFunction;
 import samsung.com.myplayer2.Model.Artist;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.lastfmapi.LastFmClient;
@@ -39,7 +39,7 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
     private ArrayList<Artist> artists;
     private ArtistClickListener mClickListener;
     Context mContext;
-    Function function = new Function();
+    //Function function = new Function();
     boolean isGrid;
 
     public RecyclerArtistAdapter(Context context, ArrayList<Artist> artistList, boolean Grid) {
@@ -95,9 +95,9 @@ public class RecyclerArtistAdapter extends RecyclerView.Adapter<RecyclerArtistAd
         Artist curArtist = artists.get(position);
 
         holder.artistName.setText(curArtist.getName());
-        String albumNmber = function.makeLabel(mContext, R.plurals.Nalbums, curArtist.getAlbumCount());
-        String songCount = function.makeLabel(mContext, R.plurals.Nsongs, curArtist.getSongCount());
-        holder.count.setText(function.makeCombinedString(mContext, albumNmber, songCount));
+        String albumNmber = ToolFunction.makeLabel(mContext, R.plurals.Nalbums, curArtist.getAlbumCount());
+        String songCount = ToolFunction.makeLabel(mContext, R.plurals.Nsongs, curArtist.getSongCount());
+        holder.count.setText(ToolFunction.makeCombinedString(mContext, albumNmber, songCount));
 
         LastFmClient.getInstance(mContext).getArtistInfo(new ArtistQuery(curArtist.getName()), new ArtistInfoListener() {
             @Override

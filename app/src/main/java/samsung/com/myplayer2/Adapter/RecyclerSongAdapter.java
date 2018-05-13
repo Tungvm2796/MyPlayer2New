@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
+import samsung.com.myplayer2.Class.ToolFunction;
 import samsung.com.myplayer2.Dialogs.AddToPlaylistDialog;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
 import samsung.com.myplayer2.Model.Song;
@@ -196,8 +197,8 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                         NavigationHelper.navigateToSongArtist((AppCompatActivity) mContext, songs.get(curpos).getArtist(), null);
                         break;
 
-                    case R.id.details:
-
+                    case R.id.share:
+                        ToolFunction.shareTrack(mContext, songs.get(curpos).getData());
                         break;
                 }
                 return false;
@@ -267,10 +268,6 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
 
                         break;
 
-                    case R.id.details:
-
-                        break;
-
                     case R.id.go_to_album:
                         NavigationHelper.navigateToSongAlbum((AppCompatActivity) mContext, songs.get(curpos).getAlbumid()
                                 , songs.get(curpos).getAlbum(), null);
@@ -316,5 +313,14 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
 //        });
 //        //displaying the popup
 //        popup2.show();
+    }
+
+    public long[] getSongIds() {
+        long[] ret = new long[getItemCount()];
+        for (int i = 0; i < getItemCount(); i++) {
+            ret[i] = songs.get(i).getID();
+        }
+
+        return ret;
     }
 }

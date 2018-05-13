@@ -56,7 +56,7 @@ public class PlaylistFunction {
         return mPlaylistList;
     }
 
-    public static void addToPlaylist(final Context context, final long[] ids, final long playlistid) {
+    public static int addToPlaylist(final Context context, final long[] ids, final long playlistid) {
         final int size = ids.length;
 
         final ContentResolver resolver = context.getContentResolver();
@@ -88,6 +88,8 @@ public class PlaylistFunction {
             makeInsertItems(ids, offSet, 1000, base);
             numinserted += resolver.bulkInsert(uri, mContentValuesCache);
         }
+
+        return numinserted;
     }
 
     public static void makeInsertItems(final long[] ids, final int offset, int len, final int base) {
@@ -174,7 +176,13 @@ public class PlaylistFunction {
         context.getContentResolver().delete(localUri, localStringBuilder.toString(), null);
     }
 
-
+    public static void removeFromPlaylist(Context context, long id, long playlistId) {
+        final Uri uri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId);
+        final ContentResolver resolver = context.getContentResolver();
+        resolver.delete(uri, MediaStore.Audio.Playlists.Members.AUDIO_ID + " = ? ", new String[]{
+                Long.toString(id)
+        });
+    }
 
 
 
@@ -188,8 +196,6 @@ public class PlaylistFunction {
         //final int playlistCount = countPlaylist(context, mPlaylistID);
 
         mCursor = makePlaylistSongCursor(context, mPlaylistID);
-
-
 
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -244,7 +250,81 @@ public class PlaylistFunction {
                         MediaStore.Audio.AudioColumns.ALBUM,
                         MediaStore.Audio.AudioColumns.DATA,
                         MediaStore.Audio.AudioColumns.ALBUM_ID,
-//                        MediaStore.Audio.AudioColumns.DURATION,
+                        //MediaStore.Audio.AudioColumns.DURATION,
+                        MediaStore.Audio.Playlists.Members.PLAY_ORDER,
+                }, mSelection.toString(), null,
+                MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
+    }
+
+
+
+    public static ArrayList<Song> getLastSongsInPlaylist(Context context, long playlistID) {
+        ArrayList<Song> mSongList = new ArrayList<>();
+
+        mPlaylistID = playlistID;
+
+        //final int playlistCount = countPlaylist(context, mPlaylistID);
+
+        mCursor = makeLastPlaylistSongCursor(context, mPlaylistID);
+
+
+
+        if (mCursor != null && mCursor.moveToFirst()) {
+            do {
+
+                final long id = mCursor.getLong(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.Playlists.Members.AUDIO_ID));
+
+                final String songName = mCursor.getString(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.TITLE));
+
+                final String artist = mCursor.getString(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ARTIST));
+
+                final String album = mCursor.getString(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM));
+
+                final String data = mCursor.getString(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DATA));
+
+                final long albumId = mCursor.getLong(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM_ID));
+
+
+//                final long duration = mCursor.getLong(mCursor
+//                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
+//
+//                final int durationInSecs = (int) duration / 1000;
+
+                final Song song = new Song(id, songName, artist, album, data, albumId, null);
+
+                mSongList.add(song);
+            } while (mCursor.moveToNext());
+        }
+        // Close the cursor
+        if (mCursor != null) {
+            mCursor.close();
+            mCursor = null;
+        }
+
+        return mSongList;
+    }
+
+    public static final Cursor makeLastPlaylistSongCursor(final Context context, final Long playlistID) {
+        final StringBuilder mSelection = new StringBuilder();
+        mSelection.append(MediaStore.Audio.AudioColumns.IS_MUSIC + "=1");
+        mSelection.append(" AND " + MediaStore.Audio.AudioColumns.TITLE + " != ''");
+        return context.getContentResolver().query(
+                MediaStore.Audio.Playlists.Members.getContentUri("external", playlistID),
+                new String[]{
+                        MediaStore.Audio.Playlists.Members._ID,
+                        MediaStore.Audio.Playlists.Members.AUDIO_ID,
+                        MediaStore.Audio.AudioColumns.TITLE,
+                        MediaStore.Audio.AudioColumns.ARTIST,
+                        MediaStore.Audio.AudioColumns.ALBUM,
+                        MediaStore.Audio.AudioColumns.DATA,
+                        MediaStore.Audio.AudioColumns.ALBUM_ID,
+                        //MediaStore.Audio.AudioColumns.DURATION,
                         MediaStore.Audio.Playlists.Members.PLAY_ORDER,
                 }, mSelection.toString(), null,
                 MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);

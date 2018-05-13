@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.provider.MediaStore;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,31 +23,34 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.ItemTouchHelperAdapter;
 import samsung.com.myplayer2.Class.ItemTouchHelperViewHolder;
-import samsung.com.myplayer2.Handler.DatabaseHandler;
+import samsung.com.myplayer2.Class.PlaylistFunction;
+import samsung.com.myplayer2.Class.ToolFunction;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
 public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAdapter.MyRecyclerSongHolder> implements ItemTouchHelperAdapter {
 
     private ArrayList<Song> songs;
-    Context mContext;
+    AppCompatActivity mContext;
     ArrayList<String> Namelist;
     ListView lv;
     Function function = new Function();
     private static String listId = "";
     private int lastPosition = -1;
     boolean animate;
+    private long playlistId;
+    private long[] songIDs;
 
-    public SongInPlaylistAdapter(Context context, ArrayList<Song> data, boolean anim) {
+    public SongInPlaylistAdapter(AppCompatActivity context, ArrayList<Song> data, boolean anim) {
         this.mContext = context;
         this.songs = data;
         this.animate = anim;
+        this.songIDs = getSongIds();
     }
 
     public SongInPlaylistAdapter() {
@@ -85,7 +90,7 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
 
     @Override
     public void onBindViewHolder(final SongInPlaylistAdapter.MyRecyclerSongHolder holder, int position) {
-        final int pos= position;
+        final int pos = position;
 
         //get song using position
         final Song currSong = songs.get(position);
@@ -109,13 +114,14 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
                 play.putExtra(Constants.POSITION, pos);
                 play.putExtra(Constants.TYPE_NAME, Constants.PLAYLIST_TYPE);
                 c.sendBroadcast(play);
+                //Toast.makeText(mContext, Integer.toString(pos), Toast.LENGTH_SHORT).show();
             }
         });
 
         holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createPopUp(mContext, holder.btn, pos);
+                createPopUp(holder.btn, pos);
             }
         });
 
@@ -138,14 +144,18 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
         }
     }
 
+    public void setPlaylistId(long playlistId) {
+        this.playlistId = playlistId;
+    }
+
     @Override
     public int getItemCount() {
         return songs.size();
     }
 
-    private void createPopUp(Context context, View view, final int curpos) {
+    private void createPopUp(View view, final int curpos) {
         //creating a popup menu
-        PopupMenu popup2 = new PopupMenu(context, view);
+        PopupMenu popup2 = new PopupMenu(mContext, view);
         //inflating menu from xml resource
         popup2.inflate(R.menu.popup_menu_in_playlist);
         //adding click listener
@@ -155,17 +165,20 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
 
                 switch (item.getItemId()) {
 
-                    case R.id.action_in_pl_1:
-                        long idsong = songs.get(curpos).getID();
+                    case R.id.action_remove_from_playlist:
+                        PlaylistFunction.removeFromPlaylist(mContext, songs.get(curpos).getID(), playlistId);
+                        removeSongAt(curpos);
+                        notifyItemRemoved(curpos);
+                        notifyDataSetChanged();
 
-                        Intent remove = new Intent("ToPlaylist");
-                        remove.setAction("Remove");
-                        remove.putExtra("songid", idsong);
-                        mContext.sendBroadcast(remove);
+                        Intent playlist = new Intent(Constants.TO_PLAYLIST_SONG);
+                        playlist.setAction(Constants.RELOAD_PLAYLIST_SONG);
+                        mContext.sendBroadcast(playlist);
 
                         break;
 
-                    case R.id.action_in_pl_2:
+                    case R.id.action_share:
+                        ToolFunction.shareTrack(mContext, songs.get(curpos).getData());
                         break;
                 }
                 return false;
@@ -179,40 +192,79 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
     public boolean onItemMove(int fromPosition, int toPosition) {
 
         if (fromPosition < songs.size() && toPosition < songs.size()) {
-            if (fromPosition < toPosition) {
-                for (int i = fromPosition; i < toPosition; i++) {
-                    Collections.swap(songs, i, i + 1);
-                }
-            } else {
-                for (int i = fromPosition; i > toPosition; i--) {
-                    Collections.swap(songs, i, i - 1);
-                }
-            }
-
-            DatabaseHandler db = new DatabaseHandler(mContext);
-            db.SwapSongOfPlaylist(listId, Long.toString(songs.get(fromPosition).getID()), Long.toString(songs.get(toPosition).getID()));
-            db.close();
+//            if (fromPosition < toPosition) {
+//                for (int i = fromPosition; i < toPosition; i++) {
+//                    Collections.swap(songs, i, i + 1);
+//                }
+//            } else {
+//                for (int i = fromPosition; i > toPosition; i--) {
+//                    Collections.swap(songs, i, i - 1);
+//                }
+//            }
+            Song song = getSongAt(fromPosition);
+            removeSongAt(fromPosition);
+            addSongTo(toPosition, song);
             notifyItemMoved(fromPosition, toPosition);
-
-            Intent change = new Intent("ToPlaylist");
-            change.setAction("Changed");
-            mContext.sendBroadcast(change);
         }
 
         return true;
     }
 
     @Override
+    public void onItemMoved(int fromPosition, int toPosition) {
+
+        MediaStore.Audio.Playlists.Members.moveItem(mContext.getContentResolver(),
+                playlistId, fromPosition, toPosition);
+    }
+
+    @Override
+    public void afterItemMoved() {
+
+        notifyDataSetChanged();
+
+        Intent change = new Intent(Constants.TO_PLAYLIST_SONG);
+        change.setAction(Constants.RELOAD_PLAYLIST_SONG);
+        mContext.sendBroadcast(change);
+    }
+
+    @Override
     public void onItemDismiss(int position) {
-        songs.remove(position);
+        removeSongAt(position);
         notifyItemRemoved(position);
     }
 
-    public void setListId(String id){
+    public void setListId(String id) {
         listId = id;
     }
 
     public ArrayList<Song> getSongs() {
         return songs;
+    }
+
+    public long[] getSongIds() {
+        long[] ret = new long[getItemCount()];
+        for (int i = 0; i < getItemCount(); i++) {
+            ret[i] = songs.get(i).getID();
+        }
+
+        return ret;
+    }
+
+    public void updateDataSet(ArrayList<Song> arraylist) {
+        this.songs = arraylist;
+        this.songIDs = getSongIds();
+    }
+
+    public void removeSongAt(int i) {
+        songs.remove(i);
+        updateDataSet(songs);
+    }
+
+    public Song getSongAt(int i) {
+        return songs.get(i);
+    }
+
+    public void addSongTo(int i, Song song) {
+        songs.add(i, song);
     }
 }

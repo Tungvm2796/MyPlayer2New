@@ -32,6 +32,7 @@ public class Constants {
     public static final String LAST_SONG_TITLE = "last_song_title";
     public static final String LAST_PATH = "last_path";
     public static final String LAST_GENRES = "last_genres";
+    public static final String LAST_PLAYLIST_ID = "last_playlistId";
 
     public static final String SONG_TITLE = "song_title";
     public static final String ALBUM_ID = "album_id";
@@ -64,7 +65,9 @@ public class Constants {
     public static final String SEEKBAR = "seekbar";
 
     public static final String TO_PLAYLIST = "ToPlaylist";
+    public static final String TO_PLAYLIST_SONG = "ToPlaylistSong";
     public static final String RELOAD_PLAYLIST = "ReloadPlaylist";
+    public static final String RELOAD_PLAYLIST_SONG = "ReloadPlaylistSong";
 
     public static final String MYPLAYER_PL_CR = "zzMyPlayer_PlayList_Createdzz";
 }

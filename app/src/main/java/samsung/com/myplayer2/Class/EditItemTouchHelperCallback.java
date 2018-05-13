@@ -42,9 +42,17 @@ public class EditItemTouchHelperCallback extends ItemTouchHelper.Callback {
     }
 
     @Override
+    public void onMoved(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, int fromPos, RecyclerView.ViewHolder target, int toPos, int x, int y) {
+        SongInPlaylistAdt.onItemMoved(fromPos, toPos);
+    }
+
+    @Override
     public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
         // We only want the active item
-        if (actionState != ItemTouchHelper.ACTION_STATE_IDLE) {
+
+        if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+            SongInPlaylistAdt.afterItemMoved();
+        } else {
             if (viewHolder instanceof ItemTouchHelperViewHolder) {
                 ItemTouchHelperViewHolder itemViewHolder =
                         (ItemTouchHelperViewHolder) viewHolder;

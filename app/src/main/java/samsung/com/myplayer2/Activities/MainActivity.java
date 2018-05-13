@@ -502,6 +502,10 @@ public class MainActivity extends BaseActivity {
         toPl.setAction("Unregister");
         sendBroadcast(toPl);
 
+        Intent toPlSong = new Intent(Constants.TO_PLAYLIST_SONG);
+        toPl.setAction("Unregister");
+        sendBroadcast(toPlSong);
+
         mLyricsPlugin.doUnbindService();
 
         super.onPause();
