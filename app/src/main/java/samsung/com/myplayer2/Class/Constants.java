@@ -68,6 +68,7 @@ public class Constants {
     public static final String TO_PLAYLIST_SONG = "ToPlaylistSong";
     public static final String RELOAD_PLAYLIST = "ReloadPlaylist";
     public static final String RELOAD_PLAYLIST_SONG = "ReloadPlaylistSong";
+    public static final int DELETE_PLAYLIST = 9999;
 
     public static final String MYPLAYER_PL_CR = "zzMyPlayer_PlayList_Createdzz";
 }

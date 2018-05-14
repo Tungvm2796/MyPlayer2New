@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -14,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,13 +28,11 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 import samsung.com.myplayer2.Adapter.RecyclerPlaylistAdapter;
-import samsung.com.myplayer2.Adapter.SongInPlaylistAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.NavigationHelper;
 import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Dialogs.CreatePlaylistDialog;
 import samsung.com.myplayer2.Model.Playlist;
-import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 import samsung.com.myplayer2.Service.MyService;
 
@@ -54,23 +52,23 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
     ArrayList<Playlist> playlists;
     EditText edt;
     RecyclerPlaylistAdapter PlaylistAdapter;
-    SongInPlaylistAdapter songAdapterPlaylist;
-    ArrayList<Song> songOfPlaylist;
-    ArrayList<Song> AllSong;
-    ArrayList<String> songIdArray;
     int pos;
-    PlaylistFunction Plfunction;
-    ItemTouchHelper mItemTouchHelper;
 
     Toolbar toolbar;
+
+    private static Context mContext;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mContext = getActivity();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_playlist, container, false);
-
-        Plfunction = new PlaylistFunction();
 
         IntentFilter toPlaylist = new IntentFilter(Constants.TO_PLAYLIST);
         toPlaylist.addAction(Constants.RELOAD_PLAYLIST);
@@ -86,7 +84,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
         playListView = v.findViewById(R.id.PlayListView);
 
         playlists = new ArrayList<>();
-        playlists = Plfunction.getPlaylists(getActivity());
+        playlists = PlaylistFunction.getPlaylists(getActivity());
 
         initRecyclerView();
 
@@ -128,7 +126,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
     @Override
     public void onPlaylistClick(RecyclerPlaylistAdapter.MyRecyclerPlaylistHolder holder, int position) {
         NavigationHelper.navigateToSongPlaylist(getActivity(), playlists.get(position).getListid()
-                , getSubString(playlists.get(position).getName()), holder.ListImg);
+                , playlists.get(position).getName(), holder.ListImg);
     }
 
     @Override
@@ -208,7 +206,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null) {
                 if (intent.getAction().equals(Constants.RELOAD_PLAYLIST)) {
-                    reloadPlaylists();
+                    updatePlaylists();
                 } else if (intent.getAction().equals("Unregister")) {
                     getActivity().unregisterReceiver(PlaylistBroadcast);
                 }
@@ -217,17 +215,23 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
     };
 
     public void reloadPlaylists() {
-        playlists = PlaylistFunction.getPlaylists(getActivity());
+        playlists = PlaylistFunction.getPlaylists(mContext);
         int playlistcount = playlists.size();
 
         initRecyclerView();
 
     }
 
+    public void updatePlaylists() {
+        playlists = PlaylistFunction.getPlaylists(mContext);
+
+        PlaylistAdapter.updateDataSet(playlists);
+    }
+
     private void initRecyclerView() {
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         playListView.setLayoutManager(mManager);
-        PlaylistAdapter = new RecyclerPlaylistAdapter(getContext(), playlists);
+        PlaylistAdapter = new RecyclerPlaylistAdapter(getContext(), playlists, true);
         PlaylistAdapter.setPlaylistClickListener(this);
         playListView.setAdapter(PlaylistAdapter);
     }

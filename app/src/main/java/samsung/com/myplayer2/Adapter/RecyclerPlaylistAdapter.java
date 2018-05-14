@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -12,16 +13,23 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import java.util.ArrayList;
 
 import samsung.com.myplayer2.Class.Constants;
+import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Model.Playlist;
+import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
 /**
@@ -33,10 +41,13 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
     private ArrayList<Playlist> playList;
     private PlaylistClickListener mClickListener;
     Context mContext;
+    private int lastPosition = -1;
+    boolean animate;
 
-    public RecyclerPlaylistAdapter(Context context, ArrayList<Playlist> PList) {
+    public RecyclerPlaylistAdapter(Context context, ArrayList<Playlist> PList, boolean anim) {
         this.mContext = context;
         this.playList = PList;
+        this.animate = anim;
     }
 
     public class MyRecyclerPlaylistHolder extends RecyclerView.ViewHolder{
@@ -83,7 +94,7 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
         final int pos = position;
         Playlist curPlayList = playList.get(position);
 
-        holder.ListName.setText(getSubString(curPlayList.getName()));
+        holder.ListName.setText(curPlayList.getName());
         holder.ListName.setTextColor(Color.BLACK);
         holder.SongCount.setText(Integer.toString(curPlayList.getSongCount()) + " songs");
 //        TypedArray images = mContext.getResources().obtainTypedArray(R.array.array_drawables);
@@ -91,6 +102,11 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
 //        GlideDrawableImageViewTarget target = new GlideDrawableImageViewTarget(holder.ListImg);
 //        Glide.with(mContext).load(images.getResourceId(choice, R.drawable.pic5)).into(target);
 //        images.recycle();
+
+        ImageLoader.getInstance().displayImage(getArtUri(curPlayList.getListid()), holder.ListImg
+        , new DisplayImageOptions.Builder().cacheInMemory(true)
+        .showImageOnFail(R.drawable.noteicon)
+        .resetViewBeforeLoading(true).build());
 
         holder.btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,12 +132,30 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
             }
         });
 
+        if (animate) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                setAnimation(holder.itemView, pos);
+            else {
+                if (pos > 10)
+                    setAnimation(holder.itemView, pos);
+            }
+        }
+
         // It is important that each shared element in the source screen has a unique transition name.
         // For example, we can't just give all the images in our grid the transition name "kittenImage"
         // because then we would have conflicting transition names.
         // By appending "_image" to the position, we can support having multiple shared elements in each
         // grid cell in the future.
         ViewCompat.setTransitionName(holder.ListImg, String.valueOf(position) + "_playlist_image");
+    }
+
+    private void setAnimation(View viewToAnimate, int position) {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > lastPosition) {
+            Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.abc_slide_in_bottom);
+            viewToAnimate.startAnimation(animation);
+            lastPosition = position;
+        }
     }
 
     @Override
@@ -159,7 +193,7 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
                     case R.id.action_delete_playlist:
                         AlertDialog.Builder aat = new AlertDialog.Builder(context);
                         aat.setTitle("Delete ?")
-                                .setMessage("Are you sure to delete "+getSubString(playList.get(curpos).getName())+" ?")
+                                .setMessage("Are you sure to delete "+playList.get(curpos).getName()+" ?")
                                 .setCancelable(true)
                                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                     @Override
@@ -197,5 +231,22 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
 
     private String getSubString(String entry){
         return entry.substring(0, entry.indexOf(Constants.MYPLAYER_PL_CR));
+    }
+
+    private String getArtUri(long id){
+        ArrayList<Song> pl = new ArrayList<>();
+        PlaylistFunction.getSongsInPlaylist(mContext, id, pl);
+
+        if(pl.size() > 0) {
+            return Function.getAlbumArtUri(pl.get(0).getAlbumid()).toString();
+        }else {
+            return "";
+        }
+    }
+
+    public void updateDataSet(ArrayList<Playlist> arraylist) {
+        this.playList.clear();
+        this.playList.addAll(arraylist);
+        notifyDataSetChanged();
     }
 }

@@ -20,6 +20,7 @@ public class PlaylistFunction {
 
     private static ContentValues[] mContentValuesCache = null;
 
+    static ArrayList<Playlist> mPlaylistList;
     private static Cursor mCursor;
 
     private static long mPlaylistID;
@@ -31,9 +32,9 @@ public class PlaylistFunction {
     //Get Data of Playlist------------------------------------------------------------
     public static ArrayList<Playlist> getPlaylists(Context context) {
 
-        ArrayList<Playlist> mPlaylistList = new ArrayList<>();
+        mPlaylistList = new ArrayList<>();
 
-        Cursor mCursor = makePlaylistCursor(context);
+        mCursor = makePlaylistCursor(context);
 
         if (mCursor != null && mCursor.moveToFirst()) {
             do {
@@ -164,9 +165,9 @@ public class PlaylistFunction {
                 new String[]{
                         BaseColumns._ID,
                         MediaStore.Audio.PlaylistsColumns.NAME
-                }, "name LIKE '%"+Constants.MYPLAYER_PL_CR+"'", null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
+                }, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
     }
-
+//"name LIKE '%"+Constants.MYPLAYER_PL_CR+"'"
     public static void deletePlaylists(Context context, long playlistId) {
         Uri localUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         StringBuilder localStringBuilder = new StringBuilder();

@@ -20,6 +20,12 @@
             android:contentDescription="Image"
             android:scaleType="centerCrop" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_alignParentBottom="true"
+            android:background="#75b9b9b9"/>
+
         <TextView
             android:id="@+id/playlist_name"
             android:layout_width="match_parent"
