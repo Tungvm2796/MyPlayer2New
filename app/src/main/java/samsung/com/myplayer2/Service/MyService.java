@@ -330,7 +330,7 @@ public class MyService extends Service implements
         return PreferenceManager.getDefaultSharedPreferences(context).getString(key, "0");
     }
 
-    private Long getLastLongId(String key){
+    private Long getLastLongId(String key) {
         return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.LAST_PLAYLIST_ID, 1);
     }
 
@@ -497,21 +497,24 @@ public class MyService extends Service implements
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-
-                progressHandler.removeCallbacks(run);
-                if (shuffle) {
-                    int newSong = songPosn;
-                    while (newSong == songPosn) {
-                        newSong = rand.nextInt(songs.size());
+                try {
+                    progressHandler.removeCallbacks(run);
+                    if (shuffle) {
+                        int newSong = songPosn;
+                        while (newSong == songPosn) {
+                            newSong = rand.nextInt(songs.size());
+                        }
+                        songPosn = newSong;
+                    } else {
+                        songPosn--;
+                        if (songPosn < 0) songPosn = songs.size() - 1;
                     }
-                    songPosn = newSong;
-                } else {
-                    songPosn--;
-                    if (songPosn < 0) songPosn = songs.size() - 1;
-                }
 
-                playSong(ListType);
-                updateProgress();
+                    playSong(ListType);
+                    updateProgress();
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Audio not found or List songs is null", Toast.LENGTH_SHORT).show();
+                }
             }
         }.execute();
     }
@@ -536,23 +539,26 @@ public class MyService extends Service implements
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-
-                progressHandler.removeCallbacks(run);
-                if (!repeat) {
-                    if (shuffle) {
-                        int newSong = songPosn;
-                        while (newSong == songPosn) {
-                            newSong = rand.nextInt(songs.size());
+                try {
+                    progressHandler.removeCallbacks(run);
+                    if (!repeat) {
+                        if (shuffle) {
+                            int newSong = songPosn;
+                            while (newSong == songPosn) {
+                                newSong = rand.nextInt(songs.size());
+                            }
+                            songPosn = newSong;
+                        } else {
+                            songPosn++;
+                            if (songPosn >= songs.size()) songPosn = 0;
                         }
-                        songPosn = newSong;
-                    } else {
-                        songPosn++;
-                        if (songPosn >= songs.size()) songPosn = 0;
                     }
-                }
 
-                playSong(ListType);
-                updateProgress();
+                    playSong(ListType);
+                    updateProgress();
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Audio not found or List songs is null", Toast.LENGTH_SHORT).show();
+                }
             }
         }.execute();
     }
@@ -615,7 +621,11 @@ public class MyService extends Service implements
                             @Override
                             protected void onPostExecute(Void aVoid) {
                                 super.onPostExecute(aVoid);
-                                playSong(ListType);
+                                try {
+                                    playSong(ListType);
+                                } catch (Exception e) {
+                                    Toast.makeText(getApplicationContext(), "Audio not found or List songs is null", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
                         //Toast.makeText(context, PreferenceManager.getDefaultSharedPreferences(context).getString(Constants.LAST_TYPE, "0"), Toast.LENGTH_SHORT).show();
@@ -790,7 +800,7 @@ public class MyService extends Service implements
         LastGenres = key;
     }
 
-    public void setLastPlaylistId(Long Id){
+    public void setLastPlaylistId(Long Id) {
         LastPlaylistId = Id;
     }
 
