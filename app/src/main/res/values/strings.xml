@@ -23,6 +23,8 @@
     <string name="share">Share</string>
     <string name="delete">Delete from device</string>
 
+    <string name="recent">Recent</string>
+    <string name="library">Library</string>
     <string name="allSong">All Song</string>
     <string name="Songs">Songs</string>
     <string name="albums">Albums</string>

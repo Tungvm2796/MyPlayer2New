@@ -21,6 +21,8 @@ public class MusicStore {
     private ArrayList<Song> SongListOfGenres;
     //List from Search
     private ArrayList<Song> SongListOfSearch;
+    //Recent Song List
+    private ArrayList<Song> SongListOfRecent;
 
 
 
@@ -70,5 +72,13 @@ public class MusicStore {
 
     public void setSongListOfSearch(ArrayList<Song> songListOfSearch) {
         SongListOfSearch = songListOfSearch;
+    }
+
+    public ArrayList<Song> getSongListOfRecent() {
+        return SongListOfRecent;
+    }
+
+    public void setSongListOfRecent(ArrayList<Song> songListOfRecent) {
+        SongListOfRecent = songListOfRecent;
     }
 }

@@ -56,7 +56,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
 
     Toolbar toolbar;
 
-    private static Context mContext;
+    private Context mContext;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

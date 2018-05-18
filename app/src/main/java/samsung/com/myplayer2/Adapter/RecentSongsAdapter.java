@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -24,14 +23,12 @@ import android.widget.Toast;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
-import samsung.com.myplayer2.Class.RcFunction;
 import samsung.com.myplayer2.Class.ToolFunction;
 import samsung.com.myplayer2.Dialogs.AddToPlaylistDialog;
 import samsung.com.myplayer2.Handler.DatabaseHandler;
@@ -42,7 +39,7 @@ import samsung.com.myplayer2.R;
  * Created by 450G4 on 3/10/2018.
  */
 
-public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> implements FastScrollRecyclerView.SectionedAdapter {
+public class RecentSongsAdapter extends RecyclerView.Adapter<RecentSongsAdapter.RecentSongHolder> {
 
 
     private ArrayList<Song> songs;
@@ -50,34 +47,24 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
     ArrayList<String> Namelist;
     ListView lv;
     Function function = new Function();
-    boolean isResult;
-    boolean isGenres;
     boolean animate;
     private int lastPosition = -1;
 
-    public RecyclerSongAdapter(AppCompatActivity context, ArrayList<Song> data, boolean search, boolean genres, boolean anim) {
+    public RecentSongsAdapter(AppCompatActivity context, ArrayList<Song> data, boolean anim) {
         this.mContext = context;
         this.songs = data;
-        this.isResult = search;
-        this.isGenres = genres;
         this.animate = anim;
     }
 
-    public RecyclerSongAdapter() {
+    public RecentSongsAdapter() {
     }
 
-    @NonNull
-    @Override
-    public String getSectionName(int position) {
-        return songs.get(position).getTitle().substring(0, 1);
-    }
-
-    public class MyRecyclerSongHolder extends RecyclerView.ViewHolder {
+    public class RecentSongHolder extends RecyclerView.ViewHolder {
         TextView songView, artistView;
         ImageView coverimg;
         ImageButton btn;
 
-        public MyRecyclerSongHolder(View songLay) {
+        public RecentSongHolder(View songLay) {
             super(songLay);
             //get title and artist views
             songView = songLay.findViewById(R.id.song_title);
@@ -87,15 +74,15 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
         }
     }
 
-    public MyRecyclerSongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecentSongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //map to song layout
         View songView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.song, parent, false);
-        return new MyRecyclerSongHolder(songView);
+        return new RecentSongHolder(songView);
     }
 
     @Override
-    public void onBindViewHolder(final MyRecyclerSongHolder holder, int position) {
+    public void onBindViewHolder(final RecentSongHolder holder, int position) {
         //get song using position
         final Song currSong = songs.get(position);
         final int pos = position;
@@ -123,15 +110,8 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                 Intent play = new Intent(Constants.TO_SERVICE);
                 play.setAction(Constants.SV_PLAYONE);
                 play.putExtra(Constants.POSITION, pos);
-                if (isResult) {
-                    play.putExtra(Constants.TYPE_NAME, Constants.SEARCH_TYPE);
-                } else if (isGenres) {
-                    play.putExtra(Constants.TYPE_NAME, Constants.GENRES_TYPE);
-                } else {
-                    play.putExtra(Constants.TYPE_NAME, Constants.SONG_TYPE);
-                }
+                play.putExtra(Constants.TYPE_NAME, Constants.RECENT_TYPE);
                 c.sendBroadcast(play);
-                RcFunction.AddRecent(mContext, Constants.RECENT_SONG_ID, songs.get(pos).getID());
             }
         });
 

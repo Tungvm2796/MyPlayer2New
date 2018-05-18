@@ -47,7 +47,7 @@ public class CreatePlaylistDialog extends android.support.v4.app.DialogFragment 
             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
 
                 long[] songs = getArguments().getLongArray("songs");
-                long playistId = PlaylistFunction.createPlaylist(getActivity(), input.toString() + Constants.MYPLAYER_PL_CR);
+                long playistId = PlaylistFunction.createPlaylist(getActivity(), input.toString());
 
                 if (playistId != -1) {
                     if (songs != null && songs.length != 0)

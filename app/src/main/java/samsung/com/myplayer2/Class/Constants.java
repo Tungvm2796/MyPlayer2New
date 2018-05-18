@@ -16,6 +16,11 @@ public class Constants {
 
     public static final String NAVIGATE_LIBRARY = "navigate_library";
     public static final String NAVIGATE_PLAYLIST = "navigate_playlist";
+    public static final String NAVIGATE_LYRICS = "navigate_lyrics";
+    public static final String NAVIGATE_RECENT = "navigate_recent";
+    public static final String NAVIGATE_SEARCH = "navigate_search";
+    public static final String NAVIGATE_ALBUM = "navigate_album";
+    public static final String NAVIGATE_ARTIST = "navigate_artist";
 
     public static final String TYPE_NAME = "type_name";
     public static final String SONG_TYPE = "song_type";
@@ -24,6 +29,7 @@ public class Constants {
     public static final String PLAYLIST_TYPE = "playlist_type";
     public static final String GENRES_TYPE = "genres_type";
     public static final String SEARCH_TYPE = "search_type";
+    public static final String RECENT_TYPE = "recent_type";
     public static final String LAST_TYPE = "last_type";
 
     public static final String LAST_ALBUMID = "last_albumId";
@@ -42,11 +48,6 @@ public class Constants {
     public static final String SONG_PATH = "song_path";
     public static final String PLAYLIST_ID = "playlist_id";
     public static final String PLAYLIST_NAME = "playlist_name";
-
-    public static final String NAVIGATE_LYRICS = "navigate_lyrics";
-    public static final String NAVIGATE_SEARCH = "navigate_search";
-    public static final String NAVIGATE_ALBUM = "navigate_album";
-    public static final String NAVIGATE_ARTIST = "navigate_artist";
 
     public static final String TO_ACTIVITY = "ToActivity";
     public static final String TO_SERVICE = "ToService";
@@ -71,4 +72,7 @@ public class Constants {
     public static final int DELETE_PLAYLIST = 9999;
 
     public static final String MYPLAYER_PL_CR = "zzMyPlayer_PlayList_Createdzz";
+
+    public static final String RECENT_ALBUM_ID = "recent_album_id";
+    public static final String RECENT_SONG_ID = "recent_song_id";
 }

@@ -49,6 +49,7 @@ import samsung.com.myplayer2.Fragments.ArtistSongFragment;
 import samsung.com.myplayer2.Fragments.LyricsFragment;
 import samsung.com.myplayer2.Fragments.MainFragment;
 import samsung.com.myplayer2.Fragments.PlaylistFragment;
+import samsung.com.myplayer2.Fragments.RecentFragment;
 import samsung.com.myplayer2.Fragments.SearchFragment;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -136,6 +137,17 @@ public class MainActivity extends BaseActivity {
         }
     };
 
+    private Runnable navigateRecent = new Runnable() {
+        public void run() {
+            navigationView.getMenu().findItem(R.id.nav_recent).setChecked(true);
+            Fragment fragment = new RecentFragment();
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.hide(getSupportFragmentManager().findFragmentById(R.id.fragment_container));
+            transaction.replace(R.id.fragment_container, fragment).commit();
+
+        }
+    };
+
     //Tam thoi chua su dung
     private Runnable navigateAlbum = new Runnable() {
         public void run() {
@@ -183,6 +195,7 @@ public class MainActivity extends BaseActivity {
         navigationMap.put(Constants.NAVIGATE_LIBRARY, navigateLibrary);
         navigationMap.put(Constants.NAVIGATE_PLAYLIST, navigatePlaylist);
         navigationMap.put(Constants.NAVIGATE_LYRICS, navigateLyrics);
+        navigationMap.put(Constants.NAVIGATE_RECENT, navigateRecent);
         navigationMap.put(Constants.NAVIGATE_ALBUM, navigateAlbum);
         navigationMap.put(Constants.NAVIGATE_ARTIST, navigateArtist);
         navigationMap.put(Constants.NAVIGATE_SEARCH, navigateSearch);
@@ -356,19 +369,19 @@ public class MainActivity extends BaseActivity {
     private void initPermission() {
         if (Build.VERSION.SDK_INT >= 23) {
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
             }
             if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
             }
             if (checkSelfPermission(Manifest.permission.WAKE_LOCK) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.WAKE_LOCK}, 1);
+                requestPermissions(new String[]{Manifest.permission.WAKE_LOCK}, 1);
             }
             if (checkSelfPermission(Manifest.permission.MEDIA_CONTENT_CONTROL) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.MEDIA_CONTENT_CONTROL}, 1);
+                requestPermissions(new String[]{Manifest.permission.MEDIA_CONTENT_CONTROL}, 1);
             }
             if (checkSelfPermission(Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.INTERNET}, 1);
+                requestPermissions(new String[]{Manifest.permission.INTERNET}, 1);
             }
         }
     }
@@ -487,7 +500,11 @@ public class MainActivity extends BaseActivity {
         txtTitle.setText(saveTitle);
         txtArtist.setText(saveArtist);
         if (!savePath.equals("0"))
-            Glide.with(context).load(function.GetBitMapByte(savePath)).into(imgDisc);
+            try {
+                Glide.with(context).load(function.GetBitMapByte(savePath)).into(imgDisc);
+            } catch (Exception e) {
+                Glide.with(context).load(R.drawable.noteicon).into(imgDisc);
+            }
 
         mLyricsPlugin.doBindService();
 
@@ -586,7 +603,7 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (isNavigatingMain() || isNavigatingPlayList()) {
+                if (isNavigatingMain() || isNavigatingPlayList() || isNavigatingRecent()) {
                     drawerLayout.openDrawer(GravityCompat.START);
                 } else super.onBackPressed();
                 return true;
@@ -628,6 +645,11 @@ public class MainActivity extends BaseActivity {
 
             case R.id.nav_playlist:
                 runnable = navigatePlaylist;
+
+                break;
+
+            case R.id.nav_recent:
+                runnable = navigateRecent;
 
                 break;
 
@@ -677,4 +699,8 @@ public class MainActivity extends BaseActivity {
         return (currentFragment instanceof PlaylistFragment);
     }
 
+    private boolean isNavigatingRecent() {
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        return (currentFragment instanceof RecentFragment);
+    }
 }

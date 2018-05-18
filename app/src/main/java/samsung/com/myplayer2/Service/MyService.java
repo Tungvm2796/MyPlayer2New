@@ -29,6 +29,7 @@ import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -99,6 +100,8 @@ public class MyService extends Service implements
     private Random rand;
 
     public static boolean bothRun = true;
+
+    private boolean recent = false;
 
     public Context context;
 
@@ -231,7 +234,7 @@ public class MyService extends Service implements
     }
 
     //play a song
-    public void playSong(String type) {
+    public void playSong(String type, boolean recent) {
         //play
         player.reset();
 
@@ -274,20 +277,23 @@ public class MyService extends Service implements
         setup.putExtra(Constants.SONG_PATH, playSong.getData());
         sendBroadcast(setup);
 
-        //Store infomation of playing song, to resume the song and the list song after stop service and kill app
-        shared = PreferenceManager.getDefaultSharedPreferences(context);
-        editor = shared.edit();
-        //editor.clear();   //Luu y la sharedPreference tu dong xoa cap key-value truoc do bi trung
-        editor.putInt(Constants.LAST_POSITION, songPosn);
-        editor.putString(Constants.LAST_SONG_TITLE, songs.get(songPosn).getTitle());
-        editor.putString(Constants.LAST_ARTIST, songs.get(songPosn).getArtist());
-        editor.putString(Constants.LAST_PATH, songs.get(songPosn).getData());
-        editor.putString(Constants.LAST_ALBUMID, Long.toString(songs.get(songPosn).getAlbumid()));
-        editor.putString(Constants.LAST_TYPE, ListType);
-        editor.putString(Constants.LAST_KEYWORD, LastKeyword);
-        editor.putString(Constants.LAST_GENRES, LastGenres);
-        editor.putLong(Constants.LAST_PLAYLIST_ID, LastPlaylistId);
-        editor.apply();
+        if(!recent) {
+            //Store infomation of playing song and playing list in Internal Storage, to resume the song and the list song after stop service and kill app
+            //And we do not store info of Recent songs and list here
+            shared = PreferenceManager.getDefaultSharedPreferences(context);
+            editor = shared.edit();
+            //editor.clear();   //Luu y la sharedPreference tu dong xoa cap key-value truoc do bi trung
+            editor.putInt(Constants.LAST_POSITION, songPosn);
+            editor.putString(Constants.LAST_SONG_TITLE, songs.get(songPosn).getTitle());
+            editor.putString(Constants.LAST_ARTIST, songs.get(songPosn).getArtist());
+            editor.putString(Constants.LAST_PATH, songs.get(songPosn).getData());
+            editor.putString(Constants.LAST_ALBUMID, Long.toString(songs.get(songPosn).getAlbumid()));
+            editor.putString(Constants.LAST_TYPE, ListType);
+            editor.putString(Constants.LAST_KEYWORD, LastKeyword);
+            editor.putString(Constants.LAST_GENRES, LastGenres);
+            editor.putLong(Constants.LAST_PLAYLIST_ID, LastPlaylistId);
+            editor.apply();
+        }
 
         //Prepare
         player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
@@ -331,7 +337,7 @@ public class MyService extends Service implements
     }
 
     private Long getLastLongId(String key) {
-        return PreferenceManager.getDefaultSharedPreferences(context).getLong(Constants.LAST_PLAYLIST_ID, 1);
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(key, 1);
     }
 
     private void SetListByType(String type) {
@@ -355,6 +361,8 @@ public class MyService extends Service implements
                 case Constants.SEARCH_TYPE:
                     setList(musicStore.getSongListOfSearch());
                     break;
+                case Constants.RECENT_TYPE:
+                    setList(musicStore.getSongListOfRecent());
             }
         }
     }
@@ -510,10 +518,15 @@ public class MyService extends Service implements
                         if (songPosn < 0) songPosn = songs.size() - 1;
                     }
 
-                    playSong(ListType);
-                    updateProgress();
+                    if (new File(songs.get(songPosn).getData()).exists()) {
+                        playSong(ListType, recent);
+                        updateProgress();
+                    } else {
+                        playPrev();
+                    }
+                    Toast.makeText(getApplicationContext(), "Jumped to index " + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Audio not found or List songs is null", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Not found audio index" + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 }
             }
         }.execute();
@@ -554,10 +567,15 @@ public class MyService extends Service implements
                         }
                     }
 
-                    playSong(ListType);
-                    updateProgress();
+                    if (new File(songs.get(songPosn).getData()).exists()) {
+                        playSong(ListType, recent);
+                        updateProgress();
+                    } else {
+                        playNext();
+                    }
+                    Toast.makeText(getApplicationContext(), "Jumped to index " + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
-                    Toast.makeText(getApplicationContext(), "Audio not found or List songs is null", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Not found audio index" + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 }
             }
         }.execute();
@@ -581,6 +599,14 @@ public class MyService extends Service implements
         } else {
             repeat = true;
             Toast.makeText(getApplicationContext(), "Repeat is On", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void setRecent() {
+        if (recent) {
+            recent = false;
+        } else {
+            recent = true;
         }
     }
 
@@ -622,7 +648,7 @@ public class MyService extends Service implements
                             protected void onPostExecute(Void aVoid) {
                                 super.onPostExecute(aVoid);
                                 try {
-                                    playSong(ListType);
+                                    playSong(ListType, recent);
                                 } catch (Exception e) {
                                     Toast.makeText(getApplicationContext(), "Audio not found or List songs is null", Toast.LENGTH_SHORT).show();
                                 }
@@ -643,14 +669,20 @@ public class MyService extends Service implements
                 Integer posn = intent.getIntExtra(Constants.POSITION, 0);
                 String getType = intent.getStringExtra(Constants.TYPE_NAME);
 
-                setListType(getType);
+                if(getType.equals(Constants.RECENT_TYPE)) {
+                    recent = true;
+                }else {
+                    setListType(getType);
+                    recent = false;
+                }
 
                 if (SizeList() <= posn)
                     songs = musicStore.getAllsongs();
 
                 setSong(posn);
 
-                playSong(ListType);
+                progressHandler.removeCallbacks(run);
+                playSong(getType, recent);
 
                 Intent intent4 = new Intent(Constants.TO_ACTIVITY);
                 intent4.setAction(Constants.PLAY_PAUSE);
@@ -788,6 +820,10 @@ public class MyService extends Service implements
         musicStore.setSongListOfSearch(songListOfSearch);
     }
 
+    public void setSongListOfRecent(ArrayList<Song> songListOfRecent) {
+        musicStore.setSongListOfRecent(songListOfRecent);
+    }
+
     public void setListType(String type) {
         ListType = type;
     }
@@ -858,7 +894,7 @@ public class MyService extends Service implements
                 .setContentIntent(pendInt)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
-                .setSmallIcon(R.drawable.ic_play_circle_outline_white_24dp)
+                .setSmallIcon(R.drawable.ic_audiotrack)
                 .setLargeIcon(loadLargeIcon(getCurSong().getData()))
                 .setAutoCancel(true)
                 .setOngoing(false)
@@ -891,7 +927,7 @@ public class MyService extends Service implements
                 .setContentIntent(pendInt)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
-                .setSmallIcon(R.drawable.ic_play_circle_outline_white_24dp)
+                .setSmallIcon(R.drawable.ic_audiotrack)
                 .setLargeIcon(loadLargeIcon(getCurSong().getData()))
                 .setAutoCancel(true)
                 .setOngoing(false)

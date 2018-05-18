@@ -4,9 +4,17 @@
         android:id="@+id/player"
         android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_library"
+            android:id="@+id/nav_recent"
             android:icon="@drawable/ic_audiotrack"
-            android:title="Library" />
+            android:title="@string/recent" />
+        <item
+            android:id="@+id/nav_library"
+            android:icon="@drawable/ic_library_music"
+            android:title="@string/library" />
+        <item
+            android:id="@+id/nav_playlist"
+            android:icon="@drawable/ic_playlist"
+            android:title="@string/playlist" />
         <item
             android:id="@+id/nav_song"
             android:icon="@drawable/ic_audiotrack"
@@ -19,14 +27,6 @@
             android:id="@+id/nav_artist"
             android:icon="@drawable/ic_artist"
             android:title="@string/artist" />
-        <item
-            android:id="@+id/nav_playlist"
-            android:icon="@drawable/ic_playlist"
-            android:title="@string/playlist" />
-        <item
-            android:id="@+id/nav_online"
-            android:icon="@drawable/ic_stream_play"
-            android:title="@string/online" />
     </group>
     <group
         android:id="@+id/setting"
