@@ -11,10 +11,12 @@
         android:layout_height="?attr/actionBarSize"
         android:elevation="5dp" />
 
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:layout_marginTop="?attr/actionBarSize"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -32,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:background="#b99b1313"
                 android:clipToPadding="false"
-                android:paddingTop="52dp"></android.support.v7.widget.RecyclerView>
+                android:paddingTop="52dp"/>
 
             <!--<TextView-->
             <!--android:layout_width="match_parent"-->
@@ -43,7 +45,7 @@
                 android:id="@+id/artist_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#bb3a3af4"></android.support.v7.widget.RecyclerView>
+                android:background="#bb3a3af4"/>
 
             <!--<TextView-->
             <!--android:layout_width="match_parent"-->
@@ -54,11 +56,11 @@
                 android:id="@+id/song_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#b9faec54"></android.support.v7.widget.RecyclerView>
+                android:background="#b9faec54"/>
 
         </LinearLayout>
 
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
     <com.arlib.floatingsearchview.FloatingSearchView
         android:id="@+id/floating_search_view"

@@ -66,7 +66,9 @@ public class RcFunction {
         }
     }
 
-    public void getRecentAlbums(Context mContext, ArrayList<Album> albumList, String where) {
+    public static void getRecentAlbums(Context mContext, ArrayList<Album> albumList) {
+
+        String[] keyword = getListId(mContext, Constants.RECENT_ALBUM_ID);
 
         final Uri uri = MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI;
 
@@ -78,24 +80,30 @@ public class RcFunction {
 
 
         final String[] columns = {"_id", "album", "artist", "album_art", "numsongs"};
-        Cursor cursor = mContext.getContentResolver().query(uri, columns, where, null, null);
 
-        if (cursor != null && cursor.moveToFirst()) {
+        for (int i = 0; i < keyword.length; i++) {
 
-            do {
+            String option = "_id = '" + keyword[i] + "'";
 
-                long id = cursor.getLong(0);
-                String name = cursor.getString(1);
-                String artist = cursor.getString(2);
-                String artPath = cursor.getString(3);
-                //Bitmap art = BitmapFactory.decodeFile(artPath);
-                int nr = Integer.parseInt(cursor.getString(4));
+            Cursor cursor = mContext.getContentResolver().query(uri, columns, option, null, null);
 
-                albumList.add(new Album(id, name, artist, nr, null));
+            if (cursor != null && cursor.moveToFirst()) {
 
-            } while (cursor.moveToNext());
+                do {
 
-            cursor.close();
+                    long id = cursor.getLong(0);
+                    String name = cursor.getString(1);
+                    String artist = cursor.getString(2);
+                    String artPath = cursor.getString(3);
+                    //Bitmap art = BitmapFactory.decodeFile(artPath);
+                    int nr = Integer.parseInt(cursor.getString(4));
+
+                    albumList.add(new Album(id, name, artist, nr, null));
+
+                } while (cursor.moveToNext());
+
+                cursor.close();
+            }
         }
     }
 

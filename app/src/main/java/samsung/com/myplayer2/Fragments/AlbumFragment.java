@@ -15,8 +15,10 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import samsung.com.myplayer2.Adapter.RecyclerAlbumAdapter;
+import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
+import samsung.com.myplayer2.Class.RcFunction;
 import samsung.com.myplayer2.Model.Album;
 import samsung.com.myplayer2.R;
 
@@ -73,6 +75,7 @@ public class AlbumFragment extends Fragment implements RecyclerAlbumAdapter.Albu
     public void onAlbumClick(RecyclerAlbumAdapter.MyRecyclerAlbumHolder view, int position) {
         NavigationHelper.navigateToSongAlbum(getActivity(), albumList.get(position).getId()
                 , albumList.get(position).getAlbumName(), view.albumImg);
+        RcFunction.AddRecent(getActivity(), Constants.RECENT_ALBUM_ID, albumList.get(position).getId());
     }
 
     private class GetAlbum extends AsyncTask<Void, Void, Void> {

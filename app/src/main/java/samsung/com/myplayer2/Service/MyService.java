@@ -241,6 +241,9 @@ public class MyService extends Service implements
         //get song
         SetListByType(type);
 
+        if (recent)
+            setList(musicStore.getSongListOfRecent());
+
         Song playSong = songs.get(songPosn);
         //get title
         songTitle = playSong.getTitle();
@@ -277,7 +280,7 @@ public class MyService extends Service implements
         setup.putExtra(Constants.SONG_PATH, playSong.getData());
         sendBroadcast(setup);
 
-        if(!recent) {
+        if (!recent) {
             //Store infomation of playing song and playing list in Internal Storage, to resume the song and the list song after stop service and kill app
             //And we do not store info of Recent songs and list here
             shared = PreferenceManager.getDefaultSharedPreferences(context);
@@ -361,8 +364,6 @@ public class MyService extends Service implements
                 case Constants.SEARCH_TYPE:
                     setList(musicStore.getSongListOfSearch());
                     break;
-                case Constants.RECENT_TYPE:
-                    setList(musicStore.getSongListOfRecent());
             }
         }
     }
@@ -669,9 +670,9 @@ public class MyService extends Service implements
                 Integer posn = intent.getIntExtra(Constants.POSITION, 0);
                 String getType = intent.getStringExtra(Constants.TYPE_NAME);
 
-                if(getType.equals(Constants.RECENT_TYPE)) {
+                if (getType.equals(Constants.RECENT_TYPE)) {
                     recent = true;
-                }else {
+                } else {
                     setListType(getType);
                     recent = false;
                 }
@@ -682,7 +683,7 @@ public class MyService extends Service implements
                 setSong(posn);
 
                 progressHandler.removeCallbacks(run);
-                playSong(getType, recent);
+                playSong(ListType, recent);
 
                 Intent intent4 = new Intent(Constants.TO_ACTIVITY);
                 intent4.setAction(Constants.PLAY_PAUSE);
