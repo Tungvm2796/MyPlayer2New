@@ -29,7 +29,6 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.arlib.floatingsearchview.FloatingSearchView;
 import com.bumptech.glide.Glide;
@@ -71,7 +70,7 @@ public class MainActivity extends BaseActivity {
     private Intent playintent;
 
     ImageButton btnPlayPauseSmall;
-    ImageView PlayingSongImgSmall;
+    ImageView playingSongImgSmall;
     Button btnHide;
 
     TextView txtTitle;
@@ -84,7 +83,7 @@ public class MainActivity extends BaseActivity {
     TextView txtTimeSong;
     TextView txtTotal;
     SeekBar seekBar;
-    ImageView imgDisc;
+    ImageView playingSongImg;
 
     String SongPath;
 
@@ -210,6 +209,9 @@ public class MainActivity extends BaseActivity {
         toActivity.addAction(Constants.TIME_SONG);
         toActivity.addAction(Constants.TIME_TOTAL);
         toActivity.addAction(Constants.SEEKBAR);
+        toActivity.addAction(Constants.IS_PLAYING);
+        toActivity.addAction(Constants.SHUFFLE_ON);
+        toActivity.addAction(Constants.REPEAT_ON);
         registerReceiver(myMainBroadcast, toActivity);
 
         initView();
@@ -226,7 +228,7 @@ public class MainActivity extends BaseActivity {
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
                 if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                     if (myService.isPng())
-                        btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
+                        btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
                     btnHide.setVisibility(View.INVISIBLE);
                     btnPlayPauseSmall.setVisibility(View.VISIBLE);
                     dragView2.setBackgroundColor(Color.WHITE);
@@ -234,8 +236,8 @@ public class MainActivity extends BaseActivity {
                     txtArtist.setTextColor(Color.GRAY);
                 } else if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     if (myService.isPng())
-                        btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
-                    //btnHide.setVisibility(View.VISIBLE);
+                        btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                    btnHide.setVisibility(View.VISIBLE);
                     btnPlayPauseSmall.setVisibility(View.INVISIBLE);
                     dragView2.setBackgroundColor(0xbb424242);
                     txtTitle.setTextColor(Color.WHITE);
@@ -257,7 +259,7 @@ public class MainActivity extends BaseActivity {
             public void onClick(View view) {
                 if (myService.isPng()) {
                     //myService.pausePlayer();
-                    btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
+                    btnPlayPause.setImageResource(R.drawable.icons8_play_64);
                     Intent pauseIntent = new Intent(Constants.TO_SERVICE);
                     pauseIntent.setAction(Constants.SV_PLAY_PAUSE);
                     pauseIntent.putExtra(Constants.KEY, Constants.PAUSE);
@@ -265,11 +267,33 @@ public class MainActivity extends BaseActivity {
 
                 } else {
                     //myService.go();
-                    btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
+                    btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
                     Intent playIntent = new Intent(Constants.TO_SERVICE);
                     playIntent.setAction(Constants.SV_PLAY_PAUSE);
                     playIntent.putExtra(Constants.KEY, Constants.PLAY);
                     sendBroadcast(playIntent);
+                }
+            }
+        });
+
+        btnPlayPauseSmall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (myService.isPng()) {
+                    //myService.pausePlayer();
+                    btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                    Intent pauseIntent2 = new Intent(Constants.TO_SERVICE);
+                    pauseIntent2.setAction(Constants.SV_PLAY_PAUSE);
+                    pauseIntent2.putExtra(Constants.KEY, Constants.PAUSE);
+                    sendBroadcast(pauseIntent2);
+
+                } else {
+                    //myService.go();
+                    btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
+                    Intent playIntent2 = new Intent(Constants.TO_SERVICE);
+                    playIntent2.setAction(Constants.SV_PLAY_PAUSE);
+                    playIntent2.putExtra(Constants.KEY, Constants.PLAY);
+                    sendBroadcast(playIntent2);
                 }
             }
         });
@@ -309,6 +333,11 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 myService.setShuffle();
+                if (myService.isShuffle()) {
+                    shuffle.setImageResource(R.drawable.icons8_shuffle_orange);
+                } else {
+                    shuffle.setImageResource(R.drawable.icons8_shuffle_white);
+                }
             }
         });
 
@@ -316,6 +345,11 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 myService.setRepeat();
+                if (myService.isRepeat()) {
+                    repeat.setImageResource(R.drawable.icons8_repeat_orange);
+                } else {
+                    repeat.setImageResource(R.drawable.icons8_repeat_white);
+                }
             }
         });
 
@@ -342,13 +376,6 @@ public class MainActivity extends BaseActivity {
                 //NavigationHelper.goToLyrics(MainActivity.this);
                 slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 navigateLyrics.run();
-            }
-        });
-
-        btnPlayPauseSmall.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(context, "Click vao pp small", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -415,7 +442,8 @@ public class MainActivity extends BaseActivity {
         slidingLayout.getChildAt(1).setOnClickListener(null);
         //slidingLayout.setDragView(findViewById(R.id.dragview));
 
-        imgDisc = findViewById(R.id.imageViewDisc);
+        playingSongImg = findViewById(R.id.playing_song_img);
+        playingSongImgSmall = findViewById(R.id.playing_song_img_small);
 
         btnHide = findViewById(R.id.btn_hide);
 
@@ -463,9 +491,9 @@ public class MainActivity extends BaseActivity {
 
         try {
             if (myService.isPng()) {
-                btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
+                btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
             } else {
-                btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
+                btnPlayPause.setImageResource(R.drawable.icons8_play_64);
             }
         } catch (Exception e) {
 
@@ -491,6 +519,9 @@ public class MainActivity extends BaseActivity {
         toActivity.addAction(Constants.TIME_SONG);
         toActivity.addAction(Constants.TIME_TOTAL);
         toActivity.addAction(Constants.SEEKBAR);
+        toActivity.addAction(Constants.IS_PLAYING);
+        toActivity.addAction(Constants.SHUFFLE_ON);
+        toActivity.addAction(Constants.REPEAT_ON);
         registerReceiver(myMainBroadcast, toActivity);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -501,12 +532,18 @@ public class MainActivity extends BaseActivity {
         txtArtist.setText(saveArtist);
         if (!savePath.equals("0"))
             try {
-                Glide.with(context).load(function.GetBitMapByte(savePath)).into(imgDisc);
+                Glide.with(context).load(function.GetBitMapByte(savePath)).into(playingSongImg);
+                Glide.with(context).load(function.GetBitMapByte(savePath)).into(playingSongImgSmall);
             } catch (Exception e) {
-                Glide.with(context).load(R.drawable.noteicon).into(imgDisc);
+                Glide.with(context).load(R.drawable.noteicon).into(playingSongImg);
+                Glide.with(context).load(R.drawable.noteicon).into(playingSongImgSmall);
             }
 
         mLyricsPlugin.doBindService();
+
+        Intent checkIntent = new Intent(Constants.TO_SERVICE);
+        checkIntent.setAction(Constants.CHECK_PLAY);
+        sendBroadcast(checkIntent);
 
         super.onResume();
     }
@@ -550,19 +587,23 @@ public class MainActivity extends BaseActivity {
                     case Constants.PLAY_PAUSE:
                         String od = intent.getStringExtra(Constants.KEY);
                         if (od.equals(Constants.PAUSE)) {
-                            btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
+                            btnPlayPause.setImageResource(R.drawable.icons8_play_64);
+                            btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_24dp);
                         } else if (od.equals(Constants.PLAY)) {
-                            btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
+                            btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                            btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
                         } else if (od.equals(Constants.COMPLETE))
-                            btnPlayPause.setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
+                            btnPlayPause.setImageResource(R.drawable.icons8_play_64);
                         break;
 
                     case Constants.START_PLAY:
                         txtTitle.setText(intent.getStringExtra(Constants.SONG_TITLE));
                         txtArtist.setText(intent.getStringExtra(Constants.ARTIST));
-                        btnPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_white_24dp);
+                        btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                        btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
                         SongPath = intent.getStringExtra(Constants.SONG_PATH);
-                        Glide.with(context).load(function.GetBitMapByte(SongPath)).into(imgDisc);
+                        Glide.with(context).load(function.GetBitMapByte(SongPath)).into(playingSongImg);
+                        Glide.with(context).load(function.GetBitMapByte(SongPath)).into(playingSongImgSmall);
                         break;
 
                     case Constants.TIME_TOTAL:
@@ -579,6 +620,18 @@ public class MainActivity extends BaseActivity {
 
                     case Constants.SEEKBAR:
                         seekBar.setProgress(0);
+                        break;
+
+                    case Constants.IS_PLAYING:
+                        btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
+                        break;
+
+                    case Constants.SHUFFLE_ON:
+                        shuffle.setImageResource(R.drawable.icons8_shuffle_orange);
+                        break;
+
+                    case Constants.REPEAT_ON:
+                        repeat.setImageResource(R.drawable.icons8_repeat_orange);
                         break;
                 }
             }

@@ -124,6 +124,7 @@ public class MyService extends Service implements
         IntentFilter svintent = new IntentFilter(Constants.TO_SERVICE);
         svintent.addAction(Constants.SV_PLAY_PAUSE);
         svintent.addAction(Constants.SV_PLAYONE);
+        svintent.addAction(Constants.CHECK_PLAY);
         svintent.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         registerReceiver(myServBroadcast, svintent);
 
@@ -603,6 +604,14 @@ public class MyService extends Service implements
         }
     }
 
+    public boolean isShuffle() {
+        return shuffle;
+    }
+
+    public boolean isRepeat() {
+        return repeat;
+    }
+
     public void setRecent() {
         if (recent) {
             recent = false;
@@ -689,6 +698,26 @@ public class MyService extends Service implements
                 intent4.setAction(Constants.PLAY_PAUSE);
                 intent4.putExtra(Constants.KEY, Constants.PLAY);
                 sendBroadcast(intent4);
+
+            } else if (intent.getAction().toString().equals(Constants.CHECK_PLAY)) {
+
+                if (player.isPlaying()) {
+                    Intent isPlay = new Intent(Constants.TO_ACTIVITY);
+                    isPlay.setAction(Constants.IS_PLAYING);
+                    sendBroadcast(isPlay);
+                }
+
+                if (isShuffle()) {
+                    Intent isShuffle = new Intent(Constants.TO_ACTIVITY);
+                    isShuffle.setAction(Constants.SHUFFLE_ON);
+                    sendBroadcast(isShuffle);
+                }
+
+                if (isRepeat()) {
+                    Intent isRepeat = new Intent(Constants.TO_ACTIVITY);
+                    isRepeat.setAction(Constants.REPEAT_ON);
+                    sendBroadcast(isRepeat);
+                }
 
             } else if (intent.getAction().compareTo(AudioManager.ACTION_AUDIO_BECOMING_NOISY) == 0) {
 

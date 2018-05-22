@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -10,7 +11,7 @@
         android:background="#0300b9">
 
         <ImageView
-            android:id="@+id/imageViewDisc"
+            android:id="@+id/playing_song_img"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop" />
@@ -19,8 +20,8 @@
             android:id="@+id/control_view"
             android:layout_width="match_parent"
             android:layout_height="110dp"
-            android:background="#bb424242"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true"
+            android:background="#bb424242" />
 
         <TextView
             android:id="@+id/time_song"
@@ -71,7 +72,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:background="@null"
-                android:src="@drawable/ic_shuffle_white_24dp" />
+                android:src="@drawable/icons8_shuffle_white" />
 
             <ImageButton
                 android:id="@+id/btn_prev"
@@ -84,12 +85,13 @@
 
             <ImageButton
                 android:id="@+id/btn_play_pause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="54dp"
+                android:layout_height="54dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:background="@null"
-                android:src="@drawable/ic_play_circle_outline_white_24dp" />
+                android:scaleType="centerCrop"
+                android:src="@drawable/icons8_play_64" />
 
             <ImageButton
                 android:id="@+id/btn_next"
@@ -107,7 +109,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:background="@null"
-                android:src="@drawable/ic_repeat_one_white_24dp" />
+                android:src="@drawable/icons8_repeat_white" />
         </LinearLayout>
 
     </RelativeLayout>

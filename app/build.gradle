@@ -55,4 +55,5 @@ dependencies {
     implementation 'com.simplecityapps:recyclerview-fastscroll:1.0.18'
     implementation 'com.afollestad.material-dialogs:core:0.9.6.0'
     implementation 'com.afollestad.material-dialogs:commons:0.9.6.0'
+    implementation 'com.github.timrijckaert:FloatingMusicActionButton:v2.0.4'
 }
