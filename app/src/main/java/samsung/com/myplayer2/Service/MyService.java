@@ -816,8 +816,12 @@ public class MyService extends Service implements
     }
 
     public String GetSongPath() {
-        Song playSong = songs.get(songPosn);
-        return playSong.getData();
+        try {
+            Song playSong = songs.get(songPosn);
+            return playSong.getData();
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     //set list of all songs
@@ -924,7 +928,7 @@ public class MyService extends Service implements
                 .setContentIntent(pendInt)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
-                .setSmallIcon(R.drawable.ic_audiotrack)
+                .setSmallIcon(R.drawable.icons8_music_note_24)
                 .setLargeIcon(loadLargeIcon(getCurSong().getData()))
                 .setAutoCancel(true)
                 .setOngoing(false)
@@ -957,7 +961,7 @@ public class MyService extends Service implements
                 .setContentIntent(pendInt)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
-                .setSmallIcon(R.drawable.ic_audiotrack)
+                .setSmallIcon(R.drawable.icons8_music_note_24)
                 .setLargeIcon(loadLargeIcon(getCurSong().getData()))
                 .setAutoCancel(true)
                 .setOngoing(false)
