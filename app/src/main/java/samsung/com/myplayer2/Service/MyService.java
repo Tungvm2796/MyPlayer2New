@@ -96,7 +96,8 @@ public class MyService extends Service implements
     private static final int NOTIFY_ID = 27;
     //shuffle flag and random
     private boolean shuffle = false;
-    private boolean repeat = false;
+    private boolean repeatOne = false;
+    private boolean repeatAll = false;
     private Random rand;
 
     public static boolean bothRun = true;
@@ -526,7 +527,7 @@ public class MyService extends Service implements
                     } else {
                         playPrev();
                     }
-                    Toast.makeText(getApplicationContext(), "Jumped to index " + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Jumped to index " + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), "Not found audio index" + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 }
@@ -556,7 +557,7 @@ public class MyService extends Service implements
                 super.onPostExecute(aVoid);
                 try {
                     progressHandler.removeCallbacks(run);
-                    if (!repeat) {
+                    if (!repeatOne) {
                         if (shuffle) {
                             int newSong = songPosn;
                             while (newSong == songPosn) {
@@ -575,7 +576,7 @@ public class MyService extends Service implements
                     } else {
                         playNext();
                     }
-                    Toast.makeText(getApplicationContext(), "Jumped to index " + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getApplicationContext(), "Jumped to index " + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
                     Toast.makeText(getApplicationContext(), "Not found audio index" + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 }
@@ -595,12 +596,16 @@ public class MyService extends Service implements
     }
 
     public void setRepeat() {
-        if (repeat) {
-            repeat = false;
-            Toast.makeText(getApplicationContext(), "Repeat is Off", Toast.LENGTH_SHORT).show();
-        } else {
-            repeat = true;
-            Toast.makeText(getApplicationContext(), "Repeat is On", Toast.LENGTH_SHORT).show();
+        if (!repeatAll && !repeatOne) {
+            repeatAll = true;
+            Toast.makeText(getApplicationContext(), "Repeat All", Toast.LENGTH_SHORT).show();
+        } else if (repeatAll && !repeatOne) {
+            repeatAll = false;
+            repeatOne = true;
+            Toast.makeText(getApplicationContext(), "Repeat Current One", Toast.LENGTH_SHORT).show();
+        } else if (!repeatAll && repeatOne) {
+            repeatAll = false;
+            repeatOne = false;
         }
     }
 
@@ -608,8 +613,12 @@ public class MyService extends Service implements
         return shuffle;
     }
 
-    public boolean isRepeat() {
-        return repeat;
+    public boolean isRepeatOne() {
+        return repeatOne;
+    }
+
+    public boolean isRepeatAll() {
+        return repeatAll;
     }
 
     public void setRecent() {
@@ -713,10 +722,16 @@ public class MyService extends Service implements
                     sendBroadcast(isShuffle);
                 }
 
-                if (isRepeat()) {
-                    Intent isRepeat = new Intent(Constants.TO_ACTIVITY);
-                    isRepeat.setAction(Constants.REPEAT_ON);
-                    sendBroadcast(isRepeat);
+                if (isRepeatOne()) {
+                    Intent isRepeatOne = new Intent(Constants.TO_ACTIVITY);
+                    isRepeatOne.setAction(Constants.REPEAT_ONE_ON);
+                    sendBroadcast(isRepeatOne);
+                }
+
+                if (isRepeatAll()) {
+                    Intent isRepeatAll = new Intent(Constants.TO_ACTIVITY);
+                    isRepeatAll.setAction(Constants.REPEAT_ALL_ON);
+                    sendBroadcast(isRepeatAll);
                 }
 
             } else if (intent.getAction().compareTo(AudioManager.ACTION_AUDIO_BECOMING_NOISY) == 0) {
@@ -789,8 +804,10 @@ public class MyService extends Service implements
         sendBroadcast(intent4);
         //btnPayPause.get().setImageResource(R.drawable.ic_play_circle_outline_white_24dp);
         if (player.getCurrentPosition() > 0) {
-            mp.reset();
-            playNext();
+            if (repeatAll || repeatOne) {
+                mp.reset();
+                playNext();
+            }
         }
     }
 

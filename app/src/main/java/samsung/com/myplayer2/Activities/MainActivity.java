@@ -211,7 +211,8 @@ public class MainActivity extends BaseActivity {
         toActivity.addAction(Constants.SEEKBAR);
         toActivity.addAction(Constants.IS_PLAYING);
         toActivity.addAction(Constants.SHUFFLE_ON);
-        toActivity.addAction(Constants.REPEAT_ON);
+        toActivity.addAction(Constants.REPEAT_ONE_ON);
+        toActivity.addAction(Constants.REPEAT_ALL_ON);
         registerReceiver(myMainBroadcast, toActivity);
 
         initView();
@@ -334,9 +335,9 @@ public class MainActivity extends BaseActivity {
             public void onClick(View view) {
                 myService.setShuffle();
                 if (myService.isShuffle()) {
-                    shuffle.setImageResource(R.drawable.icons8_shuffle_orange);
+                    shuffle.setImageResource(R.drawable.icons8_shuffle_32_orange);
                 } else {
-                    shuffle.setImageResource(R.drawable.icons8_shuffle_white);
+                    shuffle.setImageResource(R.drawable.icons8_shuffle_32_white);
                 }
             }
         });
@@ -345,10 +346,12 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 myService.setRepeat();
-                if (myService.isRepeat()) {
-                    repeat.setImageResource(R.drawable.icons8_repeat_orange);
+                if (myService.isRepeatAll()) {
+                    repeat.setImageResource(R.drawable.icons8_repeat_32_orange);
+                } else if(myService.isRepeatOne()){
+                    repeat.setImageResource(R.drawable.icons8_repeat_one_32_orange);
                 } else {
-                    repeat.setImageResource(R.drawable.icons8_repeat_white);
+                    repeat.setImageResource(R.drawable.icons8_repeat_32_white);
                 }
             }
         });
@@ -521,7 +524,8 @@ public class MainActivity extends BaseActivity {
         toActivity.addAction(Constants.SEEKBAR);
         toActivity.addAction(Constants.IS_PLAYING);
         toActivity.addAction(Constants.SHUFFLE_ON);
-        toActivity.addAction(Constants.REPEAT_ON);
+        toActivity.addAction(Constants.REPEAT_ONE_ON);
+        toActivity.addAction(Constants.REPEAT_ALL_ON);
         registerReceiver(myMainBroadcast, toActivity);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
@@ -627,11 +631,15 @@ public class MainActivity extends BaseActivity {
                         break;
 
                     case Constants.SHUFFLE_ON:
-                        shuffle.setImageResource(R.drawable.icons8_shuffle_orange);
+                        shuffle.setImageResource(R.drawable.icons8_shuffle_32_orange);
                         break;
 
-                    case Constants.REPEAT_ON:
-                        repeat.setImageResource(R.drawable.icons8_repeat_orange);
+                    case Constants.REPEAT_ONE_ON:
+                        repeat.setImageResource(R.drawable.icons8_repeat_one_32_orange);
+                        break;
+
+                    case Constants.REPEAT_ALL_ON:
+                        repeat.setImageResource(R.drawable.icons8_repeat_32_orange);
                         break;
                 }
             }

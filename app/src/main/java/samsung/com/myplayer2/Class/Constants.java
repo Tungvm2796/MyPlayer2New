@@ -67,7 +67,8 @@ public class Constants {
     public static final String CHECK_PLAY = "check_play";
     public static final String IS_PLAYING = "is_playing";
     public static final String SHUFFLE_ON = "shuffle_on";
-    public static final String REPEAT_ON = "repeat_on";
+    public static final String REPEAT_ONE_ON = "repeat_one_on";
+    public static final String REPEAT_ALL_ON = "repeat_all_on";
 
     public static final String TO_PLAYLIST = "ToPlaylist";
     public static final String TO_PLAYLIST_SONG = "ToPlaylistSong";

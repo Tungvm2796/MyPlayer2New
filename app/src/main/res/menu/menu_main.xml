@@ -24,7 +24,7 @@
 
     <item
         android:id="@+id/action_search"
-        android:icon="@drawable/icons8_search_48"
+        android:icon="@drawable/icons8_search_24"
         android:orderInCategory="1"
         android:title="@string/search"
         app:showAsAction="always" />
