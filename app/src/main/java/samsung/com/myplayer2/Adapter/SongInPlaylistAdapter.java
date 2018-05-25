@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -29,6 +31,7 @@ import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.ItemTouchHelperAdapter;
 import samsung.com.myplayer2.Class.ItemTouchHelperViewHolder;
+import samsung.com.myplayer2.Class.OnStartDragListener;
 import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Class.ToolFunction;
 import samsung.com.myplayer2.Model.Song;
@@ -46,12 +49,14 @@ public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter
     boolean animate;
     private long playlistId;
     private long[] songIDs;
+    OnStartDragListener mDragStartListener;
 
-    public SongInPlaylistAdapter(AppCompatActivity context, ArrayList<Song> data, boolean anim) {
+    public SongInPlaylistAdapter(AppCompatActivity context, ArrayList<Song> data, boolean anim, OnStartDragListener listener) {
         this.mContext = context;
         this.songs = data;
         this.animate = anim;
         this.songIDs = getSongIds();
+        mDragStartListener = listener;
     }
 
     public SongInPlaylistAdapter() {
@@ -61,6 +66,8 @@ public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter
         TextView songView, artistView;
         ImageView coverimg;
         ImageButton btn;
+        TextView duration;
+        ImageView dragImg;
 
         public MyRecyclerSongHolder(View songLay) {
             super(songLay);
@@ -69,6 +76,8 @@ public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter
             artistView = songLay.findViewById(R.id.song_artist);
             coverimg = songLay.findViewById(R.id.coverImg);
             btn = songLay.findViewById(R.id.menuSong);
+            duration = songLay.findViewById(R.id.duration);
+            dragImg = songLay.findViewById(R.id.dragImg);
         }
 
         @Override
@@ -85,7 +94,7 @@ public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter
     public SongInPlaylistAdapter.MyRecyclerSongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //map to song layout
         View songView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.song, parent, false);
+                .inflate(R.layout.song_in_playlist, parent, false);
         return new SongInPlaylistAdapter.MyRecyclerSongHolder(songView);
     }
 
@@ -116,6 +125,16 @@ public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter
                 play.putExtra(Constants.TYPE_NAME, Constants.PLAYLIST_TYPE);
                 c.sendBroadcast(play);
                 //Toast.makeText(mContext, Integer.toString(pos), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        holder.dragImg.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (MotionEventCompat.getActionMasked(motionEvent) == MotionEvent.ACTION_DOWN) {
+                    mDragStartListener.onStartDrag(holder);
+                }
+                return false;
             }
         });
 

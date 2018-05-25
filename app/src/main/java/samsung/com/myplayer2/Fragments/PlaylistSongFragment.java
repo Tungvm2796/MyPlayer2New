@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import samsung.com.myplayer2.Adapter.SongInPlaylistAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.EditItemTouchHelperCallback;
+import samsung.com.myplayer2.Class.OnStartDragListener;
 import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -36,7 +37,7 @@ import samsung.com.myplayer2.Service.MyService;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class PlaylistSongFragment extends Fragment {
+public class PlaylistSongFragment extends Fragment implements OnStartDragListener {
 
 
     public PlaylistSongFragment() {
@@ -167,7 +168,7 @@ public class PlaylistSongFragment extends Fragment {
         }
     };
 
-    class LoadPlaylistSong extends AsyncTask<Void, Void, Void>{
+    class LoadPlaylistSong extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             playlistFunction.getSongsInPlaylist(getContext(), playlistId, SongOfPlaylist);
@@ -177,7 +178,7 @@ public class PlaylistSongFragment extends Fragment {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            adapter = new SongInPlaylistAdapter((AppCompatActivity) getActivity(), SongOfPlaylist, true);
+            adapter = new SongInPlaylistAdapter((AppCompatActivity) getActivity(), SongOfPlaylist, true, PlaylistSongFragment.this);
 
             ItemTouchHelper.Callback callback =
                     new EditItemTouchHelperCallback(adapter);
@@ -187,5 +188,10 @@ public class PlaylistSongFragment extends Fragment {
             adapter.setPlaylistId(playlistId);
             PlaylistSongView.setAdapter(adapter);
         }
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        mItemTouchHelper.startDrag(viewHolder);
     }
 }

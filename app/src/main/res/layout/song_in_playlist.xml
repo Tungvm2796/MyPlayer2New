@@ -7,17 +7,26 @@
     android:padding="4dp">
 
     <ImageView
+        android:id="@+id/dragImg"
+        android:layout_width="77dp"
+        android:layout_height="63dp"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="-25dp"
+        android:layout_toLeftOf="@id/coverImg"
+        android:src="@drawable/ic_unfold_more_black_24dp" />
+
+    <ImageView
         android:id="@+id/coverImg"
         android:layout_width="57dp"
         android:layout_height="63dp"
-        android:layout_alignParentLeft="true"
-        android:layout_gravity="left"
-        android:layout_marginRight="5dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="31dp"
         android:contentDescription="Image"
         android:padding="4dp"
         android:scaleType="centerCrop" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/menuSong"
@@ -27,9 +36,9 @@
         <TextView
             android:id="@+id/song_title"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="20dp"
+            android:layout_alignParentLeft="true"
             android:ellipsize="end"
-            android:gravity="left"
             android:maxLines="1"
             android:textColor="#000000"
             android:textSize="17sp" />
@@ -37,14 +46,21 @@
         <TextView
             android:id="@+id/song_artist"
             android:layout_width="match_parent"
-            android:layout_height="23dp"
+            android:layout_height="20dp"
+            android:layout_alignParentLeft="true"
             android:layout_below="@+id/song_title"
+            android:layout_marginRight="70dp"
             android:ellipsize="end"
-            android:gravity="left"
             android:maxLines="1"
             android:textColor="#988b8b" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="52dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/song_title" />
+    </RelativeLayout>
 
     <ImageButton
         android:id="@+id/menuSong"
