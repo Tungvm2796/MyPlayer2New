@@ -13,15 +13,13 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import samsung.com.myplayer2.Class.BaseSongAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
@@ -30,7 +28,7 @@ import samsung.com.myplayer2.Dialogs.AddToPlaylistDialog;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
-public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.MyRecyclerSongHolder> {
+public class SongInAlbumAdapter extends BaseSongAdapter<SongInAlbumAdapter.MyRecyclerSongHolder> {
 
     private ArrayList<Song> songs;
     AppCompatActivity mContext;
@@ -39,11 +37,13 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
     Function function = new Function();
     boolean animate;
     private int lastPosition = -1;
+    private long[] songIDs;
 
     public SongInAlbumAdapter(AppCompatActivity context, ArrayList<Song> data, boolean anim) {
         this.mContext = context;
         this.songs = data;
         this.animate = anim;
+        this.songIDs = getSongIds();
     }
 
     public SongInAlbumAdapter() {
@@ -51,7 +51,8 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
 
     public class MyRecyclerSongHolder extends RecyclerView.ViewHolder {
         TextView songView, artistView;
-        ImageView coverimg;
+        TextView coverId;
+        TextView duration;
         ImageButton btn;
 
         public MyRecyclerSongHolder(View songLay) {
@@ -59,7 +60,8 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
             //get title and artist views
             songView = songLay.findViewById(R.id.song_title);
             artistView = songLay.findViewById(R.id.song_artist);
-            coverimg = songLay.findViewById(R.id.coverImg);
+            coverId = songLay.findViewById(R.id.coverId);
+            duration = songLay.findViewById(R.id.duration);
             btn = songLay.findViewById(R.id.menuSong);
         }
     }
@@ -67,7 +69,7 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
     public MyRecyclerSongHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         //map to song layout
         View songView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.song, parent, false);
+                .inflate(R.layout.song_in_album, parent, false);
         return new MyRecyclerSongHolder(songView);
     }
 
@@ -80,12 +82,9 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
         //get title and artist strings, embedded pictures
         holder.songView.setText(currSong.getTitle());
         holder.artistView.setText(currSong.getArtist());
-
-        Glide.with(mContext).load(function.GetBitMapByte(currSong.getData()))
-                .override(57, 63)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
-                .error(R.drawable.noteicon)
-                .into(holder.coverimg);
+        holder.coverId.setText(Long.toString(currSong.getID()));
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("mm:ss");
+        holder.duration.setText(simpleDateFormat.format(currSong.getDuration()));
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,6 +157,10 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
                     case R.id.share:
                         ToolFunction.shareTrack(mContext, songs.get(curpos).getData());
                         break;
+
+                    case R.id.delete:
+                        long[] deleteIds = {songs.get(curpos).getID()};
+                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, SongInAlbumAdapter.this, curpos);
                 }
                 return false;
             }
@@ -174,5 +177,17 @@ public class SongInAlbumAdapter extends RecyclerView.Adapter<SongInAlbumAdapter.
         }
 
         return ret;
+    }
+
+    @Override
+    public void updateDataSet(ArrayList<Song> arraylist) {
+        this.songs = arraylist;
+        this.songIDs = getSongIds();
+    }
+
+    @Override
+    public void removeSongAt(int i) {
+        songs.remove(i);
+        updateDataSet(songs);
     }
 }

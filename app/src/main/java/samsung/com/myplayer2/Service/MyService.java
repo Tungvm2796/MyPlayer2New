@@ -304,6 +304,7 @@ public class MyService extends Service implements
         player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
+                progressHandler.removeCallbacks(run);
                 mediaPlayer.start();
                 updateProgress();
                 buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
@@ -525,7 +526,11 @@ public class MyService extends Service implements
                         playSong(ListType, recent);
                         updateProgress();
                     } else {
-                        playPrev();
+                        if (songPosn > 0) {
+                            playPrev();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Previous Audio not found", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     //Toast.makeText(getApplicationContext(), "Jumped to index " + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
@@ -574,7 +579,11 @@ public class MyService extends Service implements
                         playSong(ListType, recent);
                         updateProgress();
                     } else {
-                        playNext();
+                        if (songPosn < songs.size() - 1) {
+                            playNext();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Next Audio not found", Toast.LENGTH_SHORT).show();
+                        }
                     }
                     //Toast.makeText(getApplicationContext(), "Jumped to index " + Integer.toString(songPosn), Toast.LENGTH_SHORT).show();
                 } catch (Exception e) {
@@ -699,9 +708,13 @@ public class MyService extends Service implements
                     songs = musicStore.getAllsongs();
 
                 setSong(posn);
-
-                progressHandler.removeCallbacks(run);
-                playSong(ListType, recent);
+                
+                try {
+                    //progressHandler.removeCallbacks(run);
+                    playSong(ListType, recent);
+                } catch (Exception e) {
+                    Toast.makeText(getApplicationContext(), "Audio not found, please choose another audio or reset app", Toast.LENGTH_SHORT).show();
+                }
 
                 Intent intent4 = new Intent(Constants.TO_ACTIVITY);
                 intent4.setAction(Constants.PLAY_PAUSE);

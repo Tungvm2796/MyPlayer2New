@@ -73,10 +73,15 @@ public class Function {
 
     public byte[] GetBitMapByte(String filePath) {
         MediaMetadataRetriever mData = new MediaMetadataRetriever();
-        mData.setDataSource(filePath);
 
-        //byte art[] = mData.getEmbeddedPicture();
-        return mData.getEmbeddedPicture();
+        try {
+            mData.setDataSource(filePath);
+
+            //byte art[] = mData.getEmbeddedPicture();
+            return mData.getEmbeddedPicture();
+        }catch (Exception e){
+            return null;
+        }
     }
 
     public byte[] BitmapToByte(Bitmap bitmap) {
@@ -117,7 +122,7 @@ public class Function {
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id", "duration"};
 
         String selectOption1 = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
 
@@ -141,6 +146,7 @@ public class Function {
                 String thisAlbum = musicCursor.getString(3);
                 String thisData = musicCursor.getString(4);
                 long albumId = musicCursor.getLong(5);
+                int duration = musicCursor.getInt(6);
 
 //                Uri trackUri = ContentUris.withAppendedId(musicUri, thisId);
 //
@@ -148,7 +154,7 @@ public class Function {
 //
 //                String genres = mr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
 
-                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, null));
+                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, duration, null));
 
             }
             while (musicCursor.moveToNext());
@@ -246,7 +252,7 @@ public class Function {
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id", "duration"};
 
         String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != '' AND album_id = '" + Long.toString(AlbumID) + "'";
 
@@ -270,6 +276,7 @@ public class Function {
                 //Bitmap songimg = GetBitmap(thisData);
                 //Bitmap lastimg = getResizedBitmap(songimg, 55, 60);
                 long albumId = musicCursor.getLong(5);
+                int duration = musicCursor.getInt(6);
 
 //                Uri trackUri = ContentUris.withAppendedId(musicUri, thisId);
 //
@@ -277,7 +284,7 @@ public class Function {
 //
 //                String genres = mr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
 
-                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, null));
+                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, duration, null));
 
             }
             while (musicCursor.moveToNext());
@@ -295,7 +302,7 @@ public class Function {
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id", "duration"};
 
         String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != '' AND artist = '" + artist_name + "'";
 
@@ -319,6 +326,7 @@ public class Function {
                 //Bitmap songimg = GetBitmap(thisData);
                 //Bitmap lastimg = getResizedBitmap(songimg, 55, 60);
                 long albumId = musicCursor.getLong(5);
+                int duration = musicCursor.getInt(6);
 
 //                Uri trackUri = ContentUris.withAppendedId(musicUri, thisId);
 //
@@ -326,7 +334,7 @@ public class Function {
 //
 //                String genres = mr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
 
-                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, null));
+                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, duration, null));
 
             }
             while (musicCursor.moveToNext());
@@ -344,7 +352,7 @@ public class Function {
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id", "duration"};
 
         String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
 
@@ -368,6 +376,7 @@ public class Function {
                 String thisAlbum = musicCursor.getString(3);
                 String thisData = musicCursor.getString(4);
                 long albumId = musicCursor.getLong(5);
+                int duration = musicCursor.getInt(6);
 
                 Uri trackUri = MediaStore.Audio.Genres.getContentUriForAudioId("external", (int) thisId);
                 Cursor genresCursor = mContext.getContentResolver().query(trackUri, Column, null, null, MediaStore.Audio.Genres.DEFAULT_SORT_ORDER);
@@ -381,7 +390,7 @@ public class Function {
                 }
 
                 if (genres != null && genres.equals(genres_name)) {
-                    ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, genres));
+                    ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, duration, genres));
                 }
             }
             while (musicCursor.moveToNext());
@@ -402,7 +411,7 @@ public class Function {
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id", "duration"};
 
         String selectOption1 = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
 
@@ -426,6 +435,7 @@ public class Function {
                 String thisAlbum = musicCursor.getString(3);
                 String thisData = musicCursor.getString(4);
                 long albumId = musicCursor.getLong(5);
+                int duration = musicCursor.getInt(6);
 
 //                Uri trackUri = ContentUris.withAppendedId(musicUri, thisId);
 //
@@ -433,7 +443,7 @@ public class Function {
 //
 //                String genres = mr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
 
-                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, null));
+                ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, duration, null));
 
             }
             while (musicCursor.moveToNext());
@@ -454,7 +464,7 @@ public class Function {
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id", "duration"};
 
         String selectOption = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
 
@@ -484,9 +494,9 @@ public class Function {
                     //Bitmap songimg = GetBitmap(thisData);
                     //Bitmap lastimg = getResizedBitmap(songimg, 55, 60);
                     long albumId = musicCursor.getLong(5);
+                    int duration = musicCursor.getInt(6);
 
-
-                    ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, genres));
+                    ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, duration, genres));
                 }
             }
             while (musicCursor.moveToNext());
@@ -577,8 +587,9 @@ public class Function {
                 String thisAlbum = musicCursor.getString(3);
                 String thisData = musicCursor.getString(4);
                 long albumId = musicCursor.getLong(5);
+                int duration = musicCursor.getInt(6);
 
-                arrayList.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, null));
+                arrayList.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, duration, null));
             }
             while (musicCursor.moveToNext());
         if (musicCursor != null)
@@ -594,7 +605,7 @@ public class Function {
 
         String defaultSelection = "is_music = 1 AND title != ''";
 
-        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id", "duration"};
 
         String finalSelection = selection == null ? defaultSelection : defaultSelection + " AND " + selection;
 

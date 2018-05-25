@@ -26,7 +26,7 @@ public class RcFunction {
         ContentResolver musicResolver = mContext.getContentResolver();
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
-        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id"};
+        String[] ColumnIndex = {"_id", "title", "artist", "album", "_data", "album_id", "duration"};
 
         String selectOption1 = MediaStore.Audio.Media.IS_MUSIC + " = 1 AND title != ''";
 
@@ -54,8 +54,8 @@ public class RcFunction {
                     String thisAlbum = musicCursor.getString(3);
                     String thisData = musicCursor.getString(4);
                     long albumId = musicCursor.getLong(5);
-
-                    ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, null));
+                    int duration = musicCursor.getInt(6);
+                    ArraySong.add(new Song(thisId, thisTitle, thisArtis, thisAlbum, thisData, albumId, duration, null));
 
                 }
                 while (musicCursor.moveToNext());

@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layer2"
+    android:layout_width="match_parent"
+    android:layout_height="70dp"
+    android:orientation="horizontal"
+    android:padding="4dp">
+
+    <TextView
+        android:id="@+id/coverId"
+        android:layout_width="57dp"
+        android:layout_height="63dp"
+        android:layout_alignParentLeft="true"
+        android:layout_gravity="left"
+        android:layout_marginRight="5dp"
+        android:padding="4dp"
+        android:textAlignment="center" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/menuSong"
+        android:layout_toRightOf="@+id/coverId"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/song_title"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignParentLeft="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#000000"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/song_artist"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/song_title"
+            android:layout_marginRight="70dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="#988b8b" />
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="70dp"
+            android:layout_height="20dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/song_artist" />
+    </RelativeLayout>
+
+    <ImageButton
+        android:id="@+id/menuSong"
+        android:layout_width="25dp"
+        android:layout_height="63dp"
+        android:layout_alignParentRight="true"
+        android:background="@color/transparent"
+        android:scaleType="center"
+        android:src="@drawable/ic_more_vert_black_24dp" />
+
+</RelativeLayout>

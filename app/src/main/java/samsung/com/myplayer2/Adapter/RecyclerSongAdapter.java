@@ -28,6 +28,7 @@ import com.simplecityapps.recyclerview_fastscroll.views.FastScrollRecyclerView;
 
 import java.util.ArrayList;
 
+import samsung.com.myplayer2.Class.BaseSongAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
@@ -42,7 +43,7 @@ import samsung.com.myplayer2.R;
  * Created by 450G4 on 3/10/2018.
  */
 
-public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapter.MyRecyclerSongHolder> implements FastScrollRecyclerView.SectionedAdapter {
+public class RecyclerSongAdapter extends BaseSongAdapter<RecyclerSongAdapter.MyRecyclerSongHolder> implements FastScrollRecyclerView.SectionedAdapter {
 
 
     private ArrayList<Song> songs;
@@ -54,6 +55,7 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
     boolean isGenres;
     boolean animate;
     private int lastPosition = -1;
+    private long[] songIDs;
 
     public RecyclerSongAdapter(AppCompatActivity context, ArrayList<Song> data, boolean search, boolean genres, boolean anim) {
         this.mContext = context;
@@ -61,6 +63,7 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
         this.isResult = search;
         this.isGenres = genres;
         this.animate = anim;
+        this.songIDs = getSongIds();
     }
 
     public RecyclerSongAdapter() {
@@ -202,6 +205,10 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
                     case R.id.share:
                         ToolFunction.shareTrack(mContext, songs.get(curpos).getData());
                         break;
+
+                    case R.id.delete:
+                        long[] deleteIds = {songs.get(curpos).getID()};
+                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, RecyclerSongAdapter.this, curpos);
                 }
                 return false;
             }
@@ -324,5 +331,17 @@ public class RecyclerSongAdapter extends RecyclerView.Adapter<RecyclerSongAdapte
         }
 
         return ret;
+    }
+
+    @Override
+    public void updateDataSet(ArrayList<Song> arraylist) {
+        this.songs = arraylist;
+        this.songIDs = getSongIds();
+    }
+
+    @Override
+    public void removeSongAt(int i) {
+        songs.remove(i);
+        updateDataSet(songs);
     }
 }

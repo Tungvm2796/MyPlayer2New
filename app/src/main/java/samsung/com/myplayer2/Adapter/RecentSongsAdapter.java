@@ -188,6 +188,7 @@ public class RecentSongsAdapter extends RecyclerView.Adapter<RecentSongsAdapter.
         });
         //displaying the popup
         popup.show();
+        popup.getMenu().findItem(R.id.delete).setVisible(false);
     }
 
     private void createPopUp2(Context context, View view, final int curpos) {

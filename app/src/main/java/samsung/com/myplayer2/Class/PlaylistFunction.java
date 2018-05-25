@@ -220,12 +220,12 @@ public class PlaylistFunction {
                         .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM_ID));
 
 
-//                final long duration = mCursor.getLong(mCursor
-//                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
-//
-//                final int durationInSecs = (int) duration / 1000;
+                final long duration = mCursor.getLong(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
 
-                final Song song = new Song(id, songName, artist, album, data, albumId, null);
+                final int durationInSecs = (int) duration / 1000;
+
+                final Song song = new Song(id, songName, artist, album, data, albumId, durationInSecs, null);
 
                 mSongList.add(song);
             } while (mCursor.moveToNext());
@@ -251,7 +251,7 @@ public class PlaylistFunction {
                         MediaStore.Audio.AudioColumns.ALBUM,
                         MediaStore.Audio.AudioColumns.DATA,
                         MediaStore.Audio.AudioColumns.ALBUM_ID,
-                        //MediaStore.Audio.AudioColumns.DURATION,
+                        MediaStore.Audio.AudioColumns.DURATION,
                         MediaStore.Audio.Playlists.Members.PLAY_ORDER,
                 }, mSelection.toString(), null,
                 MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);
@@ -291,13 +291,12 @@ public class PlaylistFunction {
                 final long albumId = mCursor.getLong(mCursor
                         .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.ALBUM_ID));
 
+                final long duration = mCursor.getLong(mCursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
 
-//                final long duration = mCursor.getLong(mCursor
-//                        .getColumnIndexOrThrow(MediaStore.Audio.AudioColumns.DURATION));
-//
-//                final int durationInSecs = (int) duration / 1000;
+                final int durationInSecs = (int) duration / 1000;
 
-                final Song song = new Song(id, songName, artist, album, data, albumId, null);
+                final Song song = new Song(id, songName, artist, album, data, albumId, durationInSecs, null);
 
                 mSongList.add(song);
             } while (mCursor.moveToNext());
@@ -325,7 +324,7 @@ public class PlaylistFunction {
                         MediaStore.Audio.AudioColumns.ALBUM,
                         MediaStore.Audio.AudioColumns.DATA,
                         MediaStore.Audio.AudioColumns.ALBUM_ID,
-                        //MediaStore.Audio.AudioColumns.DURATION,
+                        MediaStore.Audio.AudioColumns.DURATION,
                         MediaStore.Audio.Playlists.Members.PLAY_ORDER,
                 }, mSelection.toString(), null,
                 MediaStore.Audio.Playlists.Members.DEFAULT_SORT_ORDER);

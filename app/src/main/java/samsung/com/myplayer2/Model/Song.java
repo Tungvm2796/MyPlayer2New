@@ -12,16 +12,17 @@ public class Song implements Serializable {
     private String album;
     private String data;
     private long albumid;
+    private int duration;
     private String genres;
 
-    public Song(long songID, String songTitle, String songArtist, String songAlbum, String input, long albumID, String SongGen) {
+    public Song(long songID, String songTitle, String songArtist, String songAlbum, String input, long albumID, int dur, String SongGen) {
         id = songID;
         title = songTitle;
         artist = songArtist;
         album = songAlbum;
-
         data = input;
         albumid = albumID;
+        duration = dur;
         genres = SongGen;
 
     }
@@ -82,4 +83,11 @@ public class Song implements Serializable {
         this.genres = genres;
     }
 
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
 }

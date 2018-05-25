@@ -22,6 +22,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 
+import samsung.com.myplayer2.Class.BaseSongAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.NavigationHelper;
@@ -30,7 +31,7 @@ import samsung.com.myplayer2.Dialogs.AddToPlaylistDialog;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
-public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapter.MyRecyclerSongHolder> {
+public class SongOfArtistAdapter extends BaseSongAdapter<SongOfArtistAdapter.MyRecyclerSongHolder> {
 
     private ArrayList<Song> songs;
     AppCompatActivity mContext;
@@ -39,11 +40,13 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
     Function function = new Function();
     boolean animate;
     private int lastPosition = -1;
+    private long[] songIDs;
 
     public SongOfArtistAdapter(AppCompatActivity context, ArrayList<Song> data, boolean anim) {
         this.mContext = context;
         this.songs = data;
         this.animate = anim;
+        this.songIDs = getSongIds();
     }
 
     public SongOfArtistAdapter() {
@@ -158,6 +161,10 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
                     case R.id.share:
                         ToolFunction.shareTrack(mContext, songs.get(curpos).getData());
                         break;
+
+                    case R.id.delete:
+                        long[] deleteIds = {songs.get(curpos).getID()};
+                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, SongOfArtistAdapter.this, curpos);
                 }
                 return false;
             }
@@ -174,5 +181,17 @@ public class SongOfArtistAdapter extends RecyclerView.Adapter<SongOfArtistAdapte
         }
 
         return ret;
+    }
+
+    @Override
+    public void updateDataSet(ArrayList<Song> arraylist) {
+        this.songs = arraylist;
+        this.songIDs = getSongIds();
+    }
+
+    @Override
+    public void removeSongAt(int i) {
+        songs.remove(i);
+        updateDataSet(songs);
     }
 }

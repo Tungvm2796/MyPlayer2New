@@ -24,6 +24,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import java.util.ArrayList;
 
+import samsung.com.myplayer2.Class.BaseSongAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.ItemTouchHelperAdapter;
@@ -33,7 +34,7 @@ import samsung.com.myplayer2.Class.ToolFunction;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
 
-public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAdapter.MyRecyclerSongHolder> implements ItemTouchHelperAdapter {
+public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter.MyRecyclerSongHolder> implements ItemTouchHelperAdapter {
 
     private ArrayList<Song> songs;
     AppCompatActivity mContext;
@@ -250,11 +251,13 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
         return ret;
     }
 
+    @Override
     public void updateDataSet(ArrayList<Song> arraylist) {
         this.songs = arraylist;
         this.songIDs = getSongIds();
     }
 
+    @Override
     public void removeSongAt(int i) {
         songs.remove(i);
         updateDataSet(songs);
