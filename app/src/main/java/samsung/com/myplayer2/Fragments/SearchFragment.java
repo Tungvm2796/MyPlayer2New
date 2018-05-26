@@ -14,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -218,6 +219,8 @@ public class SearchFragment extends Fragment implements RecyclerAlbumAdapter.Alb
         artistView.setLayoutManager(artistManager);
 
         songView.setAdapter(songAdapter);
+        songView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+
         albumView.setAdapter(albumAdapter);
         artistView.setAdapter(artistAdapter);
 

@@ -27,7 +27,7 @@
         <TextView
             android:id="@+id/song_title"
             android:layout_width="match_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:ellipsize="end"
             android:gravity="left"
             android:maxLines="1"
@@ -37,7 +37,7 @@
         <TextView
             android:id="@+id/song_artist"
             android:layout_width="match_parent"
-            android:layout_height="23dp"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/song_title"
             android:ellipsize="end"
             android:gravity="left"

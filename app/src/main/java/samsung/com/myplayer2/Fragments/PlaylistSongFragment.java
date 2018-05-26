@@ -22,12 +22,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import java.util.ArrayList;
 
 import samsung.com.myplayer2.Adapter.SongInPlaylistAdapter;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.EditItemTouchHelperCallback;
+import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.OnStartDragListener;
 import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Model.Song;
@@ -53,6 +58,7 @@ public class PlaylistSongFragment extends Fragment implements OnStartDragListene
 
     Toolbar toolbar;
 
+    TextView playlistTxtName;
     ImageView PlaylistImg;
     SongInPlaylistAdapter adapter;
     RecyclerView PlaylistSongView;
@@ -94,7 +100,16 @@ public class PlaylistSongFragment extends Fragment implements OnStartDragListene
         toolbar = v.findViewById(R.id.toolbar);
         setupToolbar();
 
+        playlistTxtName = v.findViewById(R.id.playlist_txt_name);
+        playlistTxtName.setText(playlistName);
+
         PlaylistImg = v.findViewById(R.id.playlist_art);
+
+        ImageLoader.getInstance().displayImage(getArtUriForSongList(playlistId),
+                PlaylistImg, new DisplayImageOptions.Builder().cacheInMemory(true)
+                        .showImageOnLoading(R.drawable.album_none)
+                        .resetViewBeforeLoading(true).build());
+
         PlaylistSongView = v.findViewById(R.id.song_of_playlist);
         SongOfPlaylist = new ArrayList<>();
 
@@ -193,5 +208,16 @@ public class PlaylistSongFragment extends Fragment implements OnStartDragListene
     @Override
     public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
         mItemTouchHelper.startDrag(viewHolder);
+    }
+
+    public String getArtUriForSongList(long id){
+        ArrayList<Song> pl = new ArrayList<>();
+        PlaylistFunction.getSongsInPlaylist(getActivity(), id, pl);
+
+        if(pl.size() > 0) {
+            return Function.getAlbumArtUri(pl.get(0).getAlbumid()).toString();
+        }else {
+            return "";
+        }
     }
 }

@@ -26,7 +26,7 @@
         <TextView
             android:id="@+id/song_title"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:ellipsize="end"
             android:maxLines="1"
@@ -36,7 +36,7 @@
         <TextView
             android:id="@+id/song_artist"
             android:layout_width="match_parent"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/song_title"
             android:layout_marginRight="70dp"
@@ -47,7 +47,7 @@
         <TextView
             android:id="@+id/duration"
             android:layout_width="52dp"
-            android:layout_height="20dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/song_title" />
     </RelativeLayout>

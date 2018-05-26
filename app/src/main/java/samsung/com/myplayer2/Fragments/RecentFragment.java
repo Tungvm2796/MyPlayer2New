@@ -12,6 +12,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -180,6 +181,7 @@ public class RecentFragment extends Fragment implements RecentAlbumsAdapter.Rece
 
             recentSongAdapter = new RecentSongsAdapter((AppCompatActivity) mContext, recentSongs, true);
             recentSongView.setAdapter(recentSongAdapter);
+            recentSongView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
         }
     }
 }

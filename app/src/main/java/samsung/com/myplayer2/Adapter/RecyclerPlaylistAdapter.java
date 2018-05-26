@@ -3,7 +3,6 @@ package samsung.com.myplayer2.Adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
@@ -95,7 +94,6 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
         Playlist curPlayList = playList.get(position);
 
         holder.ListName.setText(curPlayList.getName());
-        holder.ListName.setTextColor(Color.BLACK);
         holder.SongCount.setText(Integer.toString(curPlayList.getSongCount()) + " songs");
 //        TypedArray images = mContext.getResources().obtainTypedArray(R.array.array_drawables);
 //        int choice = (int) (Math.random() * images.length());

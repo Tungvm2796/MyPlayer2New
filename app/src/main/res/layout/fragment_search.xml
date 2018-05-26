@@ -32,7 +32,6 @@
                 android:id="@+id/album_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#b99b1313"
                 android:clipToPadding="false"
                 android:paddingTop="52dp" />
 
@@ -47,7 +46,7 @@
                 android:id="@+id/artist_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#bb3a3af4" />
+                android:background="#bb837aff" />
 
             <TextView
                 android:id="@+id/count_song"
@@ -60,7 +59,7 @@
                 android:id="@+id/song_result"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#b9faec54" />
+                android:background="#b9fbfbfb" />
 
         </LinearLayout>
 
