@@ -24,6 +24,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -105,10 +107,18 @@ public class PlaylistSongFragment extends Fragment implements OnStartDragListene
 
         PlaylistImg = v.findViewById(R.id.playlist_art);
 
-        ImageLoader.getInstance().displayImage(getArtUriForSongList(playlistId),
-                PlaylistImg, new DisplayImageOptions.Builder().cacheInMemory(true)
-                        .showImageOnLoading(R.drawable.album_none)
-                        .resetViewBeforeLoading(true).build());
+        String art = getArtUriForSongList(playlistId);
+        if (art.equals("")) {
+            Glide.with(this).load(R.drawable.noteicon)
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .skipMemoryCache(true)
+                    .into(PlaylistImg);
+        } else {
+            ImageLoader.getInstance().displayImage(art,
+                    PlaylistImg, new DisplayImageOptions.Builder().cacheInMemory(true)
+                            .showImageOnLoading(R.drawable.noteicon)
+                            .resetViewBeforeLoading(true).build());
+        }
 
         PlaylistSongView = v.findViewById(R.id.song_of_playlist);
         SongOfPlaylist = new ArrayList<>();
@@ -210,13 +220,13 @@ public class PlaylistSongFragment extends Fragment implements OnStartDragListene
         mItemTouchHelper.startDrag(viewHolder);
     }
 
-    public String getArtUriForSongList(long id){
+    public String getArtUriForSongList(long id) {
         ArrayList<Song> pl = new ArrayList<>();
         PlaylistFunction.getSongsInPlaylist(getActivity(), id, pl);
 
-        if(pl.size() > 0) {
+        if (pl.size() > 0) {
             return Function.getAlbumArtUri(pl.get(0).getAlbumid()).toString();
-        }else {
+        } else {
             return "";
         }
     }

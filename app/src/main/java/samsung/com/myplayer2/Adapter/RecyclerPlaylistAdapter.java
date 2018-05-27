@@ -19,6 +19,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
@@ -49,7 +51,7 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
         this.animate = anim;
     }
 
-    public class MyRecyclerPlaylistHolder extends RecyclerView.ViewHolder{
+    public class MyRecyclerPlaylistHolder extends RecyclerView.ViewHolder {
         TextView ListName;
         TextView SongCount;
         public ImageView ListImg;
@@ -101,10 +103,19 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
 //        Glide.with(mContext).load(images.getResourceId(choice, R.drawable.pic5)).into(target);
 //        images.recycle();
 
-        ImageLoader.getInstance().displayImage(getArtUri(curPlayList.getListid()), holder.ListImg
-        , new DisplayImageOptions.Builder().cacheInMemory(true)
-        .showImageOnFail(R.drawable.noteicon)
-        .resetViewBeforeLoading(true).build());
+        String art = getArtUri(curPlayList.getListid());
+        if (art.equals("")) {
+            Glide.with(mContext).load(R.drawable.noteicon)
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .skipMemoryCache(true)
+                    .into(holder.ListImg);
+        } else {
+            ImageLoader.getInstance().displayImage(art, holder.ListImg
+                    , new DisplayImageOptions.Builder().cacheInMemory(true)
+                            .showImageOnLoading(R.drawable.noteicon)
+                            .showImageOnFail(R.drawable.noteicon)
+                            .resetViewBeforeLoading(true).build());
+        }
 
         holder.btnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,7 +202,7 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
                     case R.id.action_delete_playlist:
                         AlertDialog.Builder aat = new AlertDialog.Builder(context);
                         aat.setTitle("Delete ?")
-                                .setMessage("Are you sure to delete "+playList.get(curpos).getName()+" ?")
+                                .setMessage("Are you sure to delete " + playList.get(curpos).getName() + " ?")
                                 .setCancelable(true)
                                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                                     @Override
@@ -227,17 +238,17 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
         popup.show();
     }
 
-    private String getSubString(String entry){
+    private String getSubString(String entry) {
         return entry.substring(0, entry.indexOf(Constants.MYPLAYER_PL_CR));
     }
 
-    private String getArtUri(long id){
+    private String getArtUri(long id) {
         ArrayList<Song> pl = new ArrayList<>();
         PlaylistFunction.getSongsInPlaylist(mContext, id, pl);
 
-        if(pl.size() > 0) {
+        if (pl.size() > 0) {
             return Function.getAlbumArtUri(pl.get(0).getAlbumid()).toString();
-        }else {
+        } else {
             return "";
         }
     }

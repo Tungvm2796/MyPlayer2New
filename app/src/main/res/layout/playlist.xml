@@ -65,7 +65,7 @@
                 android:layout_height="match_parent"
                 android:layout_alignParentRight="true"
                 android:background="@color/transparent"
-                android:src="@drawable/icons8_menu_vertical_24" />
+                android:src="@drawable/ic_more_vert_white_24dp" />
         </RelativeLayout>
 
     </RelativeLayout>

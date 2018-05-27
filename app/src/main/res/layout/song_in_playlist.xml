@@ -13,7 +13,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginRight="-25dp"
         android:layout_toLeftOf="@id/coverImg"
-        android:src="@drawable/icons8_move_grabber_32" />
+        android:src="@drawable/ic_reorder_white_24dp" />
 
     <ImageView
         android:id="@+id/coverImg"
@@ -69,6 +69,6 @@
         android:layout_alignParentRight="true"
         android:background="@color/transparent"
         android:scaleType="center"
-        android:src="@drawable/icons8_menu_vertical_24" />
+        android:src="@drawable/ic_more_vert_white_24dp" />
 
 </RelativeLayout>

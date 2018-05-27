@@ -229,7 +229,7 @@ public class MainActivity extends BaseActivity {
             public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
                 if (newState == SlidingUpPanelLayout.PanelState.COLLAPSED) {
                     if (myService.isPng())
-                        btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                        btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
                     btnHide.setVisibility(View.INVISIBLE);
                     btnPlayPauseSmall.setVisibility(View.VISIBLE);
                     dragView2.setBackgroundColor(Color.WHITE);
@@ -237,7 +237,7 @@ public class MainActivity extends BaseActivity {
                     txtArtist.setTextColor(Color.GRAY);
                 } else if (newState == SlidingUpPanelLayout.PanelState.EXPANDED) {
                     if (myService.isPng())
-                        btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                        btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
                     btnHide.setVisibility(View.VISIBLE);
                     btnPlayPauseSmall.setVisibility(View.INVISIBLE);
                     dragView2.setBackgroundColor(0xbb424242);
@@ -260,7 +260,7 @@ public class MainActivity extends BaseActivity {
             public void onClick(View view) {
                 if (myService.isPng()) {
                     //myService.pausePlayer();
-                    btnPlayPause.setImageResource(R.drawable.icons8_play_64);
+                    btnPlayPause.setImageResource(R.drawable.ic_play_circle_filled_orange_48dp);
                     Intent pauseIntent = new Intent(Constants.TO_SERVICE);
                     pauseIntent.setAction(Constants.SV_PLAY_PAUSE);
                     pauseIntent.putExtra(Constants.KEY, Constants.PAUSE);
@@ -268,7 +268,7 @@ public class MainActivity extends BaseActivity {
 
                 } else {
                     //myService.go();
-                    btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                    btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
                     Intent playIntent = new Intent(Constants.TO_SERVICE);
                     playIntent.setAction(Constants.SV_PLAY_PAUSE);
                     playIntent.putExtra(Constants.KEY, Constants.PLAY);
@@ -335,9 +335,9 @@ public class MainActivity extends BaseActivity {
             public void onClick(View view) {
                 myService.setShuffle();
                 if (myService.isShuffle()) {
-                    shuffle.setImageResource(R.drawable.icons8_shuffle_32_orange);
+                    shuffle.setImageResource(R.drawable.ic_shuffle_orange_32dp);
                 } else {
-                    shuffle.setImageResource(R.drawable.icons8_shuffle_32_white);
+                    shuffle.setImageResource(R.drawable.ic_shuffle_white_32dp);
                 }
             }
         });
@@ -347,11 +347,11 @@ public class MainActivity extends BaseActivity {
             public void onClick(View view) {
                 myService.setRepeat();
                 if (myService.isRepeatAll()) {
-                    repeat.setImageResource(R.drawable.icons8_repeat_32_orange);
+                    repeat.setImageResource(R.drawable.ic_repeat_orange_32dp);
                 } else if(myService.isRepeatOne()){
-                    repeat.setImageResource(R.drawable.icons8_repeat_one_32_orange);
+                    repeat.setImageResource(R.drawable.ic_repeat_one_orange_32dp);
                 } else {
-                    repeat.setImageResource(R.drawable.icons8_repeat_32_white);
+                    repeat.setImageResource(R.drawable.ic_repeat_white_32dp);
                 }
             }
         });
@@ -494,9 +494,9 @@ public class MainActivity extends BaseActivity {
 
         try {
             if (myService.isPng()) {
-                btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
             } else {
-                btnPlayPause.setImageResource(R.drawable.icons8_play_64);
+                btnPlayPause.setImageResource(R.drawable.ic_play_circle_filled_orange_48dp);
             }
         } catch (Exception e) {
 
@@ -591,19 +591,19 @@ public class MainActivity extends BaseActivity {
                     case Constants.PLAY_PAUSE:
                         String od = intent.getStringExtra(Constants.KEY);
                         if (od.equals(Constants.PAUSE)) {
-                            btnPlayPause.setImageResource(R.drawable.icons8_play_64);
+                            btnPlayPause.setImageResource(R.drawable.ic_play_circle_filled_orange_48dp);
                             btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_24dp);
                         } else if (od.equals(Constants.PLAY)) {
-                            btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                            btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
                             btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
                         } else if (od.equals(Constants.COMPLETE))
-                            btnPlayPause.setImageResource(R.drawable.icons8_play_64);
+                            btnPlayPause.setImageResource(R.drawable.ic_play_circle_filled_orange_48dp);
                         break;
 
                     case Constants.START_PLAY:
                         txtTitle.setText(intent.getStringExtra(Constants.SONG_TITLE));
                         txtArtist.setText(intent.getStringExtra(Constants.ARTIST));
-                        btnPlayPause.setImageResource(R.drawable.icons8_pause_64);
+                        btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
                         btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
                         SongPath = intent.getStringExtra(Constants.SONG_PATH);
                         Glide.with(context).load(function.GetBitMapByte(SongPath)).into(playingSongImg);
@@ -631,15 +631,15 @@ public class MainActivity extends BaseActivity {
                         break;
 
                     case Constants.SHUFFLE_ON:
-                        shuffle.setImageResource(R.drawable.icons8_shuffle_32_orange);
+                        shuffle.setImageResource(R.drawable.ic_shuffle_orange_32dp);
                         break;
 
                     case Constants.REPEAT_ONE_ON:
-                        repeat.setImageResource(R.drawable.icons8_repeat_one_32_orange);
+                        repeat.setImageResource(R.drawable.ic_repeat_one_orange_32dp);
                         break;
 
                     case Constants.REPEAT_ALL_ON:
-                        repeat.setImageResource(R.drawable.icons8_repeat_32_orange);
+                        repeat.setImageResource(R.drawable.ic_repeat_orange_32dp);
                         break;
                 }
             }
