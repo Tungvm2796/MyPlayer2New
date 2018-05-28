@@ -348,7 +348,7 @@ public class MainActivity extends BaseActivity {
                 myService.setRepeat();
                 if (myService.isRepeatAll()) {
                     repeat.setImageResource(R.drawable.ic_repeat_orange_32dp);
-                } else if(myService.isRepeatOne()){
+                } else if (myService.isRepeatOne()) {
                     repeat.setImageResource(R.drawable.ic_repeat_one_orange_32dp);
                 } else {
                     repeat.setImageResource(R.drawable.ic_repeat_white_32dp);
@@ -536,8 +536,14 @@ public class MainActivity extends BaseActivity {
         txtArtist.setText(saveArtist);
         if (!savePath.equals("0"))
             try {
-                Glide.with(context).load(function.GetBitMapByte(savePath)).into(playingSongImg);
-                Glide.with(context).load(function.GetBitMapByte(savePath)).into(playingSongImgSmall);
+                byte[] getSaveArt = function.GetBitMapByte(savePath);
+                if (getSaveArt != null) {
+                    Glide.with(context).load(getSaveArt).into(playingSongImg);
+                    Glide.with(context).load(getSaveArt).into(playingSongImgSmall);
+                } else {
+                    Glide.with(context).load(R.drawable.noteicon).into(playingSongImg);
+                    Glide.with(context).load(R.drawable.noteicon).into(playingSongImgSmall);
+                }
             } catch (Exception e) {
                 Glide.with(context).load(R.drawable.noteicon).into(playingSongImg);
                 Glide.with(context).load(R.drawable.noteicon).into(playingSongImgSmall);
@@ -596,8 +602,10 @@ public class MainActivity extends BaseActivity {
                         } else if (od.equals(Constants.PLAY)) {
                             btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
                             btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
-                        } else if (od.equals(Constants.COMPLETE))
+                        } else if (od.equals(Constants.COMPLETE)) {
                             btnPlayPause.setImageResource(R.drawable.ic_play_circle_filled_orange_48dp);
+                            btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                        }
                         break;
 
                     case Constants.START_PLAY:
@@ -606,8 +614,16 @@ public class MainActivity extends BaseActivity {
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
                         btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
                         SongPath = intent.getStringExtra(Constants.SONG_PATH);
-                        Glide.with(context).load(function.GetBitMapByte(SongPath)).into(playingSongImg);
-                        Glide.with(context).load(function.GetBitMapByte(SongPath)).into(playingSongImgSmall);
+
+                        byte[] getArt = function.GetBitMapByte(SongPath);
+                        if (getArt != null) {
+                            Glide.with(context).load(getArt).into(playingSongImg);
+                            Glide.with(context).load(getArt).into(playingSongImgSmall);
+                        } else {
+                            Glide.with(context).load(R.drawable.noteicon).into(playingSongImg);
+                            Glide.with(context).load(R.drawable.noteicon).into(playingSongImgSmall);
+                        }
+
                         break;
 
                     case Constants.TIME_TOTAL:

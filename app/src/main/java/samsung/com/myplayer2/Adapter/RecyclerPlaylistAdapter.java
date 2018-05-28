@@ -105,7 +105,7 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
 
         String art = getArtUri(curPlayList.getListid());
         if (art.equals("")) {
-            Glide.with(mContext).load(R.drawable.noteicon)
+            Glide.with(mContext).load(R.drawable.noteicon2)
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .skipMemoryCache(true)
                     .into(holder.ListImg);

@@ -77,8 +77,13 @@ public class Function {
         try {
             mData.setDataSource(filePath);
 
-            //byte art[] = mData.getEmbeddedPicture();
-            return mData.getEmbeddedPicture();
+            byte art[] = mData.getEmbeddedPicture();
+            if (art.length >0 ) {
+                return mData.getEmbeddedPicture();
+            }
+            else {
+                return null;
+            }
         }catch (Exception e){
             return null;
         }
