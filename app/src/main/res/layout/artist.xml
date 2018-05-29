@@ -1,54 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="170dp"
-    android:layout_height="220dp"
-    android:layout_margin="5dp"
-    android:orientation="vertical"
-    android:paddingLeft="2dp"
-    android:paddingRight="2dp">
+    android:layout_width="wrap_content"
+    android:layout_height="240dp"
+    android:layout_margin="2.0dip"
+    android:elevation="3dp">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <ImageView
-            android:id="@+id/artist_img"
-            android:layout_width="match_parent"
-            android:layout_height="160dp"
-            android:scaleType="centerCrop" />
+        android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/footer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/artist_name"
+            <ImageView
+                android:id="@+id/artist_img"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="5dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="#000000"
-                android:textSize="17sp" />
+                android:layout_height="180dp"
+                android:scaleType="centerCrop"
+                android:transitionName="transition_artist_art" />
 
-            <TextView
-                android:id="@+id/count"
+            <LinearLayout
+                android:id="@+id/footer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:layout_marginRight="5dp"
-                android:layout_marginTop="5dp"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:textColor="#000000"
-                android:textSize="12sp" />
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp">
+
+                <TextView
+                    android:id="@+id/artist_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="#000000"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
         </LinearLayout>
+    </FrameLayout>
 
-    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </android.support.v7.widget.CardView>
