@@ -56,6 +56,7 @@ public class RecyclerSongAdapter extends BaseSongAdapter<RecyclerSongAdapter.MyR
     boolean animate;
     private int lastPosition = -1;
     private long[] songIDs;
+    private int selectedPos = RecyclerView.NO_POSITION;
 
     public RecyclerSongAdapter(AppCompatActivity context, ArrayList<Song> data, boolean search, boolean genres, boolean anim) {
         this.mContext = context;
@@ -99,9 +100,22 @@ public class RecyclerSongAdapter extends BaseSongAdapter<RecyclerSongAdapter.MyR
 
     @Override
     public void onBindViewHolder(final MyRecyclerSongHolder holder, int position) {
+
         //get song using position
         final Song currSong = songs.get(position);
         final int pos = position;
+
+//        SharedPreferences getLight = PreferenceManager.getDefaultSharedPreferences(mContext);
+//        long lightId = getLight.getLong("highLight", -1);
+//
+//        if (songs.get(pos).getID() == lightId) {
+//            holder.songView.setTextColor(Color.MAGENTA);
+//        }
+
+//        if (selectedPos == pos) {
+//            holder.songView.setTextColor(Color.BLUE);
+//        }
+
 
         //get title and artist strings, embedded pictures
         holder.songView.setText(currSong.getTitle());
@@ -134,6 +148,19 @@ public class RecyclerSongAdapter extends BaseSongAdapter<RecyclerSongAdapter.MyR
                     play.putExtra(Constants.TYPE_NAME, Constants.SONG_TYPE);
                 }
                 c.sendBroadcast(play);
+
+                if (!isResult && !isGenres) {
+                    notifyItemChanged(selectedPos);
+                    selectedPos = holder.getLayoutPosition();
+
+//                    SharedPreferences sharedLight = PreferenceManager.getDefaultSharedPreferences(mContext);
+//                    SharedPreferences.Editor editorLight = sharedLight.edit();
+//                    editorLight.putLong("highLight", songs.get(selectedPos).getID());
+//                    editorLight.apply();
+
+                    notifyItemChanged(selectedPos);
+                }
+
                 RcFunction.AddRecent(mContext, Constants.RECENT_SONG_ID, songs.get(pos).getID());
             }
         });
