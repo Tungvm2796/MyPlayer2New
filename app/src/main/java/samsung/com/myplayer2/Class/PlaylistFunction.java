@@ -167,7 +167,8 @@ public class PlaylistFunction {
                         MediaStore.Audio.PlaylistsColumns.NAME
                 }, null, null, MediaStore.Audio.Playlists.DEFAULT_SORT_ORDER);
     }
-//"name LIKE '%"+Constants.MYPLAYER_PL_CR+"'"
+
+    //"name LIKE '%"+Constants.MYPLAYER_PL_CR+"'"
     public static void deletePlaylists(Context context, long playlistId) {
         Uri localUri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
         StringBuilder localStringBuilder = new StringBuilder();
@@ -185,7 +186,14 @@ public class PlaylistFunction {
         });
     }
 
+    public static void editPlaylistName(Context context, long id, String newName) {
+        Uri uri = MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI;
 
+        ContentValues values = new ContentValues(1);
+        values.put(MediaStore.Audio.Playlists.NAME, newName);
+
+        context.getContentResolver().update(uri, values, "_id=" + id, null);
+    }
 
 
     //Get Song of Playlist----------------------------------------------------
@@ -258,7 +266,6 @@ public class PlaylistFunction {
     }
 
 
-
     public static ArrayList<Song> getLastSongsInPlaylist(Context context, long playlistID) {
         ArrayList<Song> mSongList = new ArrayList<>();
 
@@ -267,7 +274,6 @@ public class PlaylistFunction {
         //final int playlistCount = countPlaylist(context, mPlaylistID);
 
         mCursor = makeLastPlaylistSongCursor(context, mPlaylistID);
-
 
 
         if (mCursor != null && mCursor.moveToFirst()) {

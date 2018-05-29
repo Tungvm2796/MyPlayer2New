@@ -208,7 +208,7 @@ public class RecyclerSongAdapter extends BaseSongAdapter<RecyclerSongAdapter.MyR
 
                     case R.id.delete:
                         long[] deleteIds = {songs.get(curpos).getID()};
-                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, RecyclerSongAdapter.this, curpos);
+                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, RecyclerSongAdapter.this, curpos, false);
                 }
                 return false;
             }

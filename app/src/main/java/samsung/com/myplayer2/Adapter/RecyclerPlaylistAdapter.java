@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -29,6 +30,7 @@ import java.util.ArrayList;
 import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.PlaylistFunction;
+import samsung.com.myplayer2.Dialogs.EditPlaylistNameDialog;
 import samsung.com.myplayer2.Model.Playlist;
 import samsung.com.myplayer2.Model.Song;
 import samsung.com.myplayer2.R;
@@ -41,11 +43,11 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
 
     private ArrayList<Playlist> playList;
     private PlaylistClickListener mClickListener;
-    Context mContext;
+    AppCompatActivity mContext;
     private int lastPosition = -1;
     boolean animate;
 
-    public RecyclerPlaylistAdapter(Context context, ArrayList<Playlist> PList, boolean anim) {
+    public RecyclerPlaylistAdapter(AppCompatActivity context, ArrayList<Playlist> PList, boolean anim) {
         this.mContext = context;
         this.playList = PList;
         this.animate = anim;
@@ -184,7 +186,7 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
         void onPlaylistLongClick(MyRecyclerPlaylistHolder holder, int position);
     }
 
-    private void createPopUp(final Context context, final View view, final int curpos) {
+    private void createPopUp(final AppCompatActivity context, final View view, final int curpos) {
 
 
         //creating a popup menu for song in songlist
@@ -196,7 +198,10 @@ public class RecyclerPlaylistAdapter extends RecyclerView.Adapter<RecyclerPlayli
             @Override
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
+
                     case R.id.action_edit_playlist:
+                        EditPlaylistNameDialog.newInstance(playList.get(curpos).getListid())
+                                .show(context.getSupportFragmentManager(), "EDIT PLAYLIST NAME");
                         break;
 
                     case R.id.action_delete_playlist:

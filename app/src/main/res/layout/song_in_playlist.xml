@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/dragImg"
         android:layout_width="wrap_content"
-        android:layout_height="63dp"
+        android:layout_height="52dp"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="-25dp"
         android:layout_toLeftOf="@id/coverImg"
@@ -17,8 +17,8 @@
 
     <ImageView
         android:id="@+id/coverImg"
-        android:layout_width="63dp"
-        android:layout_height="63dp"
+        android:layout_width="52dp"
+        android:layout_height="52dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="31dp"
@@ -41,7 +41,7 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textColor="#fffbf7"
-            android:textSize="17sp" />
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/song_artist"
@@ -65,7 +65,7 @@
     <ImageButton
         android:id="@+id/menuSong"
         android:layout_width="25dp"
-        android:layout_height="63dp"
+        android:layout_height="52dp"
         android:layout_alignParentRight="true"
         android:background="@color/transparent"
         android:scaleType="center"

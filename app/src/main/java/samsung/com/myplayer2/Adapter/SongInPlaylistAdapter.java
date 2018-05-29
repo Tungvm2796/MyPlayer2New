@@ -31,6 +31,7 @@ import samsung.com.myplayer2.Class.Constants;
 import samsung.com.myplayer2.Class.Function;
 import samsung.com.myplayer2.Class.ItemTouchHelperAdapter;
 import samsung.com.myplayer2.Class.ItemTouchHelperViewHolder;
+import samsung.com.myplayer2.Class.NavigationHelper;
 import samsung.com.myplayer2.Class.OnStartDragListener;
 import samsung.com.myplayer2.Class.PlaylistFunction;
 import samsung.com.myplayer2.Class.ToolFunction;
@@ -186,7 +187,7 @@ public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter
                 switch (item.getItemId()) {
 
                     case R.id.action_remove_from_playlist:
-                        PlaylistFunction.removeFromPlaylist(mContext, songs.get(curpos).getID(), playlistId);
+                        updatePlaylist(curpos);
                         removeSongAt(curpos);
                         notifyItemRemoved(curpos);
                         notifyDataSetChanged();
@@ -194,11 +195,24 @@ public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter
                         Intent playlist = new Intent(Constants.TO_PLAYLIST_SONG);
                         playlist.setAction(Constants.RELOAD_PLAYLIST_SONG);
                         mContext.sendBroadcast(playlist);
+                        break;
 
+                    case R.id.action_nav_album:
+                        NavigationHelper.navigateToSongAlbum((AppCompatActivity) mContext, songs.get(curpos).getAlbumid()
+                                , songs.get(curpos).getAlbum(), null);
+                        break;
+
+                    case R.id.action_nav_artist:
+                        NavigationHelper.navigateToSongArtist((AppCompatActivity) mContext, songs.get(curpos).getArtist(), null);
                         break;
 
                     case R.id.action_share:
                         ToolFunction.shareTrack(mContext, songs.get(curpos).getData());
+                        break;
+
+                    case R.id.action_delete:
+                        long[] deleteIds = {songs.get(curpos).getID()};
+                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, SongInPlaylistAdapter.this, curpos, true);
                         break;
                 }
                 return false;
@@ -288,5 +302,10 @@ public class SongInPlaylistAdapter extends BaseSongAdapter<SongInPlaylistAdapter
 
     public void addSongTo(int i, Song song) {
         songs.add(i, song);
+    }
+
+    @Override
+    public void updatePlaylist(int curpos) {
+        PlaylistFunction.removeFromPlaylist(mContext, songs.get(curpos).getID(), playlistId);
     }
 }

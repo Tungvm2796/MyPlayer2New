@@ -624,6 +624,8 @@ public class MainActivity extends BaseActivity {
                             Glide.with(context).load(R.drawable.noteicon).into(playingSongImgSmall);
                         }
 
+                        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+
                         break;
 
                     case Constants.TIME_TOTAL:
@@ -684,6 +686,7 @@ public class MainActivity extends BaseActivity {
                     drawerLayout.openDrawer(GravityCompat.START);
                 } else super.onBackPressed();
                 return true;
+
             case R.id.action_equalizer:
 //                Intent intent = new Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL);
 //                if ((intent.resolveActivity(getPackageManager()) != null)) {
@@ -694,6 +697,14 @@ public class MainActivity extends BaseActivity {
 
                 NavigationHelper.navigateToEqualizer(MainActivity.this, myService.getAudioSessionId());
 
+                return true;
+
+            case R.id.action_hide_panel:
+                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+                return true;
+
+            case R.id.action_show_panel:
+                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 return true;
         }
         return super.onOptionsItemSelected(item);

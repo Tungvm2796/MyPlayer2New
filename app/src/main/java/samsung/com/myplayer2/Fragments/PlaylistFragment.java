@@ -231,7 +231,7 @@ public class PlaylistFragment extends Fragment implements RecyclerPlaylistAdapte
     private void initRecyclerView() {
         RecyclerView.LayoutManager mManager = new GridLayoutManager(getContext(), 2);
         playListView.setLayoutManager(mManager);
-        PlaylistAdapter = new RecyclerPlaylistAdapter(getContext(), playlists, true);
+        PlaylistAdapter = new RecyclerPlaylistAdapter((AppCompatActivity) getContext(), playlists, true);
         PlaylistAdapter.setPlaylistClickListener(this);
         playListView.setAdapter(PlaylistAdapter);
     }

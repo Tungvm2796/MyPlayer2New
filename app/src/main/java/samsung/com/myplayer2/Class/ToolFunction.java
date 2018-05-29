@@ -81,7 +81,7 @@ public class ToolFunction {
         }
     }
 
-    public static void showDeleteDialog(final Context context, final String name, final long[] list, final BaseSongAdapter adapter, final int pos) {
+    public static void showDeleteDialog(final Context context, final String name, final long[] list, final BaseSongAdapter adapter, final int pos, final boolean isPlaylist) {
 
         new MaterialDialog.Builder(context)
                 .title("Delete song?")
@@ -91,10 +91,22 @@ public class ToolFunction {
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        ToolFunction.deleteTracks(context, list);
-                        adapter.removeSongAt(pos);
-                        adapter.notifyItemRemoved(pos);
-                        adapter.notifyItemRangeChanged(pos, adapter.getItemCount());
+                        if (!isPlaylist) {
+                            ToolFunction.deleteTracks(context, list);
+                            adapter.removeSongAt(pos);
+                            adapter.notifyItemRemoved(pos);
+                            adapter.notifyItemRangeChanged(pos, adapter.getItemCount());
+                        } else {
+                            adapter.updatePlaylist(pos);
+                            ToolFunction.deleteTracks(context, list);
+                            adapter.removeSongAt(pos);
+                            adapter.notifyItemRemoved(pos);
+                            adapter.notifyDataSetChanged();
+
+                            Intent playlist = new Intent(Constants.TO_PLAYLIST_SONG);
+                            playlist.setAction(Constants.RELOAD_PLAYLIST_SONG);
+                            context.sendBroadcast(playlist);
+                        }
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {

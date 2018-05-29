@@ -38,6 +38,14 @@ public class BaseSongAdapter<V extends RecyclerView.ViewHolder> extends Recycler
 
     }
 
-    public void removeSongAt(int i){}
-    public void updateDataSet(ArrayList<Song> arraylist) {}
+    public void removeSongAt(int i) {
+    }
+
+    public void updateDataSet(ArrayList<Song> arraylist) {
+    }
+
+    public void updatePlaylist(int pos) {
+    }
+
+    ;
 }

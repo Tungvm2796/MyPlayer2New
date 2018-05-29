@@ -62,7 +62,7 @@ public class RecyclerGenresAdapter extends RecyclerView.Adapter<RecyclerGenresAd
         holder.genresName.setText(curGenres);
         int resID = mContext.getResources().getIdentifier(curGenres.toLowerCase()+"_music", "drawable", mContext.getPackageName());
         Glide.with(mContext).load(resID)
-                .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(false)
                 .error(R.drawable.music_frame).into(holder.genresImg);
 
         // It is important that each shared element in the source screen has a unique transition name.

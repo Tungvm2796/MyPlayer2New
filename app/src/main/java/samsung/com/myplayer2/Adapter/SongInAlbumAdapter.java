@@ -160,7 +160,7 @@ public class SongInAlbumAdapter extends BaseSongAdapter<SongInAlbumAdapter.MyRec
 
                     case R.id.delete:
                         long[] deleteIds = {songs.get(curpos).getID()};
-                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, SongInAlbumAdapter.this, curpos);
+                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, SongInAlbumAdapter.this, curpos, false);
                 }
                 return false;
             }

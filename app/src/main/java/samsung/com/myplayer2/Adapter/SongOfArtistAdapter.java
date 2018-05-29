@@ -164,7 +164,7 @@ public class SongOfArtistAdapter extends BaseSongAdapter<SongOfArtistAdapter.MyR
 
                     case R.id.delete:
                         long[] deleteIds = {songs.get(curpos).getID()};
-                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, SongOfArtistAdapter.this, curpos);
+                        ToolFunction.showDeleteDialog(mContext, songs.get(curpos).getTitle(), deleteIds, SongOfArtistAdapter.this, curpos, false);
                 }
                 return false;
             }

@@ -74,4 +74,10 @@ public class EditItemTouchHelperCallback extends ItemTouchHelper.Callback {
             itemViewHolder.onItemClear();
         }
     }
+
+    @Override
+    public int interpolateOutOfBoundsScroll(RecyclerView recyclerView, int viewSize, int viewSizeOutOfBounds, int totalSize, long msSinceStartScroll) {
+        final int direction = (int) Math.signum(viewSizeOutOfBounds);
+        return 10 * direction;
+    }
 }
