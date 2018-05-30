@@ -282,7 +282,7 @@ public class MainActivity extends BaseActivity {
             public void onClick(View view) {
                 if (myService.isPng()) {
                     //myService.pausePlayer();
-                    btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                    btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                     Intent pauseIntent2 = new Intent(Constants.TO_SERVICE);
                     pauseIntent2.setAction(Constants.SV_PLAY_PAUSE);
                     pauseIntent2.putExtra(Constants.KEY, Constants.PAUSE);
@@ -290,7 +290,7 @@ public class MainActivity extends BaseActivity {
 
                 } else {
                     //myService.go();
-                    btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
+                    btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_48dp);
                     Intent playIntent2 = new Intent(Constants.TO_SERVICE);
                     playIntent2.setAction(Constants.SV_PLAY_PAUSE);
                     playIntent2.putExtra(Constants.KEY, Constants.PLAY);
@@ -598,13 +598,13 @@ public class MainActivity extends BaseActivity {
                         String od = intent.getStringExtra(Constants.KEY);
                         if (od.equals(Constants.PAUSE)) {
                             btnPlayPause.setImageResource(R.drawable.ic_play_circle_filled_orange_48dp);
-                            btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                            btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                         } else if (od.equals(Constants.PLAY)) {
                             btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
-                            btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
+                            btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_48dp);
                         } else if (od.equals(Constants.COMPLETE)) {
                             btnPlayPause.setImageResource(R.drawable.ic_play_circle_filled_orange_48dp);
-                            btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                            btnPlayPauseSmall.setImageResource(R.drawable.ic_play_arrow_black_48dp);
                         }
                         break;
 
@@ -612,7 +612,7 @@ public class MainActivity extends BaseActivity {
                         txtTitle.setText(intent.getStringExtra(Constants.SONG_TITLE));
                         txtArtist.setText(intent.getStringExtra(Constants.ARTIST));
                         btnPlayPause.setImageResource(R.drawable.ic_pause_circle_filled_orange_48dp);
-                        btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
+                        btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_48dp);
                         SongPath = intent.getStringExtra(Constants.SONG_PATH);
 
                         byte[] getArt = function.GetBitMapByte(SongPath);
@@ -624,7 +624,9 @@ public class MainActivity extends BaseActivity {
                             Glide.with(context).load(R.drawable.noteicon).into(playingSongImgSmall);
                         }
 
-                        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                        if (!slidingLayout.getPanelState().equals(SlidingUpPanelLayout.PanelState.EXPANDED)) {
+                            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                        }
 
                         break;
 
@@ -645,7 +647,7 @@ public class MainActivity extends BaseActivity {
                         break;
 
                     case Constants.IS_PLAYING:
-                        btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_24dp);
+                        btnPlayPauseSmall.setImageResource(R.drawable.ic_pause_black_48dp);
                         break;
 
                     case Constants.SHUFFLE_ON:
@@ -726,19 +728,32 @@ public class MainActivity extends BaseActivity {
         runnable = null;
 
         switch (menuItem.getItemId()) {
+            case R.id.nav_recent:
+                runnable = navigateRecent;
+                break;
+
             case R.id.nav_library:
                 runnable = navigateLibrary;
-
                 break;
 
             case R.id.nav_playlist:
                 runnable = navigatePlaylist;
-
                 break;
 
-            case R.id.nav_recent:
-                runnable = navigateRecent;
+            case R.id.nav_song:
+                runnable = navigateLibraryWithIndex(0);
+                break;
 
+            case R.id.nav_album:
+                runnable = navigateLibraryWithIndex(1);
+                break;
+
+            case R.id.nav_artist:
+                runnable = navigateLibraryWithIndex(2);
+                break;
+
+            case R.id.nav_genres:
+                runnable = navigateLibraryWithIndex(3);
                 break;
 
             case R.id.nav_equalizer:
@@ -790,5 +805,27 @@ public class MainActivity extends BaseActivity {
     private boolean isNavigatingRecent() {
         Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         return (currentFragment instanceof RecentFragment);
+    }
+
+    private Runnable navigateLibraryWithIndex(final int index) {
+
+        Runnable aRunnable = new Runnable() {
+            public void run() {
+                if (index == 0) {
+                    navigationView.getMenu().findItem(R.id.nav_song).setChecked(true);
+                } else if (index == 1) {
+                    navigationView.getMenu().findItem(R.id.nav_album).setChecked(true);
+                } else if (index == 2) {
+                    navigationView.getMenu().findItem(R.id.nav_artist).setChecked(true);
+                } else if (index == 3) {
+                    navigationView.getMenu().findItem(R.id.nav_genres).setChecked(true);
+                }
+                Fragment fragment = MainFragment.getFragment(index);
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment_container, fragment).commitAllowingStateLoss();
+            }
+        };
+
+        return aRunnable;
     }
 }

@@ -17,7 +17,7 @@
             android:title="@string/playlist" />
         <item
             android:id="@+id/nav_song"
-            android:icon="@drawable/ic_audiotrack"
+            android:icon="@drawable/ic_queue_music_black"
             android:title="@string/allSong" />
         <item
             android:id="@+id/nav_album"
@@ -27,6 +27,10 @@
             android:id="@+id/nav_artist"
             android:icon="@drawable/ic_artist"
             android:title="@string/artist" />
+        <item
+            android:id="@+id/nav_genres"
+            android:icon="@drawable/ic_subtitles_black"
+            android:title="@string/genres" />
     </group>
     <group
         android:id="@+id/setting"

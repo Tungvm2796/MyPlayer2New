@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -41,10 +42,29 @@ public class MainFragment extends Fragment {
     private boolean musicBound = false;
     private Intent playintent;
 
+    int toIndex;
+
     public MainFragment() {
         // Required empty public constructor
     }
 
+    public static MainFragment getFragment(int index) {
+        MainFragment fragment = new MainFragment();
+
+        Bundle args = new Bundle();
+        args.putInt("pageIndex", index);
+
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            toIndex = getArguments().getInt("pageIndex");
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -122,6 +142,9 @@ public class MainFragment extends Fragment {
             }
         });
 
+        if (toIndex >= 0)
+            viewPager.setCurrentItem(toIndex);
+
         return rootView;
     }
 
@@ -130,8 +153,8 @@ public class MainFragment extends Fragment {
         adapter.addFragment(new SongListFragment(), this.getString(R.string.allSong));
         adapter.addFragment(new AlbumFragment(), this.getString(R.string.albums));
         adapter.addFragment(new ArtistFragment(), this.getString(R.string.artist));
-        //adapter.addFragment(new PlaylistFragment(), this.getString(R.string.playlist));
         adapter.addFragment(new GenresFragment(), this.getString(R.string.genres));
+        adapter.addFragment(new BlankFragment(), "About");
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(adapter.getCount() - 1);
     }

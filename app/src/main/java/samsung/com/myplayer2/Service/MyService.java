@@ -307,7 +307,7 @@ public class MyService extends Service implements
                 progressHandler.removeCallbacks(run);
                 mediaPlayer.start();
                 updateProgress();
-                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
+                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_48dp, "Pause", ACTION_PAUSE));
             }
         });
     }
@@ -433,12 +433,12 @@ public class MyService extends Service implements
         RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notice_layout);
         switch (casenum) {
             case 1:
-                contentView.setImageViewResource(R.id.notice_play, R.drawable.ic_pause_black_24dp);
+                contentView.setImageViewResource(R.id.notice_play, R.drawable.ic_pause_black_48dp);
                 contentView.setOnClickPendingIntent(R.id.notice_play, ppauseIntent);
                 break;
             case 2:
                 contentView.setOnClickPendingIntent(R.id.notice_play, pplayIntent);
-                contentView.setImageViewResource(R.id.notice_play, R.drawable.ic_play_arrow_black_24dp);
+                contentView.setImageViewResource(R.id.notice_play, R.drawable.ic_play_arrow_black_48dp);
                 break;
         }
 
@@ -966,9 +966,9 @@ public class MyService extends Service implements
                 .setStyle(style)
                 .setVisibility(Notification.VISIBILITY_PUBLIC);
 
-        builder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dpsmall, "Previous", ACTION_PREVIOUS));
+        builder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dp, "Previous", ACTION_PREVIOUS));
         builder.addAction(action);
-        builder.addAction(generateAction(R.drawable.ic_skip_next_black_24dpsmall, "Next", ACTION_NEXT));
+        builder.addAction(generateAction(R.drawable.ic_skip_next_black_24dp, "Next", ACTION_NEXT));
         style.setShowActionsInCompactView(0, 1, 2, 3, 4);
 
         Notification notice = builder.build();
@@ -999,9 +999,9 @@ public class MyService extends Service implements
                 .setStyle(style)
                 .setVisibility(Notification.VISIBILITY_PUBLIC);
 
-        builder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dpsmall, "Previous", ACTION_PREVIOUS));
+        builder.addAction(generateAction(R.drawable.ic_skip_previous_black_24dp, "Previous", ACTION_PREVIOUS));
         builder.addAction(action);
-        builder.addAction(generateAction(R.drawable.ic_skip_next_black_24dpsmall, "Next", ACTION_NEXT));
+        builder.addAction(generateAction(R.drawable.ic_skip_next_black_24dp, "Next", ACTION_NEXT));
         style.setShowActionsInCompactView(0, 1, 2, 3, 4);
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -1031,7 +1031,7 @@ public class MyService extends Service implements
                 updateProgress();
 
                 Log.e("MediaPlayerService", "onPlay");
-                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
+                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_48dp, "Pause", ACTION_PAUSE));
             }
 
             @Override
@@ -1047,7 +1047,7 @@ public class MyService extends Service implements
                 progressHandler.removeCallbacks(run);
 
                 Log.e("MediaPlayerService", "onPause");
-                buildNotificationPause(generateAction(R.drawable.ic_play_arrow_black_24dp, "Play", ACTION_PLAY));
+                buildNotificationPause(generateAction(R.drawable.ic_play_arrow_black_48dp, "Play", ACTION_PLAY));
             }
 
             @Override
@@ -1056,7 +1056,7 @@ public class MyService extends Service implements
                 playNext();
                 Log.e("MediaPlayerService", "onSkipToNext");
                 //Change media here
-                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
+                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_48dp, "Pause", ACTION_PAUSE));
             }
 
             @Override
@@ -1065,7 +1065,7 @@ public class MyService extends Service implements
                 playPrev();
                 Log.e("MediaPlayerService", "onSkipToPrevious");
                 //Change media here
-                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_24dp, "Pause", ACTION_PAUSE));
+                buildNotificationPlay(generateAction(R.drawable.ic_pause_black_48dp, "Pause", ACTION_PAUSE));
             }
 
             @Override

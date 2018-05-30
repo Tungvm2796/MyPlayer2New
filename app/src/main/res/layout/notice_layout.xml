@@ -71,7 +71,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@null"
-            android:src="@drawable/ic_pause_black_24dp" />
+            android:src="@drawable/ic_pause_black_48dp" />
 
         <ImageButton
             android:id="@+id/notice_next"
