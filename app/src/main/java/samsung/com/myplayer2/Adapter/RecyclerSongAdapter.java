@@ -105,18 +105,6 @@ public class RecyclerSongAdapter extends BaseSongAdapter<RecyclerSongAdapter.MyR
         final Song currSong = songs.get(position);
         final int pos = position;
 
-//        SharedPreferences getLight = PreferenceManager.getDefaultSharedPreferences(mContext);
-//        long lightId = getLight.getLong("highLight", -1);
-//
-//        if (songs.get(pos).getID() == lightId) {
-//            holder.songView.setTextColor(Color.MAGENTA);
-//        }
-
-//        if (selectedPos == pos) {
-//            holder.songView.setTextColor(Color.BLUE);
-//        }
-
-
         //get title and artist strings, embedded pictures
         holder.songView.setText(currSong.getTitle());
         holder.artistView.setText(currSong.getArtist());
@@ -195,6 +183,8 @@ public class RecyclerSongAdapter extends BaseSongAdapter<RecyclerSongAdapter.MyR
     public int getItemCount() {
         return songs.size();
     }
+
+
 
     public void updateListSong(ArrayList<Song> update) {
         this.songs = update;
