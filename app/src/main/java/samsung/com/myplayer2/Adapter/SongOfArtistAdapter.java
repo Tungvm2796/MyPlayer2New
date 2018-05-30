@@ -85,7 +85,6 @@ public class SongOfArtistAdapter extends BaseSongAdapter<SongOfArtistAdapter.MyR
         holder.artistView.setText(currSong.getArtist());
 
         Glide.with(mContext).load(function.GetBitMapByte(currSong.getData()))
-                .override(57, 63)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT).skipMemoryCache(true)
                 .error(R.drawable.noteicon)
                 .into(holder.coverimg);

@@ -137,7 +137,7 @@ public class PlaylistSongFragment extends Fragment implements OnStartDragListene
 
         final ActionBar ab = ((AppCompatActivity) getActivity()).getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
-        toolbar.setTitle(playlistName);
+        toolbar.setTitle("Playlist");
     }
 
     private ServiceConnection musicConnection = new ServiceConnection() {
